@@ -20,9 +20,9 @@ app = FastAPI(title="GO API",
               license_info={
                   "name": "BSD3"
               }, )
-app.include_router(slimmer.router)
 app.include_router(bioentity.router)
 app.include_router(ontology.router)
+app.include_router(slimmer.router)
 app.add_middleware(CORSMiddleware,
                    allow_origins=["*"],
                    allow_methods=["*"],
