@@ -1,7 +1,7 @@
 import logging
 
 from ontobio.ontol_factory import OntologyFactory
-from biolink.settings import get_biolink_config
+from ..settings import get_biolink_config
 
 cfg = get_biolink_config()
 omap = {}

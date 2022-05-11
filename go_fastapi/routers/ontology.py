@@ -1,6 +1,5 @@
 import logging
 import json
-from ontobio.sparql.sparql_go import goSummary, goSubsets
 from ontobio.sparql.sparql_ontol_utils import run_sparql_on, EOntology, transform, transformArray
 from ontobio.golr.golr_query import run_solr_on, replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
@@ -117,7 +116,7 @@ async def get_subset_by_term(id: str):
         """
         Returns subsets (slims) associated to an ontology term
         """
-        query = goSubsets(id)
+        query = get_go_subsets(id)
         results = run_sparql_on(query, EOntology.GO)
         results = transformArray(results, [])
         results = replace(results, "subset", "OBO:go#", "")
@@ -591,3 +590,19 @@ def go_summary(goid):
 
 def correct_goid(goid):
     return goid.replace(":", "_")
+
+
+def go_subsets(self, goid):
+    goid = correct_goid(self, goid)
+    return """
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+
+    SELECT ?label ?subset
+
+    WHERE {
+        BIND(<http://purl.obolibrary.org/obo/""" + goid + """> as ?goid) .
+        optional { ?goid obo:inSubset ?subset .
+                   ?subset rdfs:comment ?label } .
+    }
+    """
