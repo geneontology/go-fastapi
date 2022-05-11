@@ -54,7 +54,7 @@ async def get_term_metadata_by_id(id: str,
     """
     Returns meta data of an ontology term, e.g. GO:0003677
     """
-    query = goSummary(self, id)
+    query = go_summary(id)
     results = run_sparql_on(query, EOntology.GO)
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
@@ -117,7 +117,7 @@ async def get_subset_by_term(id: str):
         """
         Returns subsets (slims) associated to an ontology term
         """
-        query = goSubsets(self, id)
+        query = goSubsets(id)
         results = run_sparql_on(query, EOntology.GO)
         results = transformArray(results, [])
         results = replace(results, "subset", "OBO:go#", "")
@@ -259,7 +259,7 @@ async def get_subset_metadata_by_id(subset: str,
 
 
     # Step 1: create the categories
-    categories = OntologySubset.get(self, subset)
+    categories = await get_subset_metadata_by_id(subset)
     for category in categories:
 
         category["groups"] = category["terms"]
@@ -558,3 +558,36 @@ agr_slim_order = [
         ]
     }
 ]
+
+
+def go_summary(goid):
+    goid = correct_goid(goid)
+    return """
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
+    PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+
+    SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator='""" + SEPARATOR + """') as ?synonyms)
+                                                                (GROUP_CONCAT(distinct ?relatedSynonym;separator='""" + SEPARATOR + """') as ?relatedSynonyms)
+                                                                (GROUP_CONCAT(distinct ?alternativeId;separator='""" + SEPARATOR + """') as ?alternativeIds)
+                                                                (GROUP_CONCAT(distinct ?xref;separator='""" + SEPARATOR + """') as ?xrefs)
+                                                                (GROUP_CONCAT(distinct ?subset;separator='""" + SEPARATOR + """') as ?subsets)
+
+    WHERE {
+        BIND(<http://purl.obolibrary.org/obo/""" + goid + """> as ?goid) .
+        optional { ?goid rdfs:label ?label } .
+        optional { ?goid definition: ?definition } .
+        optional { ?goid rdfs:comment ?comment } .
+        optional { ?goid obo:creation_date ?creation_date } .
+        optional { ?goid obo:hasAlternativeId ?alternativeId } .
+        optional { ?goid obo:hasRelatedSynonym ?relatedSynonym } .
+        optional { ?goid obo:hasExactSynonym ?synonym } .
+        optional { ?goid obo:hasDbXref ?xref } .
+        optional { ?goid obo:inSubset ?subset } .
+    }
+    GROUP BY ?goid ?label ?definition ?comment ?creation_date
+    """
+
+
+def correct_goid(goid):
+    return goid.replace(":", "_")
