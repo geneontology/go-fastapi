@@ -73,7 +73,7 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
         return data
 
 
-@router.post("/bioentity/function/{id}/genes", tags=["bioentity"])
+@router.post("/bioentity/function/{id}/genes", tags=["bientity"])
 async def get_function_by_id(id: str, evidence: List[str] = Query(None),
                              facet: bool = Query(False, include_in_schema=False),
                              unselect_evidence: bool = Query(False, include_in_schema=False),
