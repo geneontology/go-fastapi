@@ -1,23 +1,25 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 from ontobio.golr.golr_associations import map2slim
 from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.util.user_agent import get_user_agent
 
+
 INVOLVED_IN = 'involved_in'
 ACTS_UPSTREAM_OF_OR_WITHIN = 'acts_upstream_of_or_within'
 FUNCTION_CATEGORY = 'function'
 ANATOMY_CATEGORY = 'anatomy'
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 router = APIRouter()
-
 
 # ZFIN:ZDB-GENE-980526-388
 # GO:0005575
 
-@router.post("/bioentityset/slimmer/function", tags=["slim"])
+
+@router.post("/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
 async def slimmer_function(slim: str, subjects: List[str] = Query(...), relationship_type: str = "acts_upstream_of_or_within",
                            exclude_automatic_assertions: bool = False,
                            rows: int = 100, start: int = 1):
@@ -29,7 +31,6 @@ async def slimmer_function(slim: str, subjects: List[str] = Query(...), relation
     # for some sources: https://github.com/biolink/biolink-api/issues/66
     # https://github.com/monarch-initiative/dipper/issues/461
 
-    USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
     subjects = [x.replace('WormBase:', 'WB:') if 'WormBase:' in x else x for x in subjects]
     slimmer_subjects = []
     for s in subjects:

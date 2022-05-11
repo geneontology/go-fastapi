@@ -2,12 +2,30 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import logging
-from .routers import slimmer
+from .routers import slimmer, bioentity
+from fastapi.middleware.cors import CORSMiddleware
+
 log = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(title="GO API",
+              description="Gene Ontology API based on the BioLink Model, an integration layer for linked biological "
+                          "objects.\n\n __Source:__ 'https://github.com/geneontology/biolink-api'",
+              version="1.0.0",
+              terms_of_service="http://example.com/terms/",
+              contact={
+                  "name": "Gene Ontology Consortium Software Development Team",
+                  "url": "https://help.geneontology.org",
+                  "email": "help@geneontology.org",
+              },
+              license_info={
+                  "name": "BSD3"
+              }, )
 app.include_router(slimmer.router)
-
+app.include_router(bioentity.router)
+app.add_middleware(CORSMiddleware,
+                   allow_origins=["*"],
+                   allow_methods=["*"],
+                   allow_headers=["*"])
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
