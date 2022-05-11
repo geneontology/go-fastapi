@@ -24,13 +24,6 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 router = APIRouter()
 
-#core_parser_with_relation_filter.add_argument('relation', help='A relation CURIE to filter associations', default=None)
-
-#core_parser_with_filters.add_argument('taxon', action='append',
-                                      #help='One or more taxon CURIE to filter associations by subject taxon')
-#core_parser_with_filters.add_argument('relation', help='A relation CURIE to filter associations', default=None)
-
-
 @router.post("/bioentity/function/{id}", tags=["bioentity"])
 async def get_function_associations(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                     facet: bool = Query(False, include_in_schema=False),

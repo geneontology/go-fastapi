@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import logging
-from .routers import slimmer, bioentity
+from .routers import slimmer, bioentity, ontology
 from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ app = FastAPI(title="GO API",
               }, )
 app.include_router(slimmer.router)
 app.include_router(bioentity.router)
+app.include_router(ontology.router)
 app.add_middleware(CORSMiddleware,
                    allow_origins=["*"],
                    allow_methods=["*"],
