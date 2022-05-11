@@ -1,10 +1,6 @@
 import yaml
 from os import path
 
-# This is set to false to prevent Flask-Restplus from
-# changing the error message structure
-ERROR_INCLUDE_MESSAGE = False
-
 CONFIG = path.join(path.dirname(path.abspath(__file__)), '../conf/config.yaml')
 biolink_config = None
 route_mapping = None
