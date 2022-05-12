@@ -1,4 +1,8 @@
-.PHONY : all
+MAKEFLAGS += --warn-undefined-variables
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
+.DEFAULT_GOAL := help
+
 all: install start
 
 start:
@@ -11,3 +15,12 @@ unit-tests:
 
 install:
 	poetry install
+
+help:
+	@echo ""
+	@echo "make all -- installs requirements, deploys and starts the site locally"
+	@echo "make install -- install dependencies"
+	@echo "make start -- start the API locally"
+	@echo "make test -- runs tests"
+	@echo "make help -- show this help"
+	@echo ""

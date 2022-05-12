@@ -1,6 +1,0 @@
-## Prerequisites:
-
-`
-install poetry
-
-
