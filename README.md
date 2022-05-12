@@ -2,7 +2,7 @@
 
  * [install poetry](https://python-poetry.org/docs/)
 
-## Example:
+### Example Deployment Locally:
 
 ```bash
 git clone https://github.com/sierra-moxon/go-fastapi
