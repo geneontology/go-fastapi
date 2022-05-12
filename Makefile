@@ -1,3 +1,5 @@
+.PHONY : all
+all: install start
 
 start:
 	poetry run gunicorn go_fastapi.app:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
@@ -9,4 +11,3 @@ unit-tests:
 
 install:
 	poetry install
-	poetry shell
