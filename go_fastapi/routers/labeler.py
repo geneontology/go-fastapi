@@ -1,28 +1,22 @@
 import logging
-
-from flask import request
-from flask_restplus import Resource
-from biolink.datamodel.serializers import association
-from biolink.api.restplus import api
+from fastapi import APIRouter, Query
+from ontobio.util.user_agent import get_user_agent
 from ontobio.sparql.sparql_ontol_utils import batch_fetch_labels
-import pysolr
+from typing import List
 
 log = logging.getLogger(__name__)
 
-parser = api.parser()
-parser.add_argument('id', action='append', help='List of ids')
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+router = APIRouter()
 
 
-class OntolLabelerResource(Resource):
-
-    @api.expect(parser)
-    def get(self):
+@router.post("/ontol/labeler", tags=["ontol/labeler"])
+async def expand_curie(id: List[str] = Query(None)):
         """
         Fetches a map from CURIEs/IDs to labels
         """
-        args = parser.parse_args()
 
-        return batch_fetch_labels(args.id)
+        return batch_fetch_labels(id)
 
 
     

@@ -79,6 +79,7 @@ async def get_term_graph_by_id(id: str, graph_type: str = Query(None),
 
         return data
 
+
 @router.post("/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(id: str, graph_type: str = Query(None),
                                relationship_type: str = Query(None, include_in_schema=False),
@@ -592,7 +593,7 @@ def correct_goid(goid):
     return goid.replace(":", "_")
 
 
-def go_subsets(self, goid):
+def get_go_subsets(self, goid):
     goid = correct_goid(self, goid)
     return """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
