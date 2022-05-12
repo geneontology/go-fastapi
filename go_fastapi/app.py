@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import logging
-from .routers import slimmer, bioentity, ontology, prefixes, labeler
+from .routers import slimmer, bioentity, ontology, prefixes, labeler, search
 from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger(__name__)

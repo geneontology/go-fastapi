@@ -7,6 +7,7 @@ from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 from ontobio.config import get_config
 
+# TODO: @api.marshal_with(association_results)
 log = logging.getLogger(__name__)
 
 INVOLVED_IN = 'involved_in'
