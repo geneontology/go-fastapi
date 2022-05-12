@@ -41,7 +41,7 @@ aspect_map = {
 #                                                                        NEIGHBORHOOD_GRAPH))
 
 
-@router.post("/ontology/term/{id}", tags=["ontology"])
+@router.post("/api/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str,
                                   relationship_type: str = Query(None, include_in_schema=False),
                                   graph_type: str = Query(None, include_in_schema=False),
@@ -58,7 +58,7 @@ async def get_term_metadata_by_id(id: str,
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
 
-@router.post("/ontology/term/{id}/graph", tags=["ontology"])
+@router.post("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(id: str, graph_type: str = Query(None),
                                relationship_type: str = Query(None, include_in_schema=False),
                                cnode: str = Query(None, include_in_schema=False),
@@ -80,7 +80,7 @@ async def get_term_graph_by_id(id: str, graph_type: str = Query(None),
         return data
 
 
-@router.post("/ontology/term/{id}/subgraph", tags=["ontology"])
+@router.post("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(id: str, graph_type: str = Query(None),
                                relationship_type: str = Query(None, include_in_schema=False),
                                cnode: str = Query(None, include_in_schema=False),
@@ -111,7 +111,8 @@ async def get_subgraph_by_term_id(id: str, graph_type: str = Query(None),
         json_obj = ojr.to_json(subont, include_meta=include_meta)
         return json_obj
 
-@router.post("/ontology/term/{id}/subsets", tags=["ontology"])
+
+@router.post("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subset_by_term(id: str):
 
         """
@@ -124,7 +125,7 @@ async def get_subset_by_term(id: str):
         return results
 
 
-@router.post("/ontology/term/{id}", tags=["ontology"])
+@router.post("/api/ontology/term/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
         """
         Returns meta data of an ontology subset (slim)
@@ -198,7 +199,7 @@ async def get_subset_metadata_by_id(id: str):
         return result
 
 
-@router.post("/ontology/shared/{subject}/{object}", tags=["ontology"])
+@router.post("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_subset_metadata_by_id(subject: str, object: str):
         """
         Returns the ancestor ontology terms shared by two ontology terms
@@ -236,7 +237,7 @@ def get_category_terms(category):
     return terms
 
 
-@router.post("/ontology/ribbon/", tags=["ontology"])
+@router.post("/api/ontology/ribbon/", tags=["ontology"])
 async def get_subset_metadata_by_id(subset: str,
                                     subject: List[str] = Query(None),
                                     ecodes: List[str] = Query(None),
@@ -593,8 +594,8 @@ def correct_goid(goid):
     return goid.replace(":", "_")
 
 
-def get_go_subsets(self, goid):
-    goid = correct_goid(self, goid)
+def get_go_subsets(goid):
+    goid = correct_goid(goid)
     return """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>

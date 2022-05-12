@@ -25,7 +25,8 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 router = APIRouter()
 
-@router.post("/bioentity/function/{id}", tags=["bioentity"])
+
+@router.post("/api/bioentity/function/{id}", tags=["bioentity"])
 async def get_function_associations(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                     facet: bool = Query(False, include_in_schema=False),
                                     unselect_evidence: bool = Query(False, include_in_schema=False),
@@ -33,41 +34,41 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
                                     fetch_objects: bool = Query(False, include_in_schema=False),
                                     use_compact_associations: bool = Query(False, include_in_schema=False),
                                     slim: bool = Query(False, include_in_schema=False)):
-        """
-        Returns annotations associated to a GO term
-        """
+    """
+    Returns annotations associated to a GO term
+    """
 
-        # annotation_class,aspect
-        fields = "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon," \
-                 "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
-                 "reference,annotation_extension_class,annotation_extension_class_label"
-        query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    # annotation_class,aspect
+    fields = "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon," \
+             "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
+             "reference,annotation_extension_class,annotation_extension_class_label"
+    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
 
-        evidences = evidence
-        evidence = ""
-        if evidences is not None:
-            evidence = "&fq=evidence_closure:("
-            for ev in evidences:
-                evidence += "\"" + ev + "\","
-            evidence = evidence[:-1]
-            evidence += ")"
+    evidences = evidence
+    evidence = ""
+    if evidences is not None:
+        evidence = "&fq=evidence_closure:("
+        for ev in evidences:
+            evidence += "\"" + ev + "\","
+        evidence = evidence[:-1]
+        evidence += ")"
 
-        taxon_restrictions = ""
-        cfg = get_config()
-        if cfg.taxon_restriction is not None:
-            taxon_restrictions = "&fq=taxon_subset_closure:("
-            for c in cfg.taxon_restriction:
-                taxon_restrictions += "\"" + c + "\","
-            taxon_restrictions = taxon_restrictions[:-1]
-            taxon_restrictions += ")"
+    taxon_restrictions = ""
+    cfg = get_config()
+    if cfg.taxon_restriction is not None:
+        taxon_restrictions = "&fq=taxon_subset_closure:("
+        for c in cfg.taxon_restriction:
+            taxon_restrictions += "\"" + c + "\","
+        taxon_restrictions = taxon_restrictions[:-1]
+        taxon_restrictions += ")"
 
-        optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
-        data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
 
-        return data
+    return data
 
 
-@router.post("/bioentity/function/{id}/genes", tags=["bioentity"])
+@router.post("/api//bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_function_by_id(id: str, evidence: List[str] = Query(None),
                              facet: bool = Query(False, include_in_schema=False),
                              unselect_evidence: bool = Query(False, include_in_schema=False),
@@ -76,7 +77,6 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
                              use_compact_associations: bool = Query(False, include_in_schema=False),
                              slim: bool = Query(False, include_in_schema=False),
                              start: int = 0, rows: int = 100):
-
     assocs = search_associations(
         object_category='function',
         subject_category='gene',
@@ -124,117 +124,115 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
     return assocs
 
 
-@router.post("/bioentity/function/{id}/taxons", tags=["bioentity"])
+@router.post("/api//bioentity/function/{id}/taxons", tags=["bioentity"])
 async def get_taxon_by_function_id(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
-                             facet: bool = Query(False, include_in_schema=False),
-                             unselect_evidence: bool = Query(False, include_in_schema=False),
-                             exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
-                             fetch_objects: bool = Query(False, include_in_schema=False),
-                             use_compact_associations: bool = Query(False, include_in_schema=False),
-                             slim: bool = Query(False, include_in_schema=False)
-                             ):
-        """
-        Returns taxons associated to a GO term
-        """
+                                   facet: bool = Query(False, include_in_schema=False),
+                                   unselect_evidence: bool = Query(False, include_in_schema=False),
+                                   exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
+                                   fetch_objects: bool = Query(False, include_in_schema=False),
+                                   use_compact_associations: bool = Query(False, include_in_schema=False),
+                                   slim: bool = Query(False, include_in_schema=False)
+                                   ):
+    """
+    Returns taxons associated to a GO term
+    """
 
-        fields = "taxon,taxon_label"
-        query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    fields = "taxon,taxon_label"
+    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
 
-        evidences = evidence
-        evidence = ""
-        if evidences is not None:
-            evidence = "&fq=evidence_closure:("
-            for ev in evidences:
-                evidence += "\"" + ev + "\","
-            evidence = evidence[:-1]
-            evidence += ")"
+    evidences = evidence
+    evidence = ""
+    if evidences is not None:
+        evidence = "&fq=evidence_closure:("
+        for ev in evidences:
+            evidence += "\"" + ev + "\","
+        evidence = evidence[:-1]
+        evidence += ")"
 
-        taxon_restrictions = ""
-        cfg = get_config()
-        if cfg.taxon_restriction is not None:
-            taxon_restrictions = "&fq=taxon_subset_closure:("
-            for c in cfg.taxon_restriction:
-                taxon_restrictions += "\"" + c + "\","
-            taxon_restrictions = taxon_restrictions[:-1]
-            taxon_restrictions += ")"
+    taxon_restrictions = ""
+    cfg = get_config()
+    if cfg.taxon_restriction is not None:
+        taxon_restrictions = "&fq=taxon_subset_closure:("
+        for c in cfg.taxon_restriction:
+            taxon_restrictions += "\"" + c + "\","
+        taxon_restrictions = taxon_restrictions[:-1]
+        taxon_restrictions += ")"
 
-        optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
-        data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
 
-        return data
+    return data
 
 
-@router.post("/bioentity/gene/{id}/function", tags=["bioentity"])
+@router.post("/api//bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
-                             facet: bool = Query(False, include_in_schema=False),
-                             unselect_evidence: bool = Query(False, include_in_schema=False),
-                             exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
-                             fetch_objects: bool = Query(False, include_in_schema=False),
-                             use_compact_associations: bool = Query(False, include_in_schema=False),
-                             slim: bool = Query(False, include_in_schema=False)
-                             ):
-        """
-        Returns GO terms associated to a gene.
+                                  facet: bool = Query(False, include_in_schema=False),
+                                  unselect_evidence: bool = Query(False, include_in_schema=False),
+                                  exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
+                                  fetch_objects: bool = Query(False, include_in_schema=False),
+                                  use_compact_associations: bool = Query(False, include_in_schema=False),
+                                  slim: bool = Query(False, include_in_schema=False)
+                                  ):
+    """
+    Returns GO terms associated to a gene.
 
-        IMPLEMENTATION DETAILS
-        ----------------------
+    IMPLEMENTATION DETAILS
+    ----------------------
 
-        Note: currently this is implemented as a query to the GO/AmiGO solr instance.
-        This directly supports IDs such as:
+    Note: currently this is implemented as a query to the GO/AmiGO solr instance.
+    This directly supports IDs such as:
 
-         - ZFIN e.g. ZFIN:ZDB-GENE-050417-357
+     - ZFIN e.g. ZFIN:ZDB-GENE-050417-357
 
-        Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However,
-        the standard for biolink is MGI:nnnn, so you should use this (will be transparently
-        mapped to legacy ID)
+    Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However,
+    the standard for biolink is MGI:nnnn, so you should use this (will be transparently
+    mapped to legacy ID)
 
-        Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
-        Again, this should be transparently handled; e.g. you can use NCBIGene:6469, and this will be
-        mapped behind the scenes for querying.
-        """
+    Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
+    Again, this should be transparently handled; e.g. you can use NCBIGene:6469, and this will be
+    mapped behind the scenes for querying.
+    """
 
-        assocs = search_associations(
-            object_category='function',
-            subject_category='gene',
-            subject=id,
-            sort="id asc",
-            user_agent=USER_AGENT,
-            url="http://golr-aux.geneontology.io/solr",
-            unselect_evidence=unselect_evidence,
-            facet=facet,
-            fetch_objects=fetch_objects,
-            exclude_automatic_assertions=exclude_automatic_assertions,
-            use_compact_associations=use_compact_associations,
-            slim=slim,
-            start=start,
-            rows=rows
-        )
+    assocs = search_associations(
+        object_category='function',
+        subject_category='gene',
+        subject=id,
+        sort="id asc",
+        user_agent=USER_AGENT,
+        url="http://golr-aux.geneontology.io/solr",
+        unselect_evidence=unselect_evidence,
+        facet=facet,
+        fetch_objects=fetch_objects,
+        exclude_automatic_assertions=exclude_automatic_assertions,
+        use_compact_associations=use_compact_associations,
+        slim=slim,
+        start=start,
+        rows=rows
+    )
 
-        # If there are no associations for the given ID, try other IDs.
-        # Note the AmiGO instance does *not* support equivalent IDs
-        if len(assocs['associations']) == 0:
-            # Note that GO currently uses UniProt as primary ID for some sources: https://github.com/biolink/biolink-api/issues/66
-            # https://github.com/monarch-initiative/dipper/issues/461
-            #prots = scigraph.gene_to_uniprot_proteins(id)
-            prots = gene_to_uniprot_from_mygene(id)
-            for prot in prots:
-                pr_assocs = search_associations(
-                    subject_category='gene',
-                    object_category='function',
-                    subject=prot,
-                    sort="id asc",
-                    user_agent=USER_AGENT,
-                    url="http://golr-aux.geneontology.io/solr",
-                    unselect_evidence=unselect_evidence,
-                    facet=facet,
-                    fetch_objects=fetch_objects,
-                    exclude_automatic_assertions=exclude_automatic_assertions,
-                    use_compact_associations=use_compact_associations,
-                    slim=slim,
-                    start=start,
-                    rows=rows
-                )
-                assocs = pr_assocs
-        return assocs
-
-
+    # If there are no associations for the given ID, try other IDs.
+    # Note the AmiGO instance does *not* support equivalent IDs
+    if len(assocs['associations']) == 0:
+        # Note that GO currently uses UniProt as primary ID for some sources: https://github.com/biolink/biolink-api/issues/66
+        # https://github.com/monarch-initiative/dipper/issues/461
+        # prots = scigraph.gene_to_uniprot_proteins(id)
+        prots = gene_to_uniprot_from_mygene(id)
+        for prot in prots:
+            pr_assocs = search_associations(
+                subject_category='gene',
+                object_category='function',
+                subject=prot,
+                sort="id asc",
+                user_agent=USER_AGENT,
+                url="http://golr-aux.geneontology.io/solr",
+                unselect_evidence=unselect_evidence,
+                facet=facet,
+                fetch_objects=fetch_objects,
+                exclude_automatic_assertions=exclude_automatic_assertions,
+                use_compact_associations=use_compact_associations,
+                slim=slim,
+                start=start,
+                rows=rows
+            )
+            assocs = pr_assocs
+    return assocs

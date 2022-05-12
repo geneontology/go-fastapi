@@ -5,4 +5,4 @@ start:
 test: unit-tests
 
 unit-tests:
-	pytest tests/unit/*.py
+	poetry run pytest tests/*.py
