@@ -6,3 +6,7 @@ test: unit-tests
 
 unit-tests:
 	poetry run pytest tests/*.py
+
+install:
+	poetry install
+	poetry shell
