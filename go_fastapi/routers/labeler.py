@@ -10,7 +10,7 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 
-@router.post("/ontol/labeler", tags=["ontol/labeler"])
+@router.post("/api/ontol/labeler", tags=["ontol/labeler"])
 async def expand_curie(id: List[str] = Query(None)):
         """
         Fetches a map from CURIEs/IDs to labels

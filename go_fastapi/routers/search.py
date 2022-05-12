@@ -13,7 +13,7 @@ def search(term, args):
     return q.search()
 
 
-@router.post("/search/entity/{term}", tags=["search"])
+@router.post("/api/search/entity/{term}", tags=["search"])
 async def search_term(term: str,
                       category: str,
                       boost_fix: str,

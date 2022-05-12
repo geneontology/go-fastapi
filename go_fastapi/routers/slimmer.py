@@ -19,7 +19,7 @@ router = APIRouter()
 # GO:0005575
 
 
-@router.post("/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
+@router.post("/api/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
 async def slimmer_function(slim: str, subjects: List[str] = Query(...), relationship_type: str = "acts_upstream_of_or_within",
                            exclude_automatic_assertions: bool = False,
                            rows: int = 100, start: int = 1):
