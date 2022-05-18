@@ -6,17 +6,15 @@ authors = ["Sierra Taylor Moxon <sierra.taylor@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-fastapi = "^0.77.1"
-Flask = "^2.1.2"
+fastapi = "^0.78.0"
 uvicorn = "^0.17.6"
 python-multipart = "^0.0.5"
-Jinja2 = "^3.1.2"
 ontobio = "^2.8.2"
 biothings-client = "^0.2.6"
 gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^7.1.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
