@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import logging
-from .routers import slimmer, bioentity, ontology, prefixes, labeler, search
+import routers.bioentity, routers.slimmer, routers.prefixes, routers.labeler, routers.ontology, routers.search
 from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger(__name__)
@@ -20,12 +20,12 @@ app = FastAPI(title="GO API",
               license_info={
                   "name": "BSD3"
               }, )
-app.include_router(bioentity.router)
-app.include_router(slimmer.router)
-app.include_router(prefixes.router)
-app.include_router(labeler.router)
-app.include_router(ontology.router)
-app.include_router(search.router)
+app.include_router(routers.bioentity.router)
+app.include_router(routers.slimmer.router)
+app.include_router(routers.prefixes.router)
+app.include_router(routers.labeler.router)
+app.include_router(routers.ontology.router)
+app.include_router(routers.search.router)
 
 app.add_middleware(CORSMiddleware,
                    allow_origins=["*"],
@@ -34,4 +34,4 @@ app.add_middleware(CORSMiddleware,
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
-    uvicorn.run('app:app', host="0.0.0.0", port=80)
+    uvicorn.run('app:app', host="0.0.0.0", port=8000)

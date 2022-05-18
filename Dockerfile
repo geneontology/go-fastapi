@@ -66,7 +66,7 @@ RUN poetry install -vvv
 # will become mountpoint of our code
 WORKDIR go_fastapi
 
-EXPOSE 8000 8888 5000
+EXPOSE 8000
 CMD ["uvicorn", "--reload", "main:app"]
 
 
@@ -80,6 +80,6 @@ CMD ["uvicorn", "--reload", "main:app"]
 
 
 # docker build -t name_of_image folder_containing_dockerfile (names image and stores it)
-# docker run -d --name go-fastapi -p 8888:8888 go-fastapi  (expose ports and name the container)
+# docker run -d --name go-fastapi -p 8000:8000 go-fastapi  (expose ports and name the container)
 # docker rm sierra_test (removes image)
 # docker port sierra_test (see the port mapping)
