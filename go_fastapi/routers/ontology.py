@@ -3,7 +3,7 @@ import json
 from ontobio.sparql.sparql_ontol_utils import run_sparql_on, EOntology, transform, transformArray
 from ontobio.golr.golr_query import run_solr_on, replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ..utils.ontology.ontology_manager import get_ontology
+from go_fastapi.utils.ontology.ontology_manager import get_ontology
 
 from typing import List
 from fastapi import APIRouter, Query
