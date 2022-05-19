@@ -35,7 +35,7 @@ def get_category_terms(category):
     return terms
 
 
-@router.post("/api/ontology/ribbon/", tags=["ontology"])
+@router.get("/api/ontology/ribbon/", tags=["ontology"])
 async def get_subset_metadata_by_id(subset: str,
                                     subject: List[str] = Query(None),
                                     ecodes: List[str] = Query(None),

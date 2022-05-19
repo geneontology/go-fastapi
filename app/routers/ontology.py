@@ -7,7 +7,6 @@ from app.utils.ontology.ontology_manager import get_ontology
 
 from typing import List
 from fastapi import APIRouter, Query
-from .slimmer import gene_to_uniprot_from_mygene
 from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 
@@ -41,7 +40,7 @@ aspect_map = {
 #                                                                        NEIGHBORHOOD_GRAPH))
 
 
-@router.post("/api/ontology/term/{id}", tags=["ontology"])
+@router.get("/api/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str,
                                   relationship_type: str = Query(None, include_in_schema=False),
                                   graph_type: str = Query(None, include_in_schema=False),
@@ -58,7 +57,7 @@ async def get_term_metadata_by_id(id: str,
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
 
-@router.post("/api/ontology/term/{id}/graph", tags=["ontology"])
+@router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(id: str, graph_type: str = Query(None),
                                relationship_type: str = Query(None, include_in_schema=False),
                                cnode: str = Query(None, include_in_schema=False),
@@ -80,7 +79,7 @@ async def get_term_graph_by_id(id: str, graph_type: str = Query(None),
         return data
 
 
-@router.post("/api/ontology/term/{id}/subgraph", tags=["ontology"])
+@router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(id: str, graph_type: str = Query(None),
                                relationship_type: str = Query(None, include_in_schema=False),
                                cnode: str = Query(None, include_in_schema=False),
@@ -112,7 +111,7 @@ async def get_subgraph_by_term_id(id: str, graph_type: str = Query(None),
         return json_obj
 
 
-@router.post("/api/ontology/term/{id}/subsets", tags=["ontology"])
+@router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subset_by_term(id: str):
 
         """
@@ -125,7 +124,7 @@ async def get_subset_by_term(id: str):
         return results
 
 
-@router.post("/api/ontology/term/{id}", tags=["ontology"])
+@router.get("/api/ontology/term/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
         """
         Returns meta data of an ontology subset (slim)
@@ -199,7 +198,7 @@ async def get_subset_metadata_by_id(id: str):
         return result
 
 
-@router.post("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
+@router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_subset_metadata_by_id(subject: str, object: str):
         """
         Returns the ancestor ontology terms shared by two ontology terms

@@ -9,7 +9,7 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 
-@router.post("/api/identifier/prefixes", tags=["identifier/prefixes"])
+@router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
         """
         Returns list of prefixes
@@ -17,7 +17,7 @@ async def get_all_prefixes():
         return get_prefixes()
 
 
-@router.post("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
+@router.get("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
 async def expand_curie(id: str):
         """
         Returns expanded URI
@@ -26,7 +26,7 @@ async def expand_curie(id: str):
         return expand_uri(id)
 
 
-@router.post("/api/identifier/prefixes/contract/{uri}", tags=["identifier/prefixes"])
+@router.get("/api/identifier/prefixes/contract/{uri}", tags=["identifier/prefixes"])
 async def contract_uri(uri: str):
         """
         Returns contracted URI
