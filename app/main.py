@@ -5,12 +5,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from go_fastapi.routers import bioentity
-from go_fastapi.routers import labeler
-from go_fastapi.routers import ontology
-from go_fastapi.routers import prefixes
-from go_fastapi.routers import search
-from go_fastapi.routers import slimmer
+from app.routers import bioentity
+from app.routers import labeler
+from app.routers import ontology
+from app.routers import prefixes
+from app.routers import search
+from app.routers import slimmer
 
 log = logging.getLogger(__name__)
 
@@ -42,4 +42,4 @@ app.add_middleware(CORSMiddleware,
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
-    uvicorn.run('main:app', host="0.0.0.0", port=8000)
+    uvicorn.run('main:app', host="0.0.0.0", port=8080)

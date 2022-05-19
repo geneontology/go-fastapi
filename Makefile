@@ -3,7 +3,7 @@ SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
 
-all: install start
+all: install start export-requirements
 
 start:
 	poetry run gunicorn go_fastapi.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
@@ -12,6 +12,9 @@ test: unit-tests
 
 unit-tests:
 	poetry run pytest tests/*.py
+
+export-requirements:
+	poetry export -f requirements.txt --output requirements.txt
 
 install:
 	poetry install
