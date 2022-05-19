@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from app.routers import bioentity
 from app.routers import labeler
 from app.routers import ontology
+from app.routers import ribbon
 from app.routers import prefixes
 from app.routers import search
 from app.routers import slimmer
@@ -32,6 +33,7 @@ app.include_router(slimmer.router)
 app.include_router(prefixes.router)
 app.include_router(labeler.router)
 app.include_router(ontology.router)
+app.include_router(ribbon.router)
 app.include_router(search.router)
 
 app.add_middleware(CORSMiddleware,
