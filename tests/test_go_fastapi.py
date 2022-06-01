@@ -121,7 +121,7 @@ def test_labeler_endpoint(endpoint):
     data = {
         "id": "GO:0003677"
     }
-    response = self.test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
     map_response = response.json
     assert map_response['GO:0003677'] == 'DNA binding'
