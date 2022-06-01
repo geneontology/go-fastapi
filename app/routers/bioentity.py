@@ -32,8 +32,7 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
                                     unselect_evidence: bool = Query(False, include_in_schema=False),
                                     exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
                                     fetch_objects: bool = Query(False, include_in_schema=False),
-                                    use_compact_associations: bool = Query(False, include_in_schema=False),
-                                    slim: bool = Query(False, include_in_schema=False)):
+                                    use_compact_associations: bool = Query(False, include_in_schema=False)):
     """
     Returns annotations associated to a GO term
     """
@@ -75,7 +74,6 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
                              exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
                              fetch_objects: bool = Query(False, include_in_schema=False),
                              use_compact_associations: bool = Query(False, include_in_schema=False),
-                             slim: bool = Query(False, include_in_schema=False),
                              start: int = 0, rows: int = 100):
     assocs = search_associations(
         object_category='function',
@@ -89,7 +87,6 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
         fetch_objects=fetch_objects,
         exclude_automatic_assertions=exclude_automatic_assertions,
         use_compact_associations=use_compact_associations,
-        slim=slim,
         start=start,
         rows=rows,
         evidence=evidence
@@ -116,7 +113,6 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
                 fetch_objects=fetch_objects,
                 exclude_automatic_assertions=exclude_automatic_assertions,
                 use_compact_associations=use_compact_associations,
-                slim=slim,
                 start=start,
                 rows=rows
             )
@@ -130,8 +126,7 @@ async def get_taxon_by_function_id(id: str, evidence: List[str] = Query(None), s
                                    unselect_evidence: bool = Query(False, include_in_schema=False),
                                    exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
                                    fetch_objects: bool = Query(False, include_in_schema=False),
-                                   use_compact_associations: bool = Query(False, include_in_schema=False),
-                                   slim: bool = Query(False, include_in_schema=False)
+                                   use_compact_associations: bool = Query(False, include_in_schema=False)
                                    ):
     """
     Returns taxons associated to a GO term
@@ -170,8 +165,7 @@ async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), st
                                   unselect_evidence: bool = Query(False, include_in_schema=False),
                                   exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
                                   fetch_objects: bool = Query(False, include_in_schema=False),
-                                  use_compact_associations: bool = Query(False, include_in_schema=False),
-                                  slim: bool = Query(False, include_in_schema=False)
+                                  use_compact_associations: bool = Query(False, include_in_schema=False)
                                   ):
     """
     Returns GO terms associated to a gene.
@@ -205,7 +199,6 @@ async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), st
         fetch_objects=fetch_objects,
         exclude_automatic_assertions=exclude_automatic_assertions,
         use_compact_associations=use_compact_associations,
-        slim=slim,
         start=start,
         rows=rows
     )
@@ -230,7 +223,6 @@ async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), st
                 fetch_objects=fetch_objects,
                 exclude_automatic_assertions=exclude_automatic_assertions,
                 use_compact_associations=use_compact_associations,
-                slim=slim,
                 start=start,
                 rows=rows
             )
