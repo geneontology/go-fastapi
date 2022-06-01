@@ -15,14 +15,10 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 
-# ZFIN:ZDB-GENE-980526-388
-# GO:0005575
-
-
 @router.get("/api/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
 async def slimmer_function(slims: List[str] = Query(..., help="Map objects up (slim) to a higher level category. "
-                                                       "Value can be ontology class ID",
-                                             example="GO:0005575"),
+                                                              "Value can be ontology class ID",
+                                                    description="example: GO:0005575"),
                            subjects: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388"),
                            relationship_type: str = "acts_upstream_of_or_within",
                            exclude_automatic_assertions: bool = False,
