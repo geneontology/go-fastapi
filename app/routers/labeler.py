@@ -11,12 +11,12 @@ router = APIRouter()
 
 
 @router.get("/ontol/labeler", tags=["ontol/labeler"])
-async def expand_curie(ids: List[str] = Query(None)):
+async def expand_curie(id: List[str] = Query(...)):
         """
         Fetches a map from CURIEs/IDs to labels
         """
 
-        return batch_fetch_labels(ids)
+        return batch_fetch_labels(id)
 
 
     

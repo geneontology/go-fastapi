@@ -149,7 +149,7 @@ async def get_ribbon_results(subset: str = Query(None,
     """
 
     # Step 1: create the categories
-    categories = await get_ontology_subsets_by_id(id=subset)
+    categories = await get_ontology_subsets_by_id(subset)
     for category in categories:
 
         category["groups"] = category["terms"]

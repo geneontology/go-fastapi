@@ -113,17 +113,17 @@ def test_expander_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontol/labeler/",
+        "api/ontol/labeler/",
 
     ]
 )
 def test_labeler_endpoint(endpoint):
     data = {
-        "ids": "GO:0003677"
+        "id": "GO:0003677"
     }
-    response = test_client.get(endpoint, json=data)
+    response = self.test_client.get(endpoint, json=data)
     assert response.status_code == 200
-    map_response = response.json()
+    map_response = response.json
     assert map_response['GO:0003677'] == 'DNA binding'
 
 
