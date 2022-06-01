@@ -7,6 +7,20 @@ from ..settings import get_biolink_config
 cfg = get_biolink_config()
 omap = {}
 
+aspect_map = {
+    "P": "GO:0008150",
+    "F": "GO:0003674",
+    "C": "GO:0005575"
+}
+
+
+def get_category_terms(category):
+    terms = []
+    for group in category["groups"]:
+        if group["type"] == "Term":
+            terms.append(group)
+    return terms
+
 
 def get_ontology(id):
     handle = id

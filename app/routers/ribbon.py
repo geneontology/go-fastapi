@@ -4,7 +4,9 @@ from typing import List
 from fastapi import APIRouter, Query
 from .slimmer import gene_to_uniprot_from_mygene
 from ontobio.util.user_agent import get_user_agent
-from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
+from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc, replace
+from ontobio.sparql.sparql_ontol_utils import run_sparql_on, transformArray, EOntology, transform
+import app.utils.ontology.ontology_utils as ontology_utils
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +37,95 @@ def get_category_terms(category):
     return terms
 
 
+@router.get("/ontology/term/{id}/subsets", tags=["ontology"])
+async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
+                                                             description="'CURIE identifier of a GO term,"
+                                                                         " e.g. GO:0006259")):
+    """
+    Returns subsets (slims) associated to an ontology term
+    """
+    query = ontology_utils.get_go_subsets(id)
+    results = run_sparql_on(query, EOntology.GO)
+    results = transformArray(results, [])
+    results = replace(results, "subset", "OBO:go#", "")
+    return results
+
+
+@router.get("/ontology/subset/{id}", tags=["ontology"])
+async def get_ontology_subsets_by_id(id: str = Query(...,
+                                                     description="name of a slim subset, e.g. goslim_agr, "
+                                                                 "goslim_generic")):
+    """
+    Returns meta data of an ontology subset (slim)
+    """
+
+    q = "*:*"
+    qf = ""
+    fq = "&fq=subset:" + id + "&rows=1000"
+    fields = "annotation_class,annotation_class_label,description,source"
+
+    # This is a temporary fix while waiting for the PR of the AGR slim on go-ontology
+    if id == "goslim_agr":
+
+        terms_list = set()
+        for section in ontology_utils.agr_slim_order:
+            terms_list.add(section['category'])
+            for term in section['terms']:
+                terms_list.add(term)
+
+        goslim_agr_ids = "\" \"".join(terms_list)
+        fq = "&fq=annotation_class:(\"" + goslim_agr_ids + "\")&rows=1000"
+
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
+
+    tr = {}
+    for term in data:
+        source = term['source']
+        if source not in tr:
+            tr[source] = {"annotation_class_label": source, "terms": []}
+        ready_term = term.copy()
+        del ready_term["source"]
+        tr[source]["terms"].append(ready_term)
+
+    cats = []
+    for category in tr:
+        cats.append(category)
+
+    fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
+
+    for category in tr:
+        for temp in data:
+            if temp["annotation_class_label"] == category:
+                tr[category]["annotation_class"] = temp["annotation_class"]
+                tr[category]["description"] = temp["description"]
+                break
+
+    result = []
+    for category in tr:
+        cat = tr[category]
+        result.append(cat)
+
+        # if goslim_agr, reorder the list based on the temporary json object below
+    if id == "goslim_agr":
+        temp = []
+        for agr_category in ontology_utils.agr_slim_order:
+            cat = agr_category['category']
+            for category in result:
+                if category['annotation_class'] == cat:
+                    ordered_terms = []
+                    for ot in agr_category['terms']:
+                        for uot in category['terms']:
+                            if uot['annotation_class'] == ot:
+                                ordered_terms.append(uot)
+                                break
+                    category["terms"] = ordered_terms
+                    temp.append(category)
+        result = temp
+
+    return result
+
+
 @router.get("/ontology/ribbon/", tags=["ontology"])
 async def get_ribbon_results(subset: str = Query(None,
                                                  description="Name of the subset to map GO terms "
@@ -58,7 +149,7 @@ async def get_ribbon_results(subset: str = Query(None,
     """
 
     # Step 1: create the categories
-    categories = await get_ribbon_results(subset)
+    categories = await get_ontology_subsets_by_id(id=subset)
     for category in categories:
 
         category["groups"] = category["terms"]
@@ -86,8 +177,7 @@ async def get_ribbon_results(subset: str = Query(None,
                                "type": "All"}] + category["groups"] + [{"id": category["id"],
                                                                         "label": "other " + category[
                                                                             "label"].lower().replace("_", " "),
-                                                                        "description": "Represent all annotations not "
-                                                                                       "mapped to a specific term",
+                                                                        "description": "Represent all annotations not mapped to a specific term",
                                                                         "type": "Other"}]
 
     # Step 2: create the entities / subjects
@@ -150,7 +240,7 @@ async def get_ribbon_results(subset: str = Query(None,
 
         # compute number of terms and annotations
         for annot in data:
-            aspect = aspect_map[annot["aspect"]]
+            aspect = ontology_utils.aspect_map[annot["aspect"]]
             found = False
 
             for cat in categories:
@@ -181,7 +271,7 @@ async def get_ribbon_results(subset: str = Query(None,
                     continue
 
                 for annot in data:
-                    aspect = aspect_map[annot["aspect"]]
+                    aspect = ontology_utils.aspect_map[annot["aspect"]]
 
                     # only allow annotated terms belonging to the same category if cross_aspect
                     if cross_aspect or cat['id'] == aspect:
@@ -206,13 +296,13 @@ async def get_ribbon_results(subset: str = Query(None,
                             entity['groups'][group]['ALL']['terms'].add(annot['annotation_class'])
                             entity['groups'][group]['ALL']['nb_annotations'] += 1
 
-            terms = get_category_terms(cat)
+            terms = ontology_utils.get_category_terms(cat)
             terms = [term["id"] for term in terms]
 
             other = {"ALL": {"terms": set(), "nb_classes": 0, "nb_annotations": 0}}
 
             for annot in data:
-                aspect = aspect_map[annot["aspect"]]
+                aspect = ontology_utils.aspect_map[annot["aspect"]]
 
                 # only allow annotated terms belonging to the same category if cross_aspect
                 if cross_aspect or cat['id'] == aspect:

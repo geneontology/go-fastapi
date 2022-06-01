@@ -24,12 +24,6 @@ REGULATES_TRANSITIVITY = "regulates_transitivity_graph"
 NEIGHBORHOOD_GRAPH = "neighborhood_graph"
 NEIGHBORHOOD_LIMITED_GRAPH = "neighborhood_limited_graph"
 
-aspect_map = {
-    "P": "GO:0008150",
-    "F": "GO:0003674",
-    "C": "GO:0005575"
-}
-
 
 class GraphType(str, Enum):
     topology_graph = TOPOLOGY
