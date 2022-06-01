@@ -8,12 +8,13 @@ log = logging.getLogger(__name__)
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
+
 def search(term, args):
     q = GolrSearchQuery(term, args)
     return q.search()
 
 
-@router.get("/api/search/entity/{term}", tags=["search"])
+@router.get("/search/entity/{term}", tags=["search"])
 async def search_term(term: str,
                       category: str,
                       boost_fix: str,

@@ -44,7 +44,7 @@ class RelationshipType(str, Enum):
 
 
 
-@router.get("/api/ontology/term/{id}", tags=["ontology"])
+@router.get("/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str,
                                   relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF, include_in_schema=False),
                                   graph_type: str = Query(None, include_in_schema=False),
@@ -61,7 +61,7 @@ async def get_term_metadata_by_id(id: str,
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
 
-@router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
+@router.get("/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(id: str, graph_type: GraphType = Query('topology_graph'),
                                relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF,
                                                                            include_in_schema=False),
@@ -84,7 +84,7 @@ async def get_term_graph_by_id(id: str, graph_type: GraphType = Query('topology_
     return data
 
 
-@router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
+@router.get("/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(id: str,
                                   cnode: str = Query(None, include_in_schema=False),
                                   include_ancestors: bool = Query(True, include_in_schema=False),
@@ -115,7 +115,7 @@ async def get_subgraph_by_term_id(id: str,
     return json_obj
 
 
-@router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
+@router.get("/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subset_by_term(id: str):
     """
         Returns subsets (slims) associated to an ontology term
@@ -127,7 +127,7 @@ async def get_subset_by_term(id: str):
     return results
 
 
-@router.get("/api/ontology/term/{id}", tags=["ontology"])
+@router.get("/ontology/term/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
     """
         Returns meta data of an ontology subset (slim)
@@ -201,7 +201,7 @@ async def get_subset_metadata_by_id(id: str):
     return result
 
 
-@router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
+@router.get("/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_subset_metadata_by_id(subject: str, object: str):
     """
         Returns the ancestor ontology terms shared by two ontology terms

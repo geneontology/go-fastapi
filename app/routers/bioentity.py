@@ -26,7 +26,7 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 
-@router.get("/api/bioentity/function/{id}", tags=["bioentity"])
+@router.get("/bioentity/function/{id}", tags=["bioentity"])
 async def get_function_associations(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                     facet: bool = Query(False, include_in_schema=False),
                                     unselect_evidence: bool = Query(False, include_in_schema=False),
@@ -67,7 +67,7 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
     return data
 
 
-@router.get("/api//bioentity/function/{id}/genes", tags=["bioentity"])
+@router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_function_by_id(id: str, evidence: List[str] = Query(None),
                              facet: bool = Query(False, include_in_schema=False),
                              unselect_evidence: bool = Query(False, include_in_schema=False),
@@ -120,7 +120,7 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
     return assocs
 
 
-@router.get("/api//bioentity/function/{id}/taxons", tags=["bioentity"])
+@router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
 async def get_taxon_by_function_id(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                    facet: bool = Query(False, include_in_schema=False),
                                    unselect_evidence: bool = Query(False, include_in_schema=False),
@@ -159,7 +159,7 @@ async def get_taxon_by_function_id(id: str, evidence: List[str] = Query(None), s
     return data
 
 
-@router.get("/api//bioentity/gene/{id}/function", tags=["bioentity"])
+@router.get("/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                   facet: bool = Query(False, include_in_schema=False),
                                   unselect_evidence: bool = Query(False, include_in_schema=False),
