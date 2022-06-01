@@ -18,14 +18,15 @@ def test_bioenty_endpoints(endpoint):
     assert response.status_code == 200
     assert len(response.json()) > 99
 
-
+# http://0.0.0.0//api/bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function
+# http://0.0.0.0/api//bioentity/gene/ZFIN%3AZDB-GENE-050417-357/function?start=0&rows=100
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
-        "/api/bioentity/ZFIN%3AZDB-GENE-980526-388/associations",
-        "/api/bioentity/function/ZFIN%3AZDB-GENE-980526-388/genes",
-        "/api/bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
+        "/api//bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
+        "/api//bioentity/ZFIN%3AZDB-GENE-980526-388/associations",
+        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/genes",
+        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
 
     ]
 )
@@ -38,10 +39,10 @@ def test_bioenty_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
-        "/api/bioentity/ZFIN%3AZDB-GENE-980526-388/associations",
-        "/api/bioentity/function/ZFIN%3AZDB-GENE-980526-388/genes",
-        "/api/bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
+        "/api//bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
+        "/api//bioentity/ZFIN%3AZDB-GENE-980526-388/associations",
+        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/genes",
+        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
 
     ]
 )
@@ -54,7 +55,7 @@ def test_bioenty_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/bioentityset/slimmer/function"
+        "/api//bioentityset/slimmer/function"
     ]
 )
 def test_slimmer_endpoint(endpoint):
@@ -121,7 +122,7 @@ def test_expander_endpoint(endpoint):
 )
 def test_labeler_endpoint(endpoint):
     data = {
-        "id": "GO:0003677"
+        "ids": "GO:0003677"
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
