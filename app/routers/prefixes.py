@@ -11,30 +11,27 @@ router = APIRouter()
 
 @router.get("/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
+    """
+        :return: all prefixes
         """
-        Returns list of prefixes
-        """
-        return get_prefixes()
+    return get_prefixes()
 
 
 @router.get("/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
 async def expand_curie(id: str):
+    """
+
+        :param id: ID in CURIE form to expand
+        :return: expanded IRI (full URL to resorce being expanded)
         """
-        Returns expanded URI
-        id: ID of entity to be contracted to URI, e.g "MGI:1"
-        """
-        return expand_uri(id)
+    return expand_uri(id)
 
 
 @router.get("/identifier/prefixes/contract/{uri}", tags=["identifier/prefixes"])
 async def contract_uri(uri: str):
-        """
-        Returns contracted URI
-        uri: URI of entity to be contracted to identifier/CURIE, e.g "http://www.informatics.jax.org/accession/MGI:1"
-        """
-        return contract_uri(uri)
-    
+    """
 
-    
-    
-
+        :param uri: expanded IRI (full URL to resorce being expanded)
+        :return: CURIE 
+        """
+    return contract_uri(uri)

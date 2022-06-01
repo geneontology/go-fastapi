@@ -223,16 +223,9 @@ async def get_function_by_gene_id(id: str = Query(..., description="CURIE identi
                              use_compact_associations: bool = Query(default=False, description="If true, returns "
                                                                                                "results in compact "
                                                                                                "associations format"),
-                             taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
-                                                                                "associations by subject taxon"),
                              slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"
                                                                                " category. Value can be ontology "
                                                                                "class ID or subset ID"),
-                             relation: str = Query(default=None, description="A relation CURIE to filter associations"),
-                             relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
-                                                                         description="relationship type ('involved_in’,"
-                                                                                     "‘involved_in_regulation_of’ or "
-                                                                                     "‘acts_upstream_of_or_within’),"),
                              start: int = 0, rows: int = 100):
     """
     Returns GO terms associated to a gene.
@@ -268,9 +261,6 @@ async def get_function_by_gene_id(id: str = Query(..., description="CURIE identi
         use_compact_associations=use_compact_associations,
         start=start,
         rows=rows,
-        taxon=taxon,
-        relation=relation,
-        relationship_type=relationship_type,
         slim=slim
     )
 

@@ -47,7 +47,7 @@ class RelationshipType(str, Enum):
 @router.get("/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str,
                                   relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF, include_in_schema=False),
-                                  graph_type: str = Query(None, include_in_schema=False),
+                                  graph_type: GraphType = Query(None, include_in_schema=False),
                                   cnode: str = Query(None, include_in_schema=False),
                                   include_ancestors: bool = Query(True, include_in_schema=False),
                                   include_descendents: bool = Query(True, include_in_schema=False),
@@ -62,7 +62,7 @@ async def get_term_metadata_by_id(id: str,
 
 
 @router.get("/ontology/term/{id}/graph", tags=["ontology"])
-async def get_term_graph_by_id(id: str, graph_type: GraphType = Query('topology_graph'),
+async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.topology_graph),
                                relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF,
                                                                            include_in_schema=False),
                                cnode: str = Query(None, include_in_schema=False),
@@ -75,7 +75,8 @@ async def get_term_graph_by_id(id: str, graph_type: GraphType = Query('topology_
         Returns graph of an ontology term
         """
 
-    graph_type = graph_type.value + "_json"  # GOLR field names
+    graph_type = graph_type + "_json"  # GOLR field names
+    print(graph_type)
 
     data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are stringified in the json
