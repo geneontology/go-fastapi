@@ -36,29 +36,29 @@ def get_category_terms(category):
 
 
 @router.get("/ontology/ribbon/", tags=["ontology"])
-async def get_subset_metadata_by_id(subset: str,
-                                    subject: List[str] = Query(None),
-                                    ecodes: List[str] = Query(None),
-                                    exclude_IBA: bool = False,
-                                    exclude_PB: bool = False,
-                                    cross_aspect: bool = False):
-
+async def get_ribbon_results(subset: str = Query(None,
+                                                 description="Name of the subset to map GO terms "
+                                                             "(e.g. goslim_agr)"),
+                             subject: List[str] = Query(None,
+                                                        description="List of Gene ids (e.g. "
+                                                                    "MGI:98214, RGD:620474)"),
+                             ecodes: List[str] = Query(None,
+                                                       description="List of Evidence Codes to include (e.g. "
+                                                                   "EXP, IDA). Has priority over exclude_IBA"),
+                             exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
+                             exclude_PB: bool = Query(False, description="If true, excludes direct annotations "
+                                                                         "to protein binding"),
+                             cross_aspect: bool = Query(False, description="If true, can retrieve terms from "
+                                                                           "other aspects if using a "
+                                                                           "cross-aspect"
+                                                                           " relationship such as "
+                                                                           "regulates_closure")):
     """
     Fetch the summary of annotations for a given gene or set of genes
-
-    :param subset: Name of the subset to map GO terms (e.g. goslim_agr)
-    :param subject: List of Gene ids (e.g. MGI:98214, RGD:620474)
-    :param ecodes: List of Evidence Codes to include (e.g. EXP, IDA). Has priority over exclude_IBA
-    :param exclude_IBA: If true, excludes IBA annotations
-    :param exclude_PB: If true, excludes direct annotations to protein binding
-    :param cross_aspect: If true, can retrieve terms from other aspects if using a cross-aspect relationship such as regulates_closure
-
-    :return:
     """
 
-
     # Step 1: create the categories
-    categories = await get_subset_metadata_by_id(subset)
+    categories = await get_ribbon_results(subset)
     for category in categories:
 
         category["groups"] = category["terms"]

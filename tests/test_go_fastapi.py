@@ -31,7 +31,7 @@ def test_bioenty_endpoints(endpoint):
 def test_bioenty_endpoints(endpoint):
     response = test_client.get(endpoint)
     assert response.status_code == 200
-    assert len(response.json()) > 5
+    assert len(response.json()) >= 4
 
 
 @pytest.mark.parametrize(
@@ -46,7 +46,7 @@ def test_bioenty_endpoints(endpoint):
 def test_bioenty_endpoints(endpoint):
     response = test_client.get(endpoint)
     assert response.status_code == 200
-    assert len(response.json()) > 5
+    assert len(response.json()) >= 4
 
 
 @pytest.mark.parametrize(
