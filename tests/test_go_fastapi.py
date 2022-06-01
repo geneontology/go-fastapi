@@ -7,7 +7,7 @@ test_client = TestClient(app)
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/bioentity/function/id"
+        "/bioentity/function/id"
     ]
 )
 def test_bioenty_endpoints(endpoint):
@@ -18,15 +18,13 @@ def test_bioenty_endpoints(endpoint):
     assert response.status_code == 200
     assert len(response.json()) > 99
 
-# http://0.0.0.0//api/bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function
-# http://0.0.0.0/api//bioentity/gene/ZFIN%3AZDB-GENE-050417-357/function?start=0&rows=100
+
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api//bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
-        "/api//bioentity/ZFIN%3AZDB-GENE-980526-388/associations",
-        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/genes",
-        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
+        "/bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
+        "/bioentity/function/GO%3A0044598/genes",
+        "/bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
 
     ]
 )
@@ -39,10 +37,9 @@ def test_bioenty_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api//bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
-        "/api//bioentity/ZFIN%3AZDB-GENE-980526-388/associations",
-        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/genes",
-        "/api//bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
+        "/bioentity/gene/ZFIN%3AZDB-GENE-980526-388/function",
+        "/bioentity/function/GO%3A0044598/genes",
+        "/bioentity/function/ZFIN%3AZDB-GENE-980526-388/taxons",
 
     ]
 )
@@ -55,7 +52,7 @@ def test_bioenty_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api//bioentityset/slimmer/function"
+        "/bioentityset/slimmer/function"
     ]
 )
 def test_slimmer_endpoint(endpoint):
@@ -71,7 +68,7 @@ def test_slimmer_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/identifier/prefixes",
+        "/identifier/prefixes",
 
     ]
 )
@@ -86,7 +83,7 @@ def test_prefixes_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/identifier/prefixes/contract/http%3A%2F%2Fwww.informatics.jax.org%2Faccession%2FMGI%3A1",
+        "/identifier/prefixes/contract/http%3A%2F%2Fwww.informatics.jax.org%2Faccession%2FMGI%3A1",
 
     ]
 )
@@ -101,7 +98,7 @@ def test_prefixes_contract_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/identifier/prefixes/expand/MGI%3A1",
+        "/identifier/prefixes/expand/MGI%3A1",
 
     ]
 )
@@ -116,7 +113,7 @@ def test_expander_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontol/labeler/",
+        "/ontol/labeler/",
 
     ]
 )
@@ -133,7 +130,7 @@ def test_labeler_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/ribbon/",
+        "/ontology/ribbon/",
 
     ]
 )
@@ -149,7 +146,7 @@ def test_ribbon_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/shared/GO%3A0006259/GO%3A0046483",
+        "/ontology/shared/GO%3A0006259/GO%3A0046483",
 
     ]
 )
@@ -161,7 +158,7 @@ def test_ontology_shared_sub_obj(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/subset/goslim_agr",
+        "/ontology/subset/goslim_agr",
 
     ]
 )
@@ -173,7 +170,7 @@ def test_ontology_subset(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/term/GO%3A0046483",
+        "/ontology/term/GO%3A0046483",
 
     ]
 )
@@ -185,7 +182,7 @@ def test_ontology_term_id(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/term/GO%3A0046483/subgraph",
+        "/ontology/term/GO%3A0046483/subgraph",
 
     ]
 )
@@ -197,7 +194,7 @@ def test_ontology_term_graph(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/term/GO%3A0046483/graph",
+        "/ontology/term/GO%3A0046483/graph",
 
     ]
 )
@@ -209,7 +206,7 @@ def test_ontology_term_subgraph(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/ontology/term/GO%3A0046483/subsets",
+        "/ontology/term/GO%3A0046483/subsets",
 
     ]
 )
@@ -221,7 +218,7 @@ def test_ontology_term_subsets(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/api/search/entity/ssh",
+        "/search/entity/ssh",
 
     ]
 )

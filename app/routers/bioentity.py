@@ -121,7 +121,13 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
 
 
 @router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
-async def get_taxon_by_function_id(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
+async def get_taxon_by_function_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+                                   evidence: List[str] = Query(default=None,
+                                                               description="Object id, e.g. ECO:0000501 (for IEA; "
+                                                                           "Includes inferred by default) or a "
+                                                                           "specific publication or other supporting "
+                                                                           "object, e.g. ZFIN:ZDB-PUB-060503-2"),
+                                   start: int = 0, rows: int = 100,
                                    facet: bool = Query(False, include_in_schema=False),
                                    unselect_evidence: bool = Query(False, include_in_schema=False),
                                    exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
