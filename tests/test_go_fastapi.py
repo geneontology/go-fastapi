@@ -88,10 +88,7 @@ def test_prefixes_endpoint(endpoint):
     ]
 )
 def test_prefixes_contract_endpoint(endpoint):
-    data = {
-        "uri": "http://www.informatics.jax.org/accession/MGI:1"
-    }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
 
 
@@ -125,6 +122,37 @@ def test_labeler_endpoint(endpoint):
     assert response.status_code == 200
     map_response = response.json
     assert map_response['GO:0003677'] == 'DNA binding'
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/ontology/term/{id}/subsets",
+
+    ]
+)
+def test_term_subsets_endpoint(endpoint):
+    data = {
+        "id": "RGD:620474"
+    }
+    response = test_client.get(endpoint, json=data)
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/ontology/subset/{id}",
+
+    ]
+)
+def test_term_by_subset_endpoint(endpoint):
+    data = {
+        "id": "goslim_agr"
+    }
+    response = test_client.get(endpoint, json=data)
+    assert response.status_code == 200
+
 
 
 @pytest.mark.parametrize(

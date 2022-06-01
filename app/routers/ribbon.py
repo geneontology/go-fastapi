@@ -52,13 +52,7 @@ async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
 
 
 @router.get("/ontology/subset/{id}", tags=["ontology"])
-async def get_ontology_subsets_by_id(id: str = Query(...,
-                                                     description="name of a slim subset, e.g. goslim_agr, "
-                                                                 "goslim_generic")):
-    """
-    Returns meta data of an ontology subset (slim)
-    """
-
+async def get_ontology_subsets_by_id(id: str):
     q = "*:*"
     qf = ""
     fq = "&fq=subset:" + id + "&rows=1000"
@@ -177,7 +171,8 @@ async def get_ribbon_results(subset: str = Query(None,
                                "type": "All"}] + category["groups"] + [{"id": category["id"],
                                                                         "label": "other " + category[
                                                                             "label"].lower().replace("_", " "),
-                                                                        "description": "Represent all annotations not mapped to a specific term",
+                                                                        "description": "Represent all annotations not "
+                                                                                       "mapped to a specific term",
                                                                         "type": "Other"}]
 
     # Step 2: create the entities / subjects
