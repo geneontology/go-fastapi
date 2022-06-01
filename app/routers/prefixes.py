@@ -15,10 +15,10 @@ async def get_all_prefixes():
 
 
 @router.get("/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
-async def expand_curie(id: str= Query(None, description="identifier in CURIE format of the resource to expand")):
+async def get_expand_curie(id: str= Query(None, description="identifier in CURIE format of the resource to expand")):
     return expand_uri(id)
 
 
 @router.get("/identifier/prefixes/contract/{uri}", tags=["identifier/prefixes"])
-async def contract_uri(uri: str = Query(None, description="full URI of the identified resource")):
+async def get_contract_uri(uri: str = Query(None, description="full URI of the identified resource")):
     return contract_uri(uri)
