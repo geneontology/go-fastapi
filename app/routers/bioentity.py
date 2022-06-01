@@ -6,6 +6,7 @@ from .slimmer import gene_to_uniprot_from_mygene
 from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 from ontobio.config import get_config
+from enum import Enum
 
 # TODO: @api.marshal_with(association_results)
 log = logging.getLogger(__name__)
@@ -22,6 +23,12 @@ TYPE_PUBLICATION = 'publication'
 
 categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+
+
+class RelationshipType(str, Enum):
+    INVOLVED_IN = INVOLVED_IN
+    ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
+    INVOLVED_IN_REGULATION_OF = INVOLVED_IN_REGULATION_OF
 
 router = APIRouter()
 
@@ -68,12 +75,37 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
 
 
 @router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
-async def get_function_by_id(id: str, evidence: List[str] = Query(None),
-                             facet: bool = Query(False, include_in_schema=False),
-                             unselect_evidence: bool = Query(False, include_in_schema=False),
-                             exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
-                             fetch_objects: bool = Query(False, include_in_schema=False),
-                             use_compact_associations: bool = Query(False, include_in_schema=False),
+async def get_function_by_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+                             # ... in query means "required" parameter.
+                             evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
+                                                                           "Includes inferred by default) or a "
+                                                                           "specific publication or other supporting "
+                                                                           "object, e.g. ZFIN:ZDB-PUB-060503-2"),
+                             facet: bool = Query(default=False, description="Enable faceting"),
+                             unselect_evidence: bool = Query(default=False, description="If true, excludes "
+                                                                                        "evidence objects in response"),
+                             exclude_automatic_assertions: bool = Query(default=False, description="If true, excludes "
+                                                                                                   "associations that "
+                                                                                                   "involve IEAs "
+                                                                                                   "(ECO:0000501)"),
+                             fetch_objects: bool = Query(defaut=False, description="If true, returns a distinct set "
+                                                                                   "of association.objects (typically "
+                                                                                   "ontology terms). This appears at "
+                                                                                   "the top level of the results "
+                                                                                   "payload"),
+                             use_compact_associations: bool = Query(default=False, description="If true, returns "
+                                                                                               "results in compact "
+                                                                                               "associations format"),
+                             taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
+                                                                                "associations by subject taxon"),
+                             slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"
+                                                                               " category. Value can be ontology "
+                                                                               "class ID or subset ID"),
+                             relation: str = Query(default=None, description="A relation CURIE to filter associations"),
+                             relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
+                                                                         description="relationship type ('involved_in’,"
+                                                                                     "‘involved_in_regulation_of’ or "
+                                                                                     "‘acts_upstream_of_or_within’),"),
                              start: int = 0, rows: int = 100):
     assocs = search_associations(
         object_category='function',
@@ -89,7 +121,11 @@ async def get_function_by_id(id: str, evidence: List[str] = Query(None),
         use_compact_associations=use_compact_associations,
         start=start,
         rows=rows,
-        evidence=evidence
+        evidence=evidence,
+        slim=slim,
+        relation=relation,
+        taxon=taxon,
+        relationship_type=relationship_type,
 
     )
 
