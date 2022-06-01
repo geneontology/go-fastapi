@@ -84,15 +84,15 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
                              facet: bool = Query(default=False, description="Enable faceting"),
                              unselect_evidence: bool = Query(default=False, description="If true, excludes "
                                                                                         "evidence objects in response"),
-                             exclude_automatic_assertions: bool = Query(default=False, description="If true, excludes "
-                                                                                                   "associations that "
-                                                                                                   "involve IEAs "
-                                                                                                   "(ECO:0000501)"),
-                             fetch_objects: bool = Query(defaut=False, description="If true, returns a distinct set "
+                             fetch_objects: bool = Query(default=False, description="If true, returns a distinct set "
                                                                                    "of association.objects (typically "
                                                                                    "ontology terms). This appears at "
                                                                                    "the top level of the results "
                                                                                    "payload"),
+                             exclude_automatic_assertions: bool = Query(default=False, description="If true, excludes "
+                                                                                                   "associations that "
+                                                                                                   "involve IEAs "
+                                                                                                   "(ECO:0000501)"),
                              use_compact_associations: bool = Query(default=False, description="If true, returns "
                                                                                                "results in compact "
                                                                                                "associations format"),
