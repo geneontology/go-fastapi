@@ -202,13 +202,38 @@ async def get_taxon_by_function_id(id: str = Query(..., description="CURIE ident
 
 
 @router.get("/bioentity/gene/{id}/function", tags=["bioentity"])
-async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
-                                  facet: bool = Query(False, include_in_schema=False),
-                                  unselect_evidence: bool = Query(False, include_in_schema=False),
-                                  exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
-                                  fetch_objects: bool = Query(False, include_in_schema=False),
-                                  use_compact_associations: bool = Query(False, include_in_schema=False)
-                                  ):
+async def get_function_by_gene_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+                             # ... in query means "required" parameter.
+                             evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
+                                                                           "Includes inferred by default) or a "
+                                                                           "specific publication or other supporting "
+                                                                           "object, e.g. ZFIN:ZDB-PUB-060503-2"),
+                             facet: bool = Query(default=False, description="Enable faceting"),
+                             unselect_evidence: bool = Query(default=False, description="If true, excludes "
+                                                                                        "evidence objects in response"),
+                             fetch_objects: bool = Query(default=False, description="If true, returns a distinct set "
+                                                                                   "of association.objects (typically "
+                                                                                   "ontology terms). This appears at "
+                                                                                   "the top level of the results "
+                                                                                   "payload"),
+                             exclude_automatic_assertions: bool = Query(default=False, description="If true, excludes "
+                                                                                                   "associations that "
+                                                                                                   "involve IEAs "
+                                                                                                   "(ECO:0000501)"),
+                             use_compact_associations: bool = Query(default=False, description="If true, returns "
+                                                                                               "results in compact "
+                                                                                               "associations format"),
+                             taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
+                                                                                "associations by subject taxon"),
+                             slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"
+                                                                               " category. Value can be ontology "
+                                                                               "class ID or subset ID"),
+                             relation: str = Query(default=None, description="A relation CURIE to filter associations"),
+                             relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
+                                                                         description="relationship type ('involved_in’,"
+                                                                                     "‘involved_in_regulation_of’ or "
+                                                                                     "‘acts_upstream_of_or_within’),"),
+                             start: int = 0, rows: int = 100):
     """
     Returns GO terms associated to a gene.
 
@@ -242,7 +267,11 @@ async def get_function_by_gene_id(id: str, evidence: List[str] = Query(None), st
         exclude_automatic_assertions=exclude_automatic_assertions,
         use_compact_associations=use_compact_associations,
         start=start,
-        rows=rows
+        rows=rows,
+        taxon=taxon,
+        relation=relation,
+        relationship_type=relationship_type,
+        slim=slim
     )
 
     # If there are no associations for the given ID, try other IDs.
