@@ -32,15 +32,15 @@ aspect_map = {
 
 
 class GraphType(str, Enum):
-    topology_graph = "topology_graph"
-    regulates_transitivity_graph = "regulates_transitivity_graph"
-    neighborhood_graph = "neighborhood_graph"
+    topology_graph = TOPOLOGY
+    regulates_transitivity_graph = REGULATES_TRANSITIVITY
+    neighborhood_graph = NEIGHBORHOOD_GRAPH
 
 
 class RelationshipType(str, Enum):
-    IS_A = "IS_A"
-    IS_A_PART_OF = "IS_A_PART_OF"
-    REGULATES = "REGULATES"
+    IS_A = IS_A
+    IS_A_PART_OF = IS_A_PART_OF
+    REGULATES = REGULATES
 
 
 

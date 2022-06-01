@@ -5,6 +5,7 @@ from ontobio.golr.golr_associations import map2slim
 from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.util.user_agent import get_user_agent
+from enum import Enum
 
 INVOLVED_IN = 'involved_in'
 ACTS_UPSTREAM_OF_OR_WITHIN = 'acts_upstream_of_or_within'
@@ -15,12 +16,17 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 
+class RelationshipType(str, Enum):
+    acts_upstream_of_or_within = ACTS_UPSTREAM_OF_OR_WITHIN,
+    involved_in = INVOLVED_IN
+
+
 @router.get("/api/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
 async def slimmer_function(slims: List[str] = Query(..., help="Map objects up (slim) to a higher level category. "
                                                               "Value can be ontology class ID",
                                                     description="example: GO:0005575"),
                            subjects: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388"),
-                           relationship_type: str = "acts_upstream_of_or_within",
+                           relationship_type: RelationshipType = Query(default=RelationshipType.acts_upstream_of_or_within),
                            exclude_automatic_assertions: bool = False,
                            rows: int = 100, start: int = 1):
     """
