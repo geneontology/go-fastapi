@@ -22,10 +22,10 @@ class RelationshipType(str, Enum):
 
 
 @router.get("/api/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
-async def slimmer_function(slims: List[str] = Query(..., help="Map objects up (slim) to a higher level category. "
+async def slimmer_function(slim: List[str] = Query(..., help="Map objects up (slim) to a higher level category. "
                                                               "Value can be ontology class ID",
                                                     description="example: GO:0005575"),
-                           subjects: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388"),
+                           subject: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388"),
                            relationship_type: RelationshipType = Query(default=RelationshipType.acts_upstream_of_or_within),
                            exclude_automatic_assertions: bool = False,
                            rows: int = 100, start: int = 1):
@@ -37,7 +37,7 @@ async def slimmer_function(slims: List[str] = Query(..., help="Map objects up (s
     # for some sources: https://github.com/biolink/biolink-api/issues/66
     # https://github.com/monarch-initiative/dipper/issues/461
 
-    subjects = [x.replace('WormBase:', 'WB:') if 'WormBase:' in x else x for x in subjects]
+    subjects = [x.replace('WormBase:', 'WB:') if 'WormBase:' in x else x for x in subject]
     slimmer_subjects = []
     for s in subjects:
         if 'HGNC:' in s or 'NCBIGene:' in s or 'ENSEMBL:' in s:
@@ -50,7 +50,7 @@ async def slimmer_function(slims: List[str] = Query(..., help="Map objects up (s
 
     results = map2slim(
         subjects=slimmer_subjects,
-        slim=slims,
+        slim=slim,
         object_category='function',
         user_agent=USER_AGENT,
         url="http://golr-aux.geneontology.io/solr"
