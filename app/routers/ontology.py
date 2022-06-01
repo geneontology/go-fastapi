@@ -3,8 +3,7 @@ import json
 from ontobio.sparql.sparql_ontol_utils import run_sparql_on, EOntology, transform, transformArray
 from ontobio.golr.golr_query import run_solr_on, replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from app.utils.ontology.ontology_manager import get_ontology
-
+import app.utils.ontology.ontology_utils as ontology_utils
 from typing import List
 from fastapi import APIRouter, Query
 from ontobio.util.user_agent import get_user_agent
@@ -52,7 +51,7 @@ async def get_term_metadata_by_id(id: str,
     """
     Returns meta data of an ontology term, e.g. GO:0003677
     """
-    query = go_summary(id)
+    query = ontology_utils.go_summary(id)
     results = run_sparql_on(query, EOntology.GO)
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
@@ -96,7 +95,7 @@ async def get_subgraph_by_term_id(id: str, graph_type: str = Query(None),
             qnodes += cnode
 
         # COMMENT: based on the CURIE of the id, we should be able to find out the ontology automatically
-        ont = get_ontology("go")
+        ont = ontology_utils.get_ontology("go")
         relations = relation
         print("Traversing: {} using {}".format(qnodes, relations))
         nodes = ont.traverse_nodes(qnodes,
@@ -117,7 +116,7 @@ async def get_subset_by_term(id: str):
         """
         Returns subsets (slims) associated to an ontology term
         """
-        query = get_go_subsets(id)
+        query = ontology_utils.get_go_subsets(id)
         results = run_sparql_on(query, EOntology.GO)
         results = transformArray(results, [])
         results = replace(results, "subset", "OBO:go#", "")
@@ -140,7 +139,7 @@ async def get_subset_metadata_by_id(id: str):
         if id == "goslim_agr":
 
             terms_list = set()
-            for section in agr_slim_order:
+            for section in ontology_utils.agr_slim_order:
                 terms_list.add(section['category'])
                 for term in section['terms']:
                     terms_list.add(term)
@@ -181,7 +180,7 @@ async def get_subset_metadata_by_id(id: str):
             # if goslim_agr, reorder the list based on the temporary json object below
         if id == "goslim_agr":
             temp = []
-            for agr_category in agr_slim_order:
+            for agr_category in ontology_utils.agr_slim_order:
                 cat = agr_category['category']
                 for category in result:
                     if category['annotation_class'] == cat:

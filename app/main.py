@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
+from starlette.responses import FileResponse
 from app.routers import bioentity
 from app.routers import labeler
 from app.routers import ontology
@@ -36,12 +36,21 @@ app.include_router(ontology.router)
 app.include_router(ribbon.router)
 app.include_router(search.router)
 
-app.add_middleware(CORSMiddleware,
-                   allow_origins=["*"],
-                   allow_methods=["*"],
-                   allow_headers=["*"])
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.mount("/static", StaticFiles(directory="../static", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/")
+async def read_index():
+    return FileResponse('static/index.html')
 
 if __name__ == "__main__":
     uvicorn.run('main:app', host="0.0.0.0", port=8080)

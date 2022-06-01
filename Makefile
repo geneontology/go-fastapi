@@ -6,7 +6,7 @@ SHELL := bash
 all: install start export-requirements
 
 start:
-	poetry run gunicorn go_fastapi.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
+	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
 
 test: unit-tests
 
