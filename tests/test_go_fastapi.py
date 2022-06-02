@@ -255,4 +255,3 @@ def test_ontology_term_subsets(endpoint):
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
-    assert len(response.json()) > 2
