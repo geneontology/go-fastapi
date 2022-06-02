@@ -240,7 +240,7 @@ def test_ontology_term_subsets(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/search/entity/{term}",
+        "/search/entity/ssh",
 
     ]
 )
