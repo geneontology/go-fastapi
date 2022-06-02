@@ -7,6 +7,7 @@ from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 from ontobio.config import get_config
 from enum import Enum
+from pprint import pprint
 
 # TODO: @api.marshal_with(association_results)
 log = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
 
 
 @router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
-async def get_function_by_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+async def get_function_by_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598, GO:0002544"),
                              # ... in query means "required" parameter.
                              evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
                                                                            "Includes inferred by default) or a "
@@ -107,11 +108,11 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
                                                                                      "‘involved_in_regulation_of’ or "
                                                                                      "‘acts_upstream_of_or_within’),"),
                              start: int = 0, rows: int = 100):
+
     assocs = search_associations(
         object_category='function',
         subject_category='gene',
         subject=id,
-        sort="id asc",
         user_agent=USER_AGENT,
         url="http://golr-aux.geneontology.io/solr",
         unselect_evidence=unselect_evidence,
@@ -132,6 +133,7 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs['associations']) == 0:
+        prot_associations = []
         # Note that GO currently uses UniProt as primary ID for some sources: https://github.com/biolink/biolink-api/issues/66
         # https://github.com/monarch-initiative/dipper/issues/461
         # prots = scigraph.gene_to_uniprot_proteins(id)
@@ -141,7 +143,6 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
                 subject_category='gene',
                 object_category='function',
                 subject=prot,
-                sort="id asc",
                 user_agent=USER_AGENT,
                 url="http://golr-aux.geneontology.io/solr",
                 unselect_evidence=unselect_evidence,
@@ -149,10 +150,16 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
                 fetch_objects=fetch_objects,
                 exclude_automatic_assertions=exclude_automatic_assertions,
                 use_compact_associations=use_compact_associations,
+                slim=slim,
+                relation=relation,
+                taxon=taxon,
                 start=start,
-                rows=rows
+                rows=rows,
+                evidence=evidence,
             )
-            assocs = pr_assocs
+            if pr_assocs.get('numFound') > 0:
+                prot_associations.append(prot_associations.get('associations'))
+            assocs['associations'] = prot_associations
     return assocs
 
 
