@@ -127,13 +127,13 @@ def test_labeler_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/term/{id}/subsets",
+        "/ontology/term/RGD%3A620474/subsets",
 
     ]
 )
 def test_term_subsets_endpoint(endpoint):
     data = {
-        "id": "RGD:620474"
+        "id": "GO:0006259"
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
