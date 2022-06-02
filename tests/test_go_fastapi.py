@@ -127,13 +127,13 @@ def test_labeler_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/term/RGD%3A620474/subsets",
+        "/ontology/term/{id}}/subsets",
 
     ]
 )
 def test_term_subsets_endpoint(endpoint):
     data = {
-        "id": "GO:0006259"
+        "id": "GO:0003677"
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
@@ -165,7 +165,7 @@ def test_term_by_subset_endpoint(endpoint):
 def test_ribbon_endpoint(endpoint):
     data = {
         "subset": "goslim_agr",
-        "subject": "RGD:620474"
+        "subject": ["RGD:620474"]
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
@@ -246,10 +246,19 @@ def test_ontology_term_subsets(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/search/entity/ssh",
+        "/search/entity/{term}",
 
     ]
 )
 def test_ontology_term_subsets(endpoint):
-    response = test_client.get(endpoint)
+    data = {
+        'term': 'ssh',
+        'category': 'gene',
+        'boost_fix': 0,
+        'boost_q': 0,
+        'taxon': 'NCBITaxon:7955',
+        'highlight_class': 'gene'
+    }
+    response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
+    assert len(response.json()) > 2
