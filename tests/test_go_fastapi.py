@@ -127,30 +127,24 @@ def test_labeler_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/term/{id}/subsets",
+        "/ontology/term/GO%3A0003677/subsets",
 
     ]
 )
 def test_term_subsets_endpoint(endpoint):
-    data = {
-        "id": "GO:0003677"
-    }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/subset/{id}",
+        "/ontology/subset/goslim_agr",
 
     ]
 )
 def test_term_by_subset_endpoint(endpoint):
-    data = {
-        "id": "goslim_agr"
-    }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
 
 
