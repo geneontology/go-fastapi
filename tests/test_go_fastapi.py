@@ -110,7 +110,7 @@ def test_expander_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "api/ontol/labeler/",
+        "/ontol/labeler",
 
     ]
 )
@@ -127,7 +127,7 @@ def test_labeler_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/term/{id}}/subsets",
+        "/ontology/term/{id}/subsets",
 
     ]
 )
