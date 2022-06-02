@@ -134,6 +134,7 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs['associations']) == 0:
         prot_associations = []
+        num_found = 0
         # Note that GO currently uses UniProt as primary ID for some sources: https://github.com/biolink/biolink-api/issues/66
         # https://github.com/monarch-initiative/dipper/issues/461
         # prots = scigraph.gene_to_uniprot_proteins(id)
@@ -158,8 +159,10 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
                 evidence=evidence,
             )
             if pr_assocs.get('numFound') > 0:
-                prot_associations.append(prot_associations.get('associations'))
+                prot_associations.append(pr_assocs.get('associations'))
+                num_found = num_found + pr_assocs.get('numFound')
             assocs['associations'] = prot_associations
+            assocs['numFound'] = num_found
     return assocs
 
 
