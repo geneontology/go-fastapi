@@ -245,8 +245,8 @@ def test_ontology_term_subsets(endpoint):
     data = {
         'term': 'ssh',
         'category': 'gene',
-        'boost_fix': 0,
-        'boost_q': 0,
+        'boost_fix': '0',
+        'boost_q': '0',
         'taxon': 'NCBITaxon:7955',
         'highlight_class': 'gene'
     }
