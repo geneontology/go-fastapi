@@ -73,11 +73,8 @@ def test_slimmer_endpoint(endpoint):
     ]
 )
 def test_prefixes_endpoint(endpoint):
-    data = {
-    }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
-    assert len(response.json()) > 2
 
 
 @pytest.mark.parametrize(
