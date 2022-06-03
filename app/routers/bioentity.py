@@ -31,11 +31,13 @@ class RelationshipType(str, Enum):
     ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
     INVOLVED_IN_REGULATION_OF = INVOLVED_IN_REGULATION_OF
 
+
 router = APIRouter()
 
 
 @router.get("/bioentity/function/{id}", tags=["bioentity"])
-async def get_function_by_go_term_id(id: str = Query(..., description="example: `GO:0044598`"),
+async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
+                                                                        "(e.g. GO:0044598)`"),
                                      evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                     facet: bool = Query(False, include_in_schema=False),
                                     unselect_evidence: bool = Query(False, include_in_schema=False),
@@ -79,7 +81,7 @@ async def get_function_by_go_term_id(id: str = Query(..., description="example: 
 
 
 @router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
-async def get_function_by_id(id: str = Query(..., description="CURIE identifier of a gene"),
+async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term"),
                              # ... in query means "required" parameter.
                              evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
                                                                            "Includes inferred by default) or a "
@@ -172,7 +174,7 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
 
 
 @router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
-async def get_taxon_by_function_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
                                    evidence: List[str] = Query(default=None,
                                                                description="Object id, e.g. ECO:0000501 (for IEA; "
                                                                            "Includes inferred by default) or a "
@@ -217,7 +219,7 @@ async def get_taxon_by_function_id(id: str = Query(..., description="CURIE ident
 
 
 @router.get("/bioentity/gene/{id}/function", tags=["bioentity"])
-async def get_function_by_gene_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
                              # ... in query means "required" parameter.
                              evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
                                                                            "Includes inferred by default) or a "
