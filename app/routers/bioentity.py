@@ -43,8 +43,7 @@ async def get_annotations_by_goterm_id(id: str = Query(..., description="example
                                     unselect_evidence: bool = Query(False, include_in_schema=False),
                                     exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
                                     fetch_objects: bool = Query(False, include_in_schema=False),
-                                    use_compact_associations: bool = Query(False, include_in_schema=False),
-                                    taxon: str = Query(None)):
+                                    use_compact_associations: bool = Query(False, include_in_schema=False)):
     """
     Returns annotations associated to a GO term
     """
@@ -113,64 +112,50 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                                                                                      "‘involved_in_regulation_of’ or "
                                                                                      "‘acts_upstream_of_or_within’),"),
                              start: int = 0, rows: int = 100):
-
-    assocs = search_associations(
-        object_category='function',
-        subject_category='gene',
-        subject=id,
-        user_agent=USER_AGENT,
-        url="http://golr-aux.geneontology.io/solr",
-        unselect_evidence=unselect_evidence,
-        facet=facet,
-        fetch_objects=fetch_objects,
-        exclude_automatic_assertions=exclude_automatic_assertions,
-        use_compact_associations=use_compact_associations,
-        start=start,
-        rows=rows,
-        evidence=evidence,
-        slim=slim,
-        relation=relation,
-        taxon=taxon,
-        relationship_type=relationship_type,
-
-    )
-    pprint(assocs)
-
-    # If there are no associations for the given ID, try other IDs.
-    # Note the AmiGO instance does *not* support equivalent IDs
-    if len(assocs['associations']) == 0:
-        prot_associations = []
-        num_found = 0
-        # Note that GO currently uses UniProt as primary ID for some sources: https://github.com/biolink/biolink-api/issues/66
-        # https://github.com/monarch-initiative/dipper/issues/461
-        # prots = scigraph.gene_to_uniprot_proteins(id)
-        prots = gene_to_uniprot_from_mygene(id)
-        for prot in prots:
-            pr_assocs = search_associations(
-                subject_category='gene',
-                object_category='function',
-                subject=prot,
-                user_agent=USER_AGENT,
-                url="http://golr-aux.geneontology.io/solr",
-                unselect_evidence=unselect_evidence,
-                facet=facet,
-                fetch_objects=fetch_objects,
-                exclude_automatic_assertions=exclude_automatic_assertions,
-                use_compact_associations=use_compact_associations,
-                slim=slim,
-                relation=relation,
-                taxon=taxon,
-                start=start,
-                rows=rows,
-                evidence=evidence,
-            )
-            if pr_assocs.get('numFound') > 0:
-                prot_associations.append(pr_assocs.get('associations'))
-                num_found = num_found + pr_assocs.get('numFound')
-            assocs['associations'] = prot_associations
-            # need to filter out duplicates
-            assocs['numFound'] = num_found
-    return assocs
+    args = self.parser.parse_args()
+    if args['relationship_type'] == ACTS_UPSTREAM_OF_OR_WITHIN:
+        return search_associations(
+            subject_category='gene',
+            object_category='function',
+            fq={
+                'regulates_closure': id,
+            },
+            subject_taxon=args.taxon,
+            sort="id asc",
+            invert_subject_object=True,
+            user_agent=USER_AGENT,
+            url=get_biolink_config().get('amigo_solr_assocs').get('url'),
+            **args
+        )
+    elif args['relationship_type'] == INVOLVED_IN_REGULATION_OF:
+        # Temporary fix until https://github.com/geneontology/amigo/pull/469
+        # and https://github.com/owlcollab/owltools/issues/241 are resolved
+        return search_associations(
+            subject_category='gene',
+            object_category='function',
+            fq={
+                'regulates_closure': id,
+                '-isa_partof_closure': id,
+            },
+            sort="id asc",
+            subject_taxon=args.taxon,
+            invert_subject_object=True,
+            user_agent=USER_AGENT,
+            url=get_biolink_config().get('amigo_solr_assocs').get('url'),
+            **args
+        )
+    elif args['relationship_type'] == INVOLVED_IN:
+        return search_associations(
+            subject_category='gene',
+            object_category='function',
+            subject=id,
+            sort="id asc",
+            subject_taxon=args.taxon,
+            invert_subject_object=True,
+            user_agent=USER_AGENT,
+            url=get_biolink_config().get('amigo_solr_assocs').get('url'),
+            **args
+        )
 
 
 @router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
@@ -288,6 +273,8 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
         # https://github.com/monarch-initiative/dipper/issues/461
         # prots = scigraph.gene_to_uniprot_proteins(id)
         prots = gene_to_uniprot_from_mygene(id)
+        prot_associations = []
+        num_found = 0
         for prot in prots:
             pr_assocs = search_associations(
                 subject_category='gene',
@@ -304,5 +291,10 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
                 start=start,
                 rows=rows
             )
-            assocs = pr_assocs
+            if pr_assocs.get('numFound') > 0:
+                prot_associations.append(pr_assocs.get('associations'))
+                num_found = num_found + pr_assocs.get('numFound')
+            assocs['associations'] = prot_associations
+            # TODO need to filter out duplicates
+            assocs['numFound'] = num_found
     return assocs
