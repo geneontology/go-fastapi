@@ -81,13 +81,19 @@ async def get_annotations_by_goterm_id(id: str = Query(..., description="example
 
 @router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term"),
-                             taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
-                                                                                "associations by subject taxon"),
-                             relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
-                                                                         description="relationship type ('involved_in’,"
-                                                                                     "‘involved_in_regulation_of’ or "
-                                                                                     "‘acts_upstream_of_or_within’),"),
-                             start: int = 0, rows: int = 100):
+                                 taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
+                                                                                    "associations by subject taxon"),
+                                 relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
+                                                                             description="relationship type ('involved_in’,"
+                                                                                         "‘involved_in_regulation_of’ or "
+                                                                                         "‘acts_upstream_of_or_within’),"),
+                                 relation: str = Query(None, description="A relation CURIE to filter associations"),
+                                 slim: List[str] = Query(default=None,
+                                                         description="Map objects up slim to a higher level"
+                                                                     " category. Value can be ontology "
+                                                                     "class ID or subset ID"),
+                                 evidence: List[str] = Query(default=None),
+                                 start: int = 0, rows: int = 100):
 
         """
         Returns genes associated to a GO term
@@ -100,9 +106,11 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                     'regulates_closure': id,
                 },
                 subject_taxon=taxon,
-                sort="id asc",
                 invert_subject_object=True,
                 user_agent=USER_AGENT,
+                slim=slim,
+                taxon=taxon,
+                relation=relation,
                 url="http://golr-aux.geneontology.io/solr"
             )
         elif relationship_type == INVOLVED_IN_REGULATION_OF:
@@ -115,10 +123,11 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                     'regulates_closure': id,
                     '-isa_partof_closure': id,
                 },
-                sort="id asc",
                 subject_taxon=taxon,
                 invert_subject_object=True,
                 user_agent=USER_AGENT,
+                slim=slim,
+                relation=relation,
                 url="http://golr-aux.geneontology.io/solr"
             )
         elif relationship_type == INVOLVED_IN:
@@ -126,14 +135,11 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                 subject_category='gene',
                 object_category='function',
                 subject=id,
-                sort="id asc",
                 subject_taxon=taxon,
                 invert_subject_object=True,
                 user_agent=USER_AGENT,
                 url="http://golr-aux.geneontology.io/solr"
             )
-
-
 
 
 @router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
@@ -184,25 +190,6 @@ async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identif
 @router.get("/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
                              # ... in query means "required" parameter.
-                             evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
-                                                                           "Includes inferred by default) or a "
-                                                                           "specific publication or other supporting "
-                                                                           "object, e.g. ZFIN:ZDB-PUB-060503-2"),
-                             facet: bool = Query(default=False, description="Enable faceting"),
-                             unselect_evidence: bool = Query(default=False, description="If true, excludes "
-                                                                                        "evidence objects in response"),
-                             fetch_objects: bool = Query(default=False, description="If true, returns a distinct set "
-                                                                                   "of association.objects (typically "
-                                                                                   "ontology terms). This appears at "
-                                                                                   "the top level of the results "
-                                                                                   "payload"),
-                             exclude_automatic_assertions: bool = Query(default=False, description="If true, excludes "
-                                                                                                   "associations that "
-                                                                                                   "involve IEAs "
-                                                                                                   "(ECO:0000501)"),
-                             use_compact_associations: bool = Query(default=False, description="If true, returns "
-                                                                                               "results in compact "
-                                                                                               "associations format"),
                              slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"
                                                                                " category. Value can be ontology "
                                                                                "class ID or subset ID"),
@@ -235,11 +222,6 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
         sort="id asc",
         user_agent=USER_AGENT,
         url="http://golr-aux.geneontology.io/solr",
-        unselect_evidence=unselect_evidence,
-        facet=facet,
-        fetch_objects=fetch_objects,
-        exclude_automatic_assertions=exclude_automatic_assertions,
-        use_compact_associations=use_compact_associations,
         start=start,
         rows=rows,
         slim=slim
@@ -262,11 +244,6 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
                 sort="id asc",
                 user_agent=USER_AGENT,
                 url="http://golr-aux.geneontology.io/solr",
-                unselect_evidence=unselect_evidence,
-                facet=facet,
-                fetch_objects=fetch_objects,
-                exclude_automatic_assertions=exclude_automatic_assertions,
-                use_compact_associations=use_compact_associations,
                 start=start,
                 rows=rows
             )
