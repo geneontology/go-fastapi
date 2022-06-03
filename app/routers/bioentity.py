@@ -81,81 +81,59 @@ async def get_annotations_by_goterm_id(id: str = Query(..., description="example
 
 @router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term"),
-                             # ... in query means "required" parameter.
-                             evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
-                                                                           "Includes inferred by default) or a "
-                                                                           "specific publication or other supporting "
-                                                                           "object, e.g. ZFIN:ZDB-PUB-060503-2"),
-                             facet: bool = Query(default=False, description="Enable faceting"),
-                             unselect_evidence: bool = Query(default=False, description="If true, excludes "
-                                                                                        "evidence objects in response"),
-                             fetch_objects: bool = Query(default=False, description="If true, returns a distinct set "
-                                                                                   "of association.objects (typically "
-                                                                                   "ontology terms). This appears at "
-                                                                                   "the top level of the results "
-                                                                                   "payload"),
-                             exclude_automatic_assertions: bool = Query(default=False, description="If true, excludes "
-                                                                                                   "associations that "
-                                                                                                   "involve IEAs "
-                                                                                                   "(ECO:0000501)"),
-                             use_compact_associations: bool = Query(default=False, description="If true, returns "
-                                                                                               "results in compact "
-                                                                                               "associations format"),
                              taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
                                                                                 "associations by subject taxon"),
-                             slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"
-                                                                               " category. Value can be ontology "
-                                                                               "class ID or subset ID"),
-                             relation: str = Query(default=None, description="A relation CURIE to filter associations"),
                              relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
                                                                          description="relationship type ('involved_in’,"
                                                                                      "‘involved_in_regulation_of’ or "
                                                                                      "‘acts_upstream_of_or_within’),"),
                              start: int = 0, rows: int = 100):
-    args = self.parser.parse_args()
-    if args['relationship_type'] == ACTS_UPSTREAM_OF_OR_WITHIN:
-        return search_associations(
-            subject_category='gene',
-            object_category='function',
-            fq={
-                'regulates_closure': id,
-            },
-            subject_taxon=args.taxon,
-            sort="id asc",
-            invert_subject_object=True,
-            user_agent=USER_AGENT,
-            url=get_biolink_config().get('amigo_solr_assocs').get('url'),
-            **args
-        )
-    elif args['relationship_type'] == INVOLVED_IN_REGULATION_OF:
-        # Temporary fix until https://github.com/geneontology/amigo/pull/469
-        # and https://github.com/owlcollab/owltools/issues/241 are resolved
-        return search_associations(
-            subject_category='gene',
-            object_category='function',
-            fq={
-                'regulates_closure': id,
-                '-isa_partof_closure': id,
-            },
-            sort="id asc",
-            subject_taxon=args.taxon,
-            invert_subject_object=True,
-            user_agent=USER_AGENT,
-            url=get_biolink_config().get('amigo_solr_assocs').get('url'),
-            **args
-        )
-    elif args['relationship_type'] == INVOLVED_IN:
-        return search_associations(
-            subject_category='gene',
-            object_category='function',
-            subject=id,
-            sort="id asc",
-            subject_taxon=args.taxon,
-            invert_subject_object=True,
-            user_agent=USER_AGENT,
-            url=get_biolink_config().get('amigo_solr_assocs').get('url'),
-            **args
-        )
+
+        """
+        Returns genes associated to a GO term
+        """
+        if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
+            return search_associations(
+                subject_category='gene',
+                object_category='function',
+                fq={
+                    'regulates_closure': id,
+                },
+                subject_taxon=taxon,
+                sort="id asc",
+                invert_subject_object=True,
+                user_agent=USER_AGENT,
+                url="http://golr-aux.geneontology.io/solr"
+            )
+        elif relationship_type == INVOLVED_IN_REGULATION_OF:
+            # Temporary fix until https://github.com/geneontology/amigo/pull/469
+            # and https://github.com/owlcollab/owltools/issues/241 are resolved
+            return search_associations(
+                subject_category='gene',
+                object_category='function',
+                fq={
+                    'regulates_closure': id,
+                    '-isa_partof_closure': id,
+                },
+                sort="id asc",
+                subject_taxon=taxon,
+                invert_subject_object=True,
+                user_agent=USER_AGENT,
+                url="http://golr-aux.geneontology.io/solr"
+            )
+        elif relationship_type == INVOLVED_IN:
+            return search_associations(
+                subject_category='gene',
+                object_category='function',
+                subject=id,
+                sort="id asc",
+                subject_taxon=taxon,
+                invert_subject_object=True,
+                user_agent=USER_AGENT,
+                url="http://golr-aux.geneontology.io/solr"
+            )
+
+
 
 
 @router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
@@ -228,6 +206,7 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
                              slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"
                                                                                " category. Value can be ontology "
                                                                                "class ID or subset ID"),
+
                              start: int = 0, rows: int = 100):
     """
     Returns GO terms associated to a gene.
