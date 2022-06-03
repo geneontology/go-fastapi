@@ -1,20 +1,6 @@
-solr_assocs:
+solr_url:
   url: "http://golr-aux.geneontology.io/solr"
   timeout: 30
-amigo_solr_assocs:
-  url: "http://golr-aux.geneontology.io/solr"
-  timeout: 30
-solr_search:
-  url: "http://golr-aux.geneontology.io/solr"
-  timeout: 30
-amigo_solr_search:
-  url: "http://golr-aux.geneontology.io/solr"
-  timeout: 30
-sparql:
-  url: "http://rdf-testing.geneontology.io/blazegraph/#query"
-  timeout: 30
-use_amigo_for:
-  - function
 ontologies:
   - id: go
     handle: go
