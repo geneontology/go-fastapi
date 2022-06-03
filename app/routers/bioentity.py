@@ -35,12 +35,14 @@ router = APIRouter()
 
 
 @router.get("/bioentity/function/{id}", tags=["bioentity"])
-async def get_function_associations(id: str, evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
+async def get_function_by_go_term_id(id: str = Query(..., description="example: `GO:0044598`"),
+                                     evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
                                     facet: bool = Query(False, include_in_schema=False),
                                     unselect_evidence: bool = Query(False, include_in_schema=False),
                                     exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
                                     fetch_objects: bool = Query(False, include_in_schema=False),
-                                    use_compact_associations: bool = Query(False, include_in_schema=False)):
+                                    use_compact_associations: bool = Query(False, include_in_schema=False),
+                                    taxon: str = Query(None)):
     """
     Returns annotations associated to a GO term
     """
@@ -49,6 +51,7 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
     fields = "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon," \
              "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
              "reference,annotation_extension_class,annotation_extension_class_label"
+
     query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
 
     evidences = evidence
@@ -76,7 +79,7 @@ async def get_function_associations(id: str, evidence: List[str] = Query(None), 
 
 
 @router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
-async def get_function_by_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598, GO:0002544"),
+async def get_function_by_id(id: str = Query(..., description="CURIE identifier of a gene"),
                              # ... in query means "required" parameter.
                              evidence: List[str] = Query(None, description="Object id, e.g. ECO:0000501 (for IEA; "
                                                                            "Includes inferred by default) or a "
@@ -129,6 +132,7 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
         relationship_type=relationship_type,
 
     )
+    pprint(assocs)
 
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
@@ -162,6 +166,7 @@ async def get_function_by_id(id: str = Query(..., description="CURIE identifier 
                 prot_associations.append(pr_assocs.get('associations'))
                 num_found = num_found + pr_assocs.get('numFound')
             assocs['associations'] = prot_associations
+            # need to filter out duplicates
             assocs['numFound'] = num_found
     return assocs
 
