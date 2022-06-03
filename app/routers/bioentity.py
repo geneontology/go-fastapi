@@ -38,12 +38,7 @@ router = APIRouter()
 @router.get("/bioentity/function/{id}", tags=["bioentity"])
 async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
-                                     evidence: List[str] = Query(None), start: int = 0, rows: int = 100,
-                                    facet: bool = Query(False, include_in_schema=False),
-                                    unselect_evidence: bool = Query(False, include_in_schema=False),
-                                    exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
-                                    fetch_objects: bool = Query(False, include_in_schema=False),
-                                    use_compact_associations: bool = Query(False, include_in_schema=False)):
+                                     evidence: List[str] = Query(None), start: int = 0, rows: int = 100):
     """
     Returns annotations associated to a GO term
     """
@@ -53,7 +48,11 @@ async def get_annotations_by_goterm_id(id: str = Query(..., description="example
              "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
              "reference,annotation_extension_class,annotation_extension_class_label"
 
-    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=" \
+                    "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=" \
+                    "annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=" \
+                    "reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=" \
+                    "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
 
     evidences = evidence
     evidence = ""
@@ -64,16 +63,7 @@ async def get_annotations_by_goterm_id(id: str = Query(..., description="example
         evidence = evidence[:-1]
         evidence += ")"
 
-    taxon_restrictions = ""
-    cfg = get_config()
-    if cfg.taxon_restriction is not None:
-        taxon_restrictions = "&fq=taxon_subset_closure:("
-        for c in cfg.taxon_restriction:
-            taxon_restrictions += "\"" + c + "\","
-        taxon_restrictions = taxon_restrictions[:-1]
-        taxon_restrictions += ")"
-
-    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
 
     return data
