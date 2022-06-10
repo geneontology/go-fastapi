@@ -38,6 +38,7 @@ async def slimmer_function(relationship_type: RelationshipType =
     # for some sources: https://github.com/biolink/biolink-api/issues/66
     # https://github.com/monarch-initiative/dipper/issues/461
 
+    # TODO - figure out if this is still needed. WormBase to WB
     subjects = [x.replace('WormBase:', 'WB:') if 'WormBase:' in x else x for x in subject]
     slimmer_subjects = []
     for s in subjects:

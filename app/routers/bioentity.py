@@ -82,7 +82,6 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                                                          description="Map objects up slim to a higher level"
                                                                      " category. Value can be ontology "
                                                                      "class ID or subset ID"),
-                                 evidence: List[str] = Query(default=None),
                                  start: int = 0, rows: int = 100):
 
         """
@@ -116,6 +115,7 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                 subject_taxon=taxon,
                 invert_subject_object=True,
                 user_agent=USER_AGENT,
+                taxon=taxon,
                 slim=slim,
                 relation=relation,
                 url="http://golr-aux.geneontology.io/solr"
@@ -127,6 +127,7 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
                 subject=id,
                 subject_taxon=taxon,
                 invert_subject_object=True,
+                taxon=taxon,
                 user_agent=USER_AGENT,
                 url="http://golr-aux.geneontology.io/solr"
             )
