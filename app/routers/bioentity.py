@@ -7,6 +7,7 @@ from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 from ontobio.config import get_config
 from enum import Enum
+from pydantic import BaseModel
 from pprint import pprint
 
 # TODO: @api.marshal_with(association_results)
@@ -30,6 +31,35 @@ class RelationshipType(str, Enum):
     INVOLVED_IN = INVOLVED_IN
     ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
     INVOLVED_IN_REGULATION_OF = INVOLVED_IN_REGULATION_OF
+
+
+class Association(BaseModel):
+    id: str # fields.String(readOnly=True, description='Association/annotation unique ID', required=True),
+    type: str # fields.String(readOnly=True, description='Type of association, e.g. gene-phenotype'),
+    subject: fields.Nested(bio_object_core,
+                                 description='Subject of association (what it is about), e.g. ClinVar:nnn, MGI:1201606',
+                                 required=True),
+    subject_extensions: fields.List(fields.Nested(annotation_extension,
+                                                        description='Additional properties of the subject in the context of this association.')),
+    object: fields.Nested(bio_object_core,
+                                description='Object (sensu RDF), aka target, e.g. HP:0000448, MP:0002109, DOID:14330',
+                                required=True),
+    object_extensions: fields.List(fields.Nested(annotation_extension,
+                                                       description='Additional properties of the object in the context of this association. See http://www.biomedcentral.com/1471-2105/15/155')),
+    relation: fields.Nested(relation_ref, description='Relationship type connecting subject and object',
+                                  required=True),
+    slim: fields.List(fields.String, description='Objects mapped to a slim'),
+    negated: fields.Boolean(description='True if association is negated'),
+    qualifiers: fields.List(fields.String, description='Qualifier on the association'),
+    evidence_graph: fields.Nested(bbop_graph,
+                                        description='An indirect association is a join between two or more direct assocations, e.g. gene to disease via ortholog. We record the full set of associations as a graph object'),
+    evidence_types: fields.List(fields.Nested(named_object),
+                                      description='Evidence types (ECO classes) extracted from evidence graph'),
+    provided_by: fields.List(fields.String, description='Provider of association, e.g. Orphanet, ClinVar'),
+    publications: fields.List(fields.Nested(publication),
+                                    description='Publications supporting association, extracted from evidence graph')
+        )
+
 
 
 router = APIRouter()
