@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 import pytest
+from pprint import pprint
 
 test_client = TestClient(app)
 
@@ -17,7 +18,7 @@ def test_bioenty_id_endpoints(endpoint):
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
-    print(response.json())
+    pprint(response.json())
 
 
 @pytest.mark.parametrize(

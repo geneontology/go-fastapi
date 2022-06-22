@@ -49,22 +49,17 @@ async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE 
                                                                         "(e.g. GO:0044598)`"),
                               start: int = 0, rows: int = 100):
 
-    fields = "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon," \
-             "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
-             "reference,annotation_extension_class,annotation_extension_class_label"
+    # fields is translated to fl in solr, which determines which stored fields should be returned with
+    # the query
+    fields = "id,bioentity_name,synonym,taxon,taxon_label,"
 
-    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=" \
-                    "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=" \
-                    "annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=" \
-                    "reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=" \
-                    "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    # query_filters is translated to the qf solr parameter
+    query_filters = "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1" \
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
+    # id here is passed to solr q parameter
     bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
-    print(bioentity)
     return bioentity
-
-
 
 
 @router.get("/bioentity/function/{id}", tags=["bioentity"])
