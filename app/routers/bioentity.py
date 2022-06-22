@@ -1,5 +1,7 @@
 import logging
+from go_library.datamodel.amigo_solr import *
 from typing import List
+from pydantic import BaseModel
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import search_associations
 from .slimmer import gene_to_uniprot_from_mygene
@@ -7,7 +9,7 @@ from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 from ontobio.config import get_config
 from enum import Enum
-from go_library import datamodel
+
 
 # TODO: @api.marshal_with(association_results)
 log = logging.getLogger(__name__)
@@ -26,6 +28,14 @@ categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 
+class Annot(BaseModel):
+    id: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: list[str] = []
+
+
 class RelationshipType(str, Enum):
     INVOLVED_IN = INVOLVED_IN
     ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
@@ -35,7 +45,14 @@ class RelationshipType(str, Enum):
 router = APIRouter()
 
 
-@router.get("/bioentity/function/{id}", tags=["bioentity"])
+@router.get("/bioentity/test/{id}", tags=["bioentity"], response_model=Annot)
+async def get_annotations_by_test_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
+                                                                        "(e.g. GO:0044598)`")):
+    annot = Annot(id=id)
+    return annot
+
+
+@router.get("/bioentity/function/{id}", tags=["bioentity"], response_model=List[Annot])
 async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
                                      evidence: List[str] = Query(None), start: int = 0, rows: int = 100):
