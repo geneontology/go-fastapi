@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 from app.main import app
-from pprint import pprint
 import pytest
 
 test_client = TestClient(app)
@@ -14,12 +13,11 @@ test_client = TestClient(app)
 )
 def test_bioenty_id_endpoints(endpoint):
     data = {
-        'id': 'GO:0044598',
+        'id': 'ZFIN:ZDB-GENE-980526-388',
     }
     response = test_client.get(endpoint, json=data)
     assert response.status_code == 200
-    assert len(response.json()) > 99
-
+    print(response.json())
 
 
 @pytest.mark.parametrize(

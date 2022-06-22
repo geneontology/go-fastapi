@@ -47,17 +47,23 @@ router = APIRouter()
 @router.get("/bioentity/{id}", tags=["bioentity"])
 async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
-                              start: int = 0,
-                              rows: int = 100):
+                              start: int = 0, rows: int = 100):
 
-    return search_associations(
-        subject=id,
-        subject_closure="id",
-        user_agent=USER_AGENT,
-        sort="id asc",
-        object_category="function",
-        url="http://golr-aux.geneontology.io/solr",
-    )
+    fields = "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon," \
+             "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
+             "reference,annotation_extension_class,annotation_extension_class_label"
+
+    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=" \
+                    "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=" \
+                    "annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=" \
+                    "reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=" \
+                    "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
+    bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
+    print(bioentity)
+    return bioentity
+
 
 
 
