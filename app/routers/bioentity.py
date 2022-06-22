@@ -44,6 +44,23 @@ class RelationshipType(str, Enum):
 router = APIRouter()
 
 
+@router.get("/bioentity/{id}", tags=["bioentity"])
+async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
+                                                                        "(e.g. GO:0044598)`"),
+                              start: int = 0,
+                              rows: int = 100):
+
+    return search_associations(
+        subject=id,
+        subject_closure="id",
+        user_agent=USER_AGENT,
+        sort="id asc",
+        object_category="function",
+        url="http://golr-aux.geneontology.io/solr",
+    )
+
+
+
 @router.get("/bioentity/function/{id}", tags=["bioentity"])
 async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
