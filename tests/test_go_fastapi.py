@@ -1,8 +1,25 @@
 from fastapi.testclient import TestClient
 from app.main import app
 import pytest
+from pprint import pprint
 
 test_client = TestClient(app)
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/bioentity/id"
+    ]
+)
+def test_bioenty_id_endpoints(endpoint):
+    data = {
+        'id': 'ZFIN:ZDB-GENE-980526-388',
+    }
+    response = test_client.get(endpoint, json=data)
+    assert response.status_code == 200
+    pprint(response.json())
+
 
 @pytest.mark.parametrize(
     "endpoint",
@@ -10,7 +27,7 @@ test_client = TestClient(app)
         "/bioentity/function/id"
     ]
 )
-def test_bioenty_endpoints(endpoint):
+def test_bioenty_function_id_endpoints(endpoint):
     data = {
         'id': 'GO:0044598',
     }
@@ -28,7 +45,7 @@ def test_bioenty_endpoints(endpoint):
 
     ]
 )
-def test_bioenty_endpoints(endpoint):
+def test_bioenty_gene_endpoints(endpoint):
     response = test_client.get(endpoint)
     assert response.status_code == 200
     assert len(response.json()) >= 4
@@ -43,7 +60,7 @@ def test_bioenty_endpoints(endpoint):
 
     ]
 )
-def test_bioenty_endpoints(endpoint):
+def test_bioenty_gene_function_endpoints(endpoint):
     response = test_client.get(endpoint)
     assert response.status_code == 200
     assert len(response.json()) >= 4

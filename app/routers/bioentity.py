@@ -1,5 +1,7 @@
 import logging
+from go_library.datamodel.amigo_solr import *
 from typing import List
+from pydantic import BaseModel, Field
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import search_associations
 from .slimmer import gene_to_uniprot_from_mygene
@@ -7,7 +9,7 @@ from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 from ontobio.config import get_config
 from enum import Enum
-from pprint import pprint
+
 
 # TODO: @api.marshal_with(association_results)
 log = logging.getLogger(__name__)
@@ -26,6 +28,13 @@ categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 
+class Annotation(BaseModel):
+    id: str
+    full_name: Union[str, None] = None
+    taxon_closure: Optional[Union[str, List[str]]] = Field(default_factory=list)
+    secondary_taxon: str
+
+
 class RelationshipType(str, Enum):
     INVOLVED_IN = INVOLVED_IN
     ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
@@ -33,6 +42,24 @@ class RelationshipType(str, Enum):
 
 
 router = APIRouter()
+
+
+@router.get("/bioentity/{id}", tags=["bioentity"])
+async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
+                                                                        "(e.g. GO:0044598)`"),
+                              start: int = 0, rows: int = 100):
+
+    # fields is translated to fl in solr, which determines which stored fields should be returned with
+    # the query
+    fields = "id,bioentity_name,synonym,taxon,taxon_label,"
+
+    # query_filters is translated to the qf solr parameter
+    query_filters = "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1" \
+
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
+    # id here is passed to solr q parameter
+    bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
+    return bioentity
 
 
 @router.get("/bioentity/function/{id}", tags=["bioentity"])
