@@ -30,10 +30,6 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 class Annot(BaseModel):
     id: str
-    description: Union[str, None] = None
-    price: float
-    tax: Union[float, None] = None
-    tags: list[str] = []
 
 
 class RelationshipType(str, Enum):
@@ -52,7 +48,7 @@ async def get_annotations_by_test_id(id: str = Query(..., description="example: 
     return annot
 
 
-@router.get("/bioentity/function/{id}", tags=["bioentity"], response_model=List[Annot])
+@router.get("/bioentity/function/{id}", tags=["bioentity"], response_model=List[Annotation])
 async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
                                      evidence: List[str] = Query(None), start: int = 0, rows: int = 100):
