@@ -6,19 +6,19 @@ import pytest
 test_client = TestClient(app)
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/bioentity/function/id"
-    ]
-)
-def test_get_annotations_by_test_id(endpoint):
-    data = {
-        'id': 'GO:0044598',
-    }
-    response = test_client.get(endpoint, json=data)
-    assert response.status_code == 200
-    pprint(response.json())
+# @pytest.mark.parametrize(
+#     "endpoint",
+#     [
+#         "/bioentity/test/id"
+#     ]
+# )
+# def test_get_annotations_by_test_id(endpoint):
+#     data = {
+#         'id': 'GO:0044598',
+#     }
+#     response = test_client.get(endpoint, json=data)
+#     assert response.status_code == 200
+#     pprint(response.json())
 
 
 @pytest.mark.parametrize(
