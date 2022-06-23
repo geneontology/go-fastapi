@@ -249,7 +249,7 @@ def test_ontology_term_subsets(endpoint):
 
     ]
 )
-def test_ontology_term_subsets(endpoint):
+def test_search_entity(endpoint):
     data = {
         'term': 'ssh',
         'category': 'gene',
@@ -259,4 +259,16 @@ def test_ontology_term_subsets(endpoint):
         'highlight_class': 'gene'
     }
     response = test_client.get(endpoint, json=data)
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/search/entity/autocomplete/biological",
+
+    ]
+)
+def test_autocomplete(endpoint):
+    response = test_client.get(endpoint)
     assert response.status_code == 200

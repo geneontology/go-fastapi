@@ -27,11 +27,11 @@ categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 
 
-class Annotation(BaseModel):
-    id: str
-    full_name: Union[str, None] = None
-    taxon_closure: Optional[Union[str, List[str]]] = Field(default_factory=list)
-    secondary_taxon: str
+# class Annotation(BaseModel):
+#     id: str
+#     full_name: Union[str, None] = None
+#     taxon_closure: Optional[Union[str, List[str]]] = Field(default_factory=list)
+#     secondary_taxon: str
 
 
 class RelationshipType(str, Enum):
