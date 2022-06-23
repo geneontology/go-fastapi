@@ -1,5 +1,4 @@
 import logging
-from go_library.datamodel.amigo_solr import *
 from typing import List
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Query

@@ -1,7 +1,7 @@
 import logging
-from fastapi import APIRouter
 from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import GolrSearchQuery
+from fastapi import APIRouter, Query
 
 log = logging.getLogger(__name__)
 
@@ -15,28 +15,24 @@ def search(term, args):
 
 
 @router.get("/search/entity/{term}", tags=["search"])
-async def search_term(term: str,
-                      category: str,
-                      boost_fix: str,
-                      boost_q: str,
-                      taxon: str,
-                      highlight_class: str,
-                      rows: int = 20,
-                      start: int = 0):
+async def search_term(term: str):
     # TODO @api.marshal_with(search_result)
     """
     Returns list of matching concepts or entities using lexical search
 
     :param term: search string, e.g. shh, cell
-    :param category: e.g. gene, disease
-    :param boost_fix: boost function e.g. pow(edges,0.334)
-    :param boost_q: boost query e.g. category:genotype^-10
-    :param taxon: taxon filter, eg NCBITaxon:9606, includes inferred taxa
-    :param highlight_class: highlight class
-    :param rows: number of rows
-    :param start: number to start from
 
     """
     q = GolrSearchQuery(term, user_agent=USER_AGENT)
     results = q.search()
+    return results
+
+
+@router.get('/search/entity/autocomplete/{term}', tags=["search"])
+async def autocomplete_term(term: str = Query(..., description="example: `biological`")):
+    """
+        Returns list of matching concepts or entities using lexical search
+        """
+    q = GolrSearchQuery(term, user_agent=USER_AGENT)
+    results = q.autocomplete()
     return results
