@@ -9,14 +9,14 @@ test_client = TestClient(app)
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/bioentity/id"
+        "/bioentity/ZFIN%3AZDB-GENE-980526-388"
     ]
 )
 def test_bioenty_id_endpoints(endpoint):
     data = {
         'id': 'ZFIN:ZDB-GENE-980526-388',
     }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
     pprint(response.json())
 
@@ -24,14 +24,14 @@ def test_bioenty_id_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/bioentity/function/id"
+        "/bioentity/function/GO%3A0044598"
     ]
 )
 def test_bioenty_function_id_endpoints(endpoint):
     data = {
         'id': 'GO:0044598',
     }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
     assert len(response.json()) > 99
 
