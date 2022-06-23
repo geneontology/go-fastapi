@@ -13,9 +13,6 @@ test_client = TestClient(app)
     ]
 )
 def test_bioenty_id_endpoints(endpoint):
-    data = {
-        'id': 'ZFIN:ZDB-GENE-980526-388',
-    }
     response = test_client.get(endpoint)
     assert response.status_code == 200
     pprint(response.json())
@@ -28,9 +25,6 @@ def test_bioenty_id_endpoints(endpoint):
     ]
 )
 def test_bioenty_function_id_endpoints(endpoint):
-    data = {
-        'id': 'GO:0044598',
-    }
     response = test_client.get(endpoint)
     assert response.status_code == 200
     assert len(response.json()) > 99
@@ -114,10 +108,7 @@ def test_prefixes_contract_endpoint(endpoint):
     ]
 )
 def test_expander_endpoint(endpoint):
-    data = {
-        "id": "MGI:1"
-    }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint)
     assert response.status_code == 200
 
 
