@@ -37,34 +37,19 @@ class RelationshipType(str, Enum):
     REGULATES = REGULATES
 
 
-
 @router.get("/ontology/term/{id}", tags=["ontology"])
-async def get_term_metadata_by_id(id: str,
-                                  relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF, include_in_schema=False),
-                                  graph_type: GraphType = Query(None, include_in_schema=False),
-                                  cnode: str = Query(None, include_in_schema=False),
-                                  include_ancestors: bool = Query(True, include_in_schema=False),
-                                  include_descendents: bool = Query(True, include_in_schema=False),
-                                  relation: List[str] = Query(['subClassOf', 'BFO:0000050'], include_in_schema=False),
-                                  include_meta: bool = Query(False, include_in_schema=False)):
+async def get_term_metadata_by_id(id: str):
     """
     Returns meta data of an ontology term, e.g. GO:0003677
     """
+    print(id)
     query = ontology_utils.go_summary(id)
     results = run_sparql_on(query, EOntology.GO)
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
 
 @router.get("/ontology/term/{id}/graph", tags=["ontology"])
-async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.topology_graph),
-                               relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF,
-                                                                           include_in_schema=False),
-                               cnode: str = Query(None, include_in_schema=False),
-                               include_ancestors: bool = Query(True, include_in_schema=False),
-                               include_descendents: bool = Query(True, include_in_schema=False),
-                               relation: List[str] = Query(['subClassOf', 'BFO:0000050'], include_in_schema=False),
-                               include_meta: bool = Query(False, include_in_schema=False)
-                               ):
+async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.topology_graph)):
     """
         Returns graph of an ontology term
         """
@@ -111,7 +96,7 @@ async def get_subgraph_by_term_id(id: str,
 
 
 @router.get("/ontology/term/{id}/subsets", tags=["ontology"])
-async def get_subset_by_term(id: str):
+async def get_subsets_by_term(id: str):
     """
         Returns subsets (slims) associated to an ontology term
         """
@@ -122,7 +107,7 @@ async def get_subset_by_term(id: str):
     return results
 
 
-@router.get("/ontology/term/{id}", tags=["ontology"])
+@router.get("/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
     """
         Returns meta data of an ontology subset (slim)
@@ -197,7 +182,7 @@ async def get_subset_metadata_by_id(id: str):
 
 
 @router.get("/ontology/shared/{subject}/{object}", tags=["ontology"])
-async def get_subset_metadata_by_id(subject: str, object: str):
+async def get_ancestors_shared_by_two_terms(subject: str, object: str):
     """
         Returns the ancestor ontology terms shared by two ontology terms
 
@@ -205,6 +190,8 @@ async def get_subset_metadata_by_id(subject: str, object: str):
         object: 'CURIE identifier of a GO term, e.g. GO:0046483'
         """
 
+    print(subject)
+    print(object)
     fields = "isa_partof_closure,isa_partof_closure_label"
 
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
