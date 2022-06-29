@@ -167,36 +167,19 @@ def test_ontology_subset(endpoint):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/term/{id}",
-
-    ]
-)
-def test_ontology_term_id(endpoint):
-    data = {
-        "id": "GO:0046483"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", go_ids)
+def test_ontology_term_id(id):
+    response = test_client.get(f"/ontology/term/{id}")
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/term/{id}/subgraph",
-
-    ]
-)
-def test_ontology_term_graph(endpoint):
-    data = {
-        "id": "GO:0046483"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", go_ids)
+def test_ontology_term_graph(id):
+    response = test_client.get(f"/ontology/term/{id}/subgraph")
     assert response.status_code == 200
 
 
+@pytest.skip
 @pytest.mark.parametrize(
     "endpoint",
     [
@@ -210,24 +193,18 @@ def test_ontology_term_subgraph(endpoint):
         "graph_type": "topology_graph"
     }
     response = test_client.get(endpoint, params=data)
+    print(response.json())
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/term/{id}/subsets",
-
-    ]
-)
-def test_ontology_term_subsets(endpoint):
-    data = {
-        "id": "GO:0046483"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.skip
+@pytest.mark.parametrize("id", go_ids)
+def test_ontology_term_subsets(id):
+    response = test_client.get(f"/ontology/term/{id}/subsets")
     assert response.status_code == 200
 
 
+@pytest.skip
 @pytest.mark.parametrize(
     "endpoint",
     [
@@ -249,6 +226,7 @@ def test_search_entity(endpoint):
     assert response.status_code == 200
 
 
+@pytest.skip
 @pytest.mark.parametrize(
     "endpoint",
     [
