@@ -6,47 +6,27 @@ from pprint import pprint
 test_client = TestClient(app)
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/bioentity/{id}"
-    ]
-)
-def test_bioenty_id_endpoints(endpoint):
-    data = {
-        id: "ZFIN:ZDB-GENE-980526-388"
-    }
-    response = test_client.get(endpoint, params=data)
+gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
+go_ids = ["GO:0008150", "GO:0008149"]
+
+
+@pytest.mark.parametrize("id", gene_ids)
+def test_bioenty_id_endpoints(id):
+    response = test_client.get(f"/bioentity/{id}")
     assert response.status_code == 200
     pprint(response.json())
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/bioentity/function/{id}"
-    ]
-)
-def test_bioenty_function_id_endpoints(endpoint):
-    data = {
-        id: "GO:0044598"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", go_ids)
+def test_bioenty_function_id_endpoints(id):
+    response = test_client.get(f"/bioentity/function/{id}")
     assert response.status_code == 200
     assert len(response.json()) > 99
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/bioentity/gene/{id}/function",
-    ]
-)
-def test_bioenty_gene_endpoints(endpoint):
-    data = {
-        id: "ZFIN:ZDB-GENE-980526-388"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", go_ids)
+def test_bioenty_gene_endpoints(id):
+    response = test_client.get(f"/bioentity/gene/{id}/function")
     assert response.status_code == 200
     assert len(response.json()) >= 4
 
@@ -170,12 +150,15 @@ def test_term_subsets_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/subset/",
+        "/ontology/subset/{id}",
 
     ]
 )
 def test_term_by_subset_endpoint(endpoint):
-    response = test_client.get(endpoint)
+    data = {
+        "id": "goslim_agr"
+    }
+    response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
 
 
@@ -199,12 +182,16 @@ def test_ribbon_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/shared/GO%3A0006259/GO%3A0046483",
+        "/ontology/shared/{subject}/{object}",
 
     ]
 )
-def test_ontology_shared_sub_obj(endpoint):
-    response = test_client.get(endpoint)
+def test_ontology_ancestors_shared_sub_obj(endpoint):
+    data = {
+        "subject": "GO:0006259",
+        "object": "GO:0046483"
+    }
+    response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
 
 
@@ -262,7 +249,8 @@ def test_ontology_term_graph(endpoint):
 )
 def test_ontology_term_subgraph(endpoint):
     data = {
-        "id": "GO:0046483"
+        "id": "GO:0046483",
+        "graph_type": "topology_graph"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
