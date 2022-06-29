@@ -52,71 +52,8 @@ async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
 
 
 @router.get("/ontology/subset/{id}", tags=["ontology"])
-async def get_ontology_subsets_by_id(id: str):
-    q = "*:*"
-    qf = ""
-    fq = "&fq=subset:" + id + "&rows=1000"
-    fields = "annotation_class,annotation_class_label,description,source"
-
-    # This is a temporary fix while waiting for the PR of the AGR slim on go-ontology
-    if id == "goslim_agr":
-
-        terms_list = set()
-        for section in ontology_utils.agr_slim_order:
-            terms_list.add(section['category'])
-            for term in section['terms']:
-                terms_list.add(term)
-
-        goslim_agr_ids = "\" \"".join(terms_list)
-        fq = "&fq=annotation_class:(\"" + goslim_agr_ids + "\")&rows=1000"
-
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
-
-    tr = {}
-    for term in data:
-        source = term['source']
-        if source not in tr:
-            tr[source] = {"annotation_class_label": source, "terms": []}
-        ready_term = term.copy()
-        del ready_term["source"]
-        tr[source]["terms"].append(ready_term)
-
-    cats = []
-    for category in tr:
-        cats.append(category)
-
-    fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
-
-    for category in tr:
-        for temp in data:
-            if temp["annotation_class_label"] == category:
-                tr[category]["annotation_class"] = temp["annotation_class"]
-                tr[category]["description"] = temp["description"]
-                break
-
-    result = []
-    for category in tr:
-        cat = tr[category]
-        result.append(cat)
-
-        # if goslim_agr, reorder the list based on the temporary json object below
-    if id == "goslim_agr":
-        temp = []
-        for agr_category in ontology_utils.agr_slim_order:
-            cat = agr_category['category']
-            for category in result:
-                if category['annotation_class'] == cat:
-                    ordered_terms = []
-                    for ot in agr_category['terms']:
-                        for uot in category['terms']:
-                            if uot['annotation_class'] == ot:
-                                ordered_terms.append(uot)
-                                break
-                    category["terms"] = ordered_terms
-                    temp.append(category)
-        result = temp
-
+async def get_subset_by_id(id: str):
+    result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 
 
@@ -143,7 +80,7 @@ async def get_ribbon_results(subset: str = Query(None,
     """
 
     # Step 1: create the categories
-    categories = await get_ontology_subsets_by_id(subset)
+    categories = ontology_utils.get_ontology_subsets_by_id(subset)
     for category in categories:
 
         category["groups"] = category["terms"]

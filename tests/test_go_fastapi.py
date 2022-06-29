@@ -88,15 +88,8 @@ def test_prefixes_endpoint(endpoint):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/identifier/prefixes/contract/http%3A%2F%2Fwww.informatics.jax.org%2Faccession%2FMGI%3A1",
-
-    ]
-)
-def test_prefixes_contract_endpoint(endpoint):
-    response = test_client.get(endpoint)
+def test_prefixes_contract_endpoint():
+    response = test_client.get('/identifier/prefixes/contract/http%3A%2F%2Fwww.informatics.jax.org%2Faccession%2FMGI%3AA1')
     assert response.status_code == 200
 
 
