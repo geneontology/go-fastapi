@@ -80,6 +80,7 @@ async def get_ribbon_results(subset: str = Query(None,
     """
 
     # Step 1: create the categories
+    print(subset)
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
     for category in categories:
 
