@@ -31,19 +31,16 @@ def test_bioenty_gene_endpoints(id):
     assert len(response.json()) >= 4
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/bioentity/function/{id}/genes",
-        "/bioentity/function/{id}/taxons"
+@pytest.mark.parametrize("id", go_ids)
+def test_bioenty_gene_function_endpoints(id):
+    response = test_client.get(f"/bioentity/function/{id}/genes")
+    assert response.status_code == 200
+    assert len(response.json()) >= 4
 
-    ]
-)
-def test_bioenty_gene_function_endpoints(endpoint):
-    data = {
-        id: "GO:0008150"
-    }
-    response = test_client.get(endpoint, params=data)
+
+@pytest.mark.parametrize("id", go_ids)
+def test_bioenty_gene_function_endpoints(id):
+    response = test_client.get(f"/bioentity/function/{id}/taxons")
     assert response.status_code == 200
     assert len(response.json()) >= 4
 
@@ -64,15 +61,8 @@ def test_slimmer_endpoint(endpoint):
     assert len(response.json()) > 2
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/identifier/prefixes",
-
-    ]
-)
-def test_prefixes_endpoint(endpoint):
-    response = test_client.get(endpoint)
+def test_prefixes_endpoint():
+    response = test_client.get(f"/identifier/prefixes")
     assert response.status_code == 200
 
 
@@ -81,6 +71,7 @@ def test_prefixes_contract_endpoint():
         "uri": "https://www.informatics.jax.org/accession/MGI:1"
     }
     response = test_client.get('/identifier/prefixes/contract/{uri}', params=data)
+    print(response.json())
     assert response.status_code == 200
 
 
