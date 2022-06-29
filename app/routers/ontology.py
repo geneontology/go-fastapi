@@ -37,7 +37,6 @@ class RelationshipType(str, Enum):
     REGULATES = REGULATES
 
 
-
 @router.get("/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str,
                                   relationship_type: RelationshipType = Query(RelationshipType.IS_A_PART_OF, include_in_schema=False),
@@ -50,6 +49,7 @@ async def get_term_metadata_by_id(id: str,
     """
     Returns meta data of an ontology term, e.g. GO:0003677
     """
+    print(id)
     query = ontology_utils.go_summary(id)
     results = run_sparql_on(query, EOntology.GO)
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])

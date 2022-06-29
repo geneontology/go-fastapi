@@ -39,8 +39,7 @@ def test_bioenty_function_id_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/bioentity/function/{id}/taxons",
-        "/bioentity/function/{id}/genes"
+        "/bioentity/gene/{id}/function",
     ]
 )
 def test_bioenty_gene_endpoints(endpoint):
@@ -137,6 +136,22 @@ def test_labeler_endpoint(endpoint):
     assert map_response['GO:0003677'] == 'DNA binding'
 
 
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/ontology/term/{id}",
+
+    ]
+)
+def test_term_id_endpoint(endpoint):
+    data = {
+        "id": "GO:0003677"
+    }
+    response = test_client.get(endpoint, params=data)
+    assert response.status_code == 200
+
+
 @pytest.mark.parametrize(
     "endpoint",
     [
@@ -146,7 +161,7 @@ def test_labeler_endpoint(endpoint):
 )
 def test_term_subsets_endpoint(endpoint):
     data = {
-        id: "GO:0003677"
+        "id": "GO:0003677"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
@@ -155,7 +170,7 @@ def test_term_subsets_endpoint(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/subset/goslim_agr",
+        "/ontology/subset/",
 
     ]
 )
@@ -202,7 +217,7 @@ def test_ontology_shared_sub_obj(endpoint):
 )
 def test_ontology_subset(endpoint):
     data = {
-        id: "GO:0003677"
+        "id": "GO:0003677"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
@@ -217,7 +232,7 @@ def test_ontology_subset(endpoint):
 )
 def test_ontology_term_id(endpoint):
     data = {
-        id: "GO:0046483"
+        "id": "GO:0046483"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
@@ -232,7 +247,7 @@ def test_ontology_term_id(endpoint):
 )
 def test_ontology_term_graph(endpoint):
     data = {
-        id: "GO:0046483"
+        "id": "GO:0046483"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
@@ -247,7 +262,7 @@ def test_ontology_term_graph(endpoint):
 )
 def test_ontology_term_subgraph(endpoint):
     data = {
-        id: "GO:0046483"
+        "id": "GO:0046483"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
@@ -262,7 +277,7 @@ def test_ontology_term_subgraph(endpoint):
 )
 def test_ontology_term_subsets(endpoint):
     data = {
-        id: "GO:0046483"
+        "id": "GO:0046483"
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
