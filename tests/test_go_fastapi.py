@@ -71,7 +71,7 @@ def test_slimmer_endpoint(endpoint):
         'subject': 'ZFIN:ZDB-GENE-980526-388',
         'slim': ['GO:0003674', 'GO:0008150', 'GO:0005575']
     }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
     assert len(response.json()) > 2
 
@@ -159,7 +159,7 @@ def test_ribbon_endpoint(endpoint):
         "subset": "goslim_agr",
         "subject": ["RGD:620474"]
     }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
 
 
@@ -251,7 +251,7 @@ def test_search_entity(endpoint):
         'taxon': 'NCBITaxon:7955',
         'highlight_class': 'gene'
     }
-    response = test_client.get(endpoint, json=data)
+    response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
 
 
