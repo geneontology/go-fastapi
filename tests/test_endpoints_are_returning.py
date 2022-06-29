@@ -39,10 +39,8 @@ def test_bioenty_function_id_endpoints(endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/bioentity/gene/{id}/taxons",
-        "/bioentity/gene/{id}/function",
-        "/bioentity/function/{id}/taxons"
-
+        "/bioentity/function/{id}/taxons",
+        "/bioentity/function/{id}/genes"
     ]
 )
 def test_bioenty_gene_endpoints(endpoint):
@@ -58,6 +56,7 @@ def test_bioenty_gene_endpoints(endpoint):
     "endpoint",
     [
         "/bioentity/function/{id}/genes",
+        "/bioentity/function/{id}/taxons"
 
     ]
 )
