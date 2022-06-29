@@ -8,6 +8,8 @@ test_client = TestClient(app)
 
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
 go_ids = ["GO:0008150", "GO:0008149"]
+subsets = ["goslim_agr"]
+shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 
 @pytest.mark.parametrize("id", gene_ids)
@@ -75,18 +77,11 @@ def test_prefixes_contract_endpoint():
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/identifier/prefixes/expand/{id}",
+@pytest.mark.parametrize("id", gene_ids)
+def test_expander_endpoint(id):
 
-    ]
-)
-def test_expander_endpoint(endpoint):
-    data = {
-        id: "MGI:1"
-    }
-    response = test_client.get(endpoint, params=data)
+    response = test_client.get(f"/identifier/prefixes/expand/{id}")
+    print(response.json())
     assert response.status_code == 200
 
 
@@ -107,51 +102,22 @@ def test_labeler_endpoint(endpoint):
     assert map_response['GO:0003677'] == 'DNA binding'
 
 
-
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/term/{id}",
-
-    ]
-)
-def test_term_id_endpoint(endpoint):
-    data = {
-        "id": "GO:0003677"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", go_ids)
+def test_term_id_endpoint(id):
+    response = test_client.get(f"/ontology/term/{id}")
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/term/{id}/subsets",
-
-    ]
-)
-def test_term_subsets_endpoint(endpoint):
-    data = {
-        "id": "GO:0003677"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", go_ids)
+def test_term_subsets_endpoint(id):
+    response = test_client.get(f"/ontology/term/{id}/subsets")
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/subset/{id}",
-
-    ]
-)
-def test_term_by_subset_endpoint(endpoint):
-    data = {
-        "id": "goslim_agr"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", subsets)
+def test_term_by_subset_endpoint(id):
+    response = test_client.get(f"/ontology/subset/{id}")
     assert response.status_code == 200
-
 
 
 @pytest.mark.parametrize(
