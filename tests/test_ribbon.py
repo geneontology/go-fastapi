@@ -52,7 +52,7 @@ def test_sars_cov2_ribbon():
     assert len(response.json().get('subjects')) == 0
 
 
-def test_annotation_not_available():
+def test_sgd_ribbon_term_not_available():
     data = {
         "subset": "goslim_agr",
         "subject": ["SGD:S000002812"]
@@ -61,3 +61,19 @@ def test_annotation_not_available():
 
     for subject in response.json().get('subjects'):
         assert subject.get('groups').get('GO:0008219') is None
+
+
+def test_fly_ribbon():
+    data = {
+        "subset": "goslim_agr",
+        "subject": ["FB:FBgn0051155"]
+    }
+    response = test_client.get(f"/ontology/ribbon/", params=data)
+    for subject in response.json().get('subjects'):
+        assert subject.get('label') == 'Polr2G'
+        assert subject.get('taxon_label') == 'Drosophila melanogaster'
+        assert(subject.get('groups').get('GO:0003674'))
+        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 4)
+        assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 6)
+        assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 5)
+    assert response.status_code == 200
