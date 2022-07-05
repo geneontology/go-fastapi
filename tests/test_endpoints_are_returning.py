@@ -136,19 +136,10 @@ def test_ribbon_endpoint(endpoint):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/shared/{subject}/{object}",
-
-    ]
-)
-def test_ontology_ancestors_shared_sub_obj(endpoint):
-    data = {
-        "subject": "GO:0006259",
-        "object": "GO:0046483"
-    }
-    response = test_client.get(endpoint, params=data)
+def test_ontology_ancestors_shared_sub_obj():
+    subject = 'GO:0006259'
+    object = 'GO:0046483'
+    response = test_client.get(f"/ontology/shared/{subject}/{object}")
     assert response.status_code == 200
 
 
@@ -186,14 +177,8 @@ def test_ontology_term_subsets(id):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/search/entity/{id}",
-
-    ]
-)
-def test_search_entity(endpoint):
+@pytest.mark.parametrize("id", go_ids)
+def test_search_entity(id):
     data = {
         'term': 'ssh',
         'category': 'gene',
@@ -203,7 +188,8 @@ def test_search_entity(endpoint):
         'highlight_class': 'gene',
         'id': 'ssh'
     }
-    response = test_client.get(endpoint, params=data)
+    response = test_client.get(f"/search/entity/ssh", params=data)
+    pprint(response.json())
     assert response.status_code == 200
 
 
