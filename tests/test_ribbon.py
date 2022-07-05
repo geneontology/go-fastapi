@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
-
+from pprint import pprint
 test_client = TestClient(app)
 
 
@@ -41,3 +41,12 @@ def test_human_ribbon():
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 165)
         assert (subject.get('groups').get('GO:0030154').get('ALL').get('nb_annotations') >= 38)
     assert response.status_code == 200
+
+
+def test_sars_cov2_ribbon():
+    data = {
+        "subset": "goslim_agr",
+        "subject": ["RefSeq:P0DTD3"]
+    }
+    response = test_client.get(f"/ontology/ribbon/", params=data)
+    assert len(response.json().get('subjects')) == 0
