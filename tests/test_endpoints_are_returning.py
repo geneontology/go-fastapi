@@ -177,8 +177,7 @@ def test_ontology_term_subsets(id):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("id", go_ids)
-def test_search_entity(id):
+def test_search_entity():
     data = {
         'term': 'ssh',
         'category': 'gene',
@@ -193,13 +192,6 @@ def test_search_entity(id):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/search/entity/autocomplete/biological",
-
-    ]
-)
-def test_autocomplete(endpoint):
-    response = test_client.get(endpoint)
+def test_autocomplete():
+    response = test_client.get(f"/search/entity/autocomplete/biological")
     assert response.status_code == 200
