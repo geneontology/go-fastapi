@@ -77,3 +77,19 @@ def test_fly_ribbon():
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 6)
         assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 5)
     assert response.status_code == 200
+
+
+def test_mgi_ribbon():
+    data = {
+        "subset": "goslim_agr",
+        "subject": ["MGI:1917258"]
+    }
+    response = test_client.get(f"/ontology/ribbon/", params=data)
+    for subject in response.json().get('subjects'):
+        assert subject.get('label') == 'Ace2'
+        assert subject.get('taxon_label') == 'Mus musculus'
+        assert(subject.get('groups').get('GO:0003674'))
+        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 16)
+        assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 16)
+        assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 15)
+    assert response.status_code == 200
