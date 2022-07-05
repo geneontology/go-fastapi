@@ -152,18 +152,9 @@ def test_ontology_ancestors_shared_sub_obj(endpoint):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/subset/{id}",
-
-    ]
-)
-def test_ontology_subset(endpoint):
-    data = {
-        "id": "GO:0003677"
-    }
-    response = test_client.get(endpoint, params=data)
+@pytest.mark.parametrize("id", subsets)
+def test_ontology_subset(id):
+    response = test_client.get(f"/ontology/subset/{id}")
     assert response.status_code == 200
 
 
