@@ -170,19 +170,12 @@ def test_ontology_term_graph(id):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/ontology/term/{id}/graph",
-
-    ]
-)
-def test_ontology_term_subgraph(endpoint):
+@pytest.mark.parametrize("id", go_ids)
+def test_ontology_term_subgraph(id):
     data = {
-        "id": "GO:0046483",
         "graph_type": "topology_graph"
     }
-    response = test_client.get(endpoint, params=data)
+    response = test_client.get(f"/ontology/term/{id}/graph", params=data)
     print(response.json())
     assert response.status_code == 200
 
