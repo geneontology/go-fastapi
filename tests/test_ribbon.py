@@ -50,3 +50,14 @@ def test_sars_cov2_ribbon():
     }
     response = test_client.get(f"/ontology/ribbon/", params=data)
     assert len(response.json().get('subjects')) == 0
+
+
+def test_annotation_not_available():
+    data = {
+        "subset": "goslim_agr",
+        "subject": ["SGD:S000002812"]
+    }
+    response = test_client.get(f"/ontology/ribbon/", params=data)
+
+    for subject in response.json().get('subjects'):
+        assert subject.get('groups').get('GO:0008219') is None
