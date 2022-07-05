@@ -133,6 +133,7 @@ def test_ribbon_endpoint(endpoint):
         "subject": ["RGD:620474"]
     }
     response = test_client.get(endpoint, params=data)
+    pprint(response.json())
     assert response.status_code == 200
 
 
