@@ -39,7 +39,7 @@ def test_human_ribbon():
         assert subject.get('label') == 'SHH'
         assert subject.get('taxon_label') == 'Homo sapiens'
         assert(subject.get('groups').get('GO:0003674'))
-        print((subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 19))
+        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 19)
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 165)
-        assert(subject.get('groups').get('GO:0030154').get('ALL').get('nb_annotations') >= 38)
+        assert (subject.get('groups').get('GO:0030154').get('ALL').get('nb_annotations') >= 38)
     assert response.status_code == 200
