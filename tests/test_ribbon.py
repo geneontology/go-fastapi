@@ -15,7 +15,7 @@ def test_zebrafish_ribbon():
         "subset": "goslim_agr",
         "subject": ["ZFIN:ZDB-GENE-980526-166"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'shha'
         assert subject.get('taxon_label') == 'Danio rerio'
@@ -32,7 +32,7 @@ def test_human_ribbon():
         "subset": "goslim_agr",
         "subject": ["HGNC:10848"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'SHH'
         assert subject.get('taxon_label') == 'Homo sapiens'
@@ -48,7 +48,7 @@ def test_sars_cov2_ribbon():
         "subset": "goslim_agr",
         "subject": ["RefSeq:P0DTD3"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     assert len(response.json().get('subjects')) == 0
 
 
@@ -57,7 +57,7 @@ def test_sgd_ribbon_term_not_available():
         "subset": "goslim_agr",
         "subject": ["SGD:S000002812"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
 
     for subject in response.json().get('subjects'):
         assert subject.get('groups').get('GO:0008219') is None
@@ -68,7 +68,7 @@ def test_fly_ribbon():
         "subset": "goslim_agr",
         "subject": ["FB:FBgn0051155"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'Polr2G'
         assert subject.get('taxon_label') == 'Drosophila melanogaster'
@@ -84,7 +84,7 @@ def test_mgi_ribbon():
         "subset": "goslim_agr",
         "subject": ["MGI:1917258"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'Ace2'
         assert subject.get('taxon_label') == 'Mus musculus'
@@ -100,7 +100,7 @@ def test_wb_ribbon():
         "subset": "goslim_agr",
         "subject": ["WB:WBGene00000898"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'daf-2'
         assert subject.get('taxon_label') == 'Caenorhabditis elegans'
@@ -116,7 +116,7 @@ def test_rgd_ribbon():
         "subset": "goslim_agr",
         "subject": ["RGD:70971"]
     }
-    response = test_client.get(f"/ontology/ribbon/", params=data)
+    response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'daf-2'
         assert subject.get('taxon_label') == 'Caenorhabditis elegans'
