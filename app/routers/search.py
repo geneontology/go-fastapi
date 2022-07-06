@@ -14,7 +14,7 @@ def search(term, args):
     return q.search()
 
 
-@router.get("/search/entity/{term}", tags=["search"])
+@router.get("/api/search/entity/{term}", tags=["search"])
 async def search_term(term: str):
     # TODO @api.marshal_with(search_result)
     """
@@ -28,7 +28,7 @@ async def search_term(term: str):
     return results
 
 
-@router.get('/search/entity/autocomplete/{term}', tags=["search"])
+@router.get('/api/search/entity/autocomplete/{term}', tags=["search"])
 async def autocomplete_term(term: str = Query(..., description="example: `biological`")):
     """
         Returns list of matching concepts or entities using lexical search

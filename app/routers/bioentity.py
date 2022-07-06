@@ -43,7 +43,7 @@ class RelationshipType(str, Enum):
 router = APIRouter()
 
 
-@router.get("/bioentity/{id}", tags=["bioentity"])
+@router.get("/api/bioentity/{id}", tags=["bioentity"])
 async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
                               start: int = 0, rows: int = 100):
@@ -64,7 +64,7 @@ async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE 
     return bioentity
 
 
-@router.get("/bioentity/function/{id}", tags=["bioentity"])
+@router.get("/api/bioentity/function/{id}", tags=["bioentity"])
 async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
                                                                         "(e.g. GO:0044598)`"),
                                      evidence: List[str] = Query(None), start: int = 0, rows: int = 100):
@@ -99,7 +99,7 @@ async def get_annotations_by_goterm_id(id: str = Query(..., description="example
     return data
 
 
-@router.get("/bioentity/function/{id}/genes", tags=["bioentity"])
+@router.get("/api/bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term"),
                                  taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
                                                                                     "associations by subject taxon"),
@@ -163,7 +163,7 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
             )
 
 
-@router.get("/bioentity/function/{id}/taxons", tags=["bioentity"])
+@router.get("/api/bioentity/function/{id}/taxons", tags=["bioentity"])
 async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
                                    evidence: List[str] = Query(default=None,
                                                                description="Object id, e.g. ECO:0000501 (for IEA; "
@@ -208,7 +208,7 @@ async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identif
     return data
 
 
-@router.get("/bioentity/gene/{id}/function", tags=["bioentity"])
+@router.get("/api/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
                              # ... in query means "required" parameter.
                              slim: List[str] = Query(default=None, description="Map objects up slim to a higher level"

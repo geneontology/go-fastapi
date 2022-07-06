@@ -37,7 +37,7 @@ def get_category_terms(category):
     return terms
 
 
-@router.get("/ontology/term/{id}/subsets", tags=["ontology"])
+@router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
                                                              description="'CURIE identifier of a GO term,"
                                                                          " e.g. GO:0006259")):
@@ -51,13 +51,13 @@ async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
     return results
 
 
-@router.get("/ontology/subset/{id}", tags=["ontology"])
+@router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_by_id(id: str):
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 
 
-@router.get("/ontology/ribbon/", tags=["ontology"])
+@router.get("/api/ontology/ribbon/", tags=["ontology"])
 async def get_ribbon_results(subset: str = Query(None,
                                                  description="Name of the subset to map GO terms "
                                                              "(e.g. goslim_agr)"),
