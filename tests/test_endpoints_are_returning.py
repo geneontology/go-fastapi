@@ -5,7 +5,6 @@ from pprint import pprint
 
 test_client = TestClient(app)
 
-
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
@@ -14,35 +13,35 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 @pytest.mark.parametrize("id", gene_ids)
 def test_bioenty_id_endpoints(id):
-    response = test_client.get(f"/bioentity/{id}")
+    response = test_client.get(f"/api/bioentity/{id}")
     assert response.status_code == 200
     pprint(response.json())
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_bioenty_function_id_endpoints(id):
-    response = test_client.get(f"/bioentity/function/{id}")
+    response = test_client.get(f"/api/bioentity/function/{id}")
     assert response.status_code == 200
     assert len(response.json()) > 99
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_bioenty_gene_endpoints(id):
-    response = test_client.get(f"/bioentity/gene/{id}/function")
+    response = test_client.get(f"/api/bioentity/gene/{id}/function")
     assert response.status_code == 200
     assert len(response.json()) >= 4
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_bioenty_gene_function_endpoints(id):
-    response = test_client.get(f"/bioentity/function/{id}/genes")
+    response = test_client.get(f"/api/bioentity/function/{id}/genes")
     assert response.status_code == 200
     assert len(response.json()) >= 4
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_bioenty_gene_function_endpoints(id):
-    response = test_client.get(f"/bioentity/function/{id}/taxons")
+    response = test_client.get(f"/api/bioentity/function/{id}/taxons")
     assert response.status_code == 200
     assert len(response.json()) >= 4
 
@@ -50,7 +49,7 @@ def test_bioenty_gene_function_endpoints(id):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/bioentityset/slimmer/function"
+        "/api/bioentityset/slimmer/function"
     ]
 )
 def test_slimmer_endpoint(endpoint):
@@ -64,7 +63,7 @@ def test_slimmer_endpoint(endpoint):
 
 
 def test_prefixes_endpoint():
-    response = test_client.get(f"/identifier/prefixes")
+    response = test_client.get(f"/api/identifier/prefixes")
     assert response.status_code == 200
 
 
@@ -72,7 +71,7 @@ def test_prefixes_contract_endpoint():
     data = {
         "uri": "https://www.informatics.jax.org/accession/MGI:1"
     }
-    response = test_client.get('/identifier/prefixes/contract/{uri}', params=data)
+    response = test_client.get('/api/identifier/prefixes/contract/{uri}', params=data)
     print(response.json())
     assert response.status_code == 200
 
@@ -80,7 +79,7 @@ def test_prefixes_contract_endpoint():
 @pytest.mark.parametrize("id", gene_ids)
 def test_expander_endpoint(id):
 
-    response = test_client.get(f"/identifier/prefixes/expand/{id}")
+    response = test_client.get(f"/api/identifier/prefixes/expand/{id}")
     print(response.json())
     assert response.status_code == 200
 
@@ -88,7 +87,7 @@ def test_expander_endpoint(id):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontol/labeler",
+        "/api/ontol/labeler",
 
     ]
 )
@@ -104,26 +103,26 @@ def test_labeler_endpoint(endpoint):
 
 @pytest.mark.parametrize("id", go_ids)
 def test_term_id_endpoint(id):
-    response = test_client.get(f"/ontology/term/{id}")
+    response = test_client.get(f"/api/ontology/term/{id}")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_term_subsets_endpoint(id):
-    response = test_client.get(f"/ontology/term/{id}/subsets")
+    response = test_client.get(f"/api/ontology/term/{id}/subsets")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", subsets)
 def test_term_by_subset_endpoint(id):
-    response = test_client.get(f"/ontology/subset/{id}")
+    response = test_client.get(f"/api/ontology/subset/{id}")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "/ontology/ribbon/",
+        "/api/ontology/ribbon/",
 
     ]
 )
@@ -140,25 +139,25 @@ def test_ribbon_endpoint(endpoint):
 def test_ontology_ancestors_shared_sub_obj():
     subject = 'GO:0006259'
     object = 'GO:0046483'
-    response = test_client.get(f"/ontology/shared/{subject}/{object}")
+    response = test_client.get(f"/api/ontology/shared/{subject}/{object}")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", subsets)
 def test_ontology_subset(id):
-    response = test_client.get(f"/ontology/subset/{id}")
+    response = test_client.get(f"/api/ontology/subset/{id}")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_ontology_term_id(id):
-    response = test_client.get(f"/ontology/term/{id}")
+    response = test_client.get(f"/api/ontology/term/{id}")
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_ontology_term_graph(id):
-    response = test_client.get(f"/ontology/term/{id}/subgraph")
+    response = test_client.get(f"/api/ontology/term/{id}/subgraph")
     assert response.status_code == 200
 
 
@@ -167,14 +166,14 @@ def test_ontology_term_subgraph(id):
     data = {
         "graph_type": "topology_graph"
     }
-    response = test_client.get(f"/ontology/term/{id}/graph", params=data)
+    response = test_client.get(f"/api/ontology/term/{id}/graph", params=data)
     print(response.json())
     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", go_ids)
 def test_ontology_term_subsets(id):
-    response = test_client.get(f"/ontology/term/{id}/subsets")
+    response = test_client.get(f"/api/ontology/term/{id}/subsets")
     assert response.status_code == 200
 
 
@@ -188,11 +187,11 @@ def test_search_entity():
         'highlight_class': 'gene',
         'id': 'ssh'
     }
-    response = test_client.get(f"/search/entity/ssh", params=data)
+    response = test_client.get(f"/api/search/entity/ssh", params=data)
     pprint(response.json())
     assert response.status_code == 200
 
 
 def test_autocomplete():
-    response = test_client.get(f"/search/entity/autocomplete/biological")
+    response = test_client.get(f"/api/search/entity/autocomplete/biological")
     assert response.status_code == 200
