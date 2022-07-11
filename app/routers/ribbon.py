@@ -45,6 +45,9 @@ async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
     Returns subsets (slims) associated to an ontology term
     """
     query = ontology_utils.get_go_subsets(id)
+    # replace with OntologyFactory with ontobio - but config on startup
+    # or use OAK  here and rewrite - still need to config on startup (SQLLite - up front to make
+    # the latest version, etc)
     results = run_sparql_on(query, EOntology.GO)
     results = transformArray(results, [])
     results = replace(results, "subset", "OBO:go#", "")
