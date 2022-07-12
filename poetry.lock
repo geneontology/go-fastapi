@@ -1090,6 +1090,14 @@ dev = ["fire", "pandas", "pre-commit", "pytest"]
 viz = ["pygraphviz"]
 
 [[package]]
+name = "oak"
+version = "0.1.8.1"
+description = "A simple static-blog generator"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "oaklib"
 version = "0.1.23"
 description = "Ontology Access Kit: Python library for common ontology operations over a variety of backends"
@@ -2246,7 +2254,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "d157b8a2f6ae9ff18a200f26a8bc36cae15679169711db589ef6349b98a568b7"
+content-hash = "fa5cc008e6b1749847b52814cc04aac1538bb6f4a86f3f3ef3a94e2c676f7e02"
 
 [metadata.files]
 aiohttp = [
@@ -3045,6 +3053,7 @@ nxontology = [
     {file = "nxontology-0.4.1-py3-none-any.whl", hash = "sha256:74cc228adcbbde49c4b35eb40c8b69db40e0a07757533573a775e88b7b2d29f9"},
     {file = "nxontology-0.4.1.tar.gz", hash = "sha256:8f1e5d6d7787542e9414be4ae34bb09e369dbaf2d6c646bba2d18b122c083d44"},
 ]
+oak = []
 oaklib = [
     {file = "oaklib-0.1.23-py3-none-any.whl", hash = "sha256:0716baf2fe4e86f2fe5294ff876e784c8397ba3a53891f0caf9a2b4fd84700d5"},
     {file = "oaklib-0.1.23.tar.gz", hash = "sha256:bb0e9acabe981a3e7c12bc9951c26b7f37b22ebd3e9e2fea820747d7767d1afe"},
