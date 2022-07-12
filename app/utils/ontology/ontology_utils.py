@@ -104,6 +104,7 @@ def get_ontology(id):
         omap[handle] = ofa.create(handle)
     else:
         logging.info("Using cached for {}".format(handle))
+
     return omap[handle]
 
 
