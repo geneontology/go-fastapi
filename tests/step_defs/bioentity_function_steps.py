@@ -1,26 +1,37 @@
 import pytest
-from pytest_bdd import scenario, given, when, then, scenarios
+from pytest_bdd import scenarios, given, then, parsers, scenario
 from app.main import app
 from fastapi.testclient import TestClient
+from pprint import pprint
+
+EXTRA_TYPES = {
+    'String': str,
+}
 
 
-@scenario('../features/bioentityfunction.feature',
-          'User fetches all GO functional annotations for a zebrafish gene')
+@scenario('../features/bioentityfunction.feature', 'test function endpoint')
 def test_add():
-    # tests will be executed by the bioentity_function.feature steps
     pass
 
+# Given Steps
 
-@given("the queried test-client endpoint returns", target_fixture='result')
-def api_result():
+
+@given(parsers.cfparse('the API is queried with "{bioentity_id:String}"',
+                       extra_types=EXTRA_TYPES), target_fixture='result')
+def api_result(bioentity_id):
     test_client = TestClient(app)
-    response = test_client.get(f"/api/bioentity/gene/ZFIN%3AZDB-GENE-050417-357/function")
-    assert response.status_code == 200
-    return response.json()
+    response = test_client.get(f"/api/bioentity/gene/{bioentity_id}/function")
+    return response
 
 
-@then("the endpoint should return successfully")
+# Then Steps
+
+@then(parsers.parse('the response status code is "{code:d}"'))
+def response_code(result, code):
+    assert result.status_code == code
+
+
+@then('the response contains results for a GO:0030500')
 def endpoint_retuns(result):
-    print(result)
-
-
+    data = result.json()
+    pprint(data)
