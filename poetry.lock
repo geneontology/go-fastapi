@@ -493,6 +493,14 @@ rdflib-shim = "*"
 rfc3987 = "*"
 
 [[package]]
+name = "glob2"
+version = "0.7"
+description = "Version of the glob module that can capture patterns and supports recursive wildcards"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "go-library"
 version = "0.1.0"
 description = "Enter description of your project here"
@@ -919,6 +927,22 @@ linkml-runtime = ">=1.2.7,<2.0.0"
 pysolr = ">=3.9.0,<4.0.0"
 
 [[package]]
+name = "mako"
+version = "1.2.1"
+description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+MarkupSafe = ">=0.9.2"
+
+[package.extras]
+babel = ["babel"]
+lingua = ["lingua"]
+testing = ["pytest"]
+
+[[package]]
 name = "markdown-it-py"
 version = "2.1.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
@@ -1231,6 +1255,22 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "parse-type"
+version = "0.6.0"
+description = "Simplifies to build parse types based on the parse module"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*"
+
+[package.dependencies]
+parse = {version = ">=1.18.0", markers = "python_version >= \"3.0\""}
+six = ">=1.11"
+
+[package.extras]
+develop = ["coverage (>=4.4)", "pytest-html (>=1.19.0)", "pytest-cov", "tox (>=2.8)", "pytest (<5.0)", "pytest (>=5.0)"]
+docs = ["sphinx (>=1.2)"]
+
+[[package]]
 name = "pillow"
 version = "9.1.1"
 description = "Python Imaging Library (Fork)"
@@ -1481,6 +1521,25 @@ tomli = ">=1.0.0"
 
 [package.extras]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
+
+[[package]]
+name = "pytest-bdd"
+version = "6.0.1"
+description = "BDD for pytest"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+glob2 = "*"
+Mako = "*"
+parse = "*"
+parse-type = "*"
+py = "*"
+pytest = ">=5.0"
+
+[package.extras]
+testing = ["tox", "mypy (==0.910)"]
 
 [[package]]
 name = "pytest-logging"
@@ -2254,7 +2313,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "fa5cc008e6b1749847b52814cc04aac1538bb6f4a86f3f3ef3a94e2c676f7e02"
+content-hash = "52b398615af6e2c9f90660a3913a8b977904064593176ff1521fcbd064348413"
 
 [metadata.files]
 aiohttp = [
@@ -2633,6 +2692,7 @@ funowl = [
     {file = "funowl-0.1.12-py3-none-any.whl", hash = "sha256:44f2337d47d21ab6532f8f0e51173c506a0d9dae9efa959cb105b0311e352082"},
     {file = "funowl-0.1.12.tar.gz", hash = "sha256:3316c37ecde08cdfa96ebcbcc02ed53c355dc56845d654a8f37aa7a913ca6f71"},
 ]
+glob2 = []
 go-library = [
     {file = "go_library-0.1.0-py3-none-any.whl", hash = "sha256:f6ad1124d2734cfefff6e87b72921ddd87970b9b679f25e0b565f66f5c2c279b"},
     {file = "go_library-0.1.0.tar.gz", hash = "sha256:d2c62d55e509735a9ed77c68bc8c76953edd5505e79b08dbccac44bae575e76d"},
@@ -2857,6 +2917,7 @@ linkml-solr = [
     {file = "linkml-solr-0.1.2.tar.gz", hash = "sha256:90ffc06da45581a2f8ea21c7d89dcd8f3e63e70f41c14eaad550e84eaa3ec570"},
     {file = "linkml_solr-0.1.2-py3-none-any.whl", hash = "sha256:7b70562426fceee246b100b16945763aa15d37e902d6009c90af6893e5f83d59"},
 ]
+mako = []
 markdown-it-py = [
     {file = "markdown-it-py-2.1.0.tar.gz", hash = "sha256:cf7e59fed14b5ae17c0006eff14a2d9a00ed5f3a846148153899a0224e2c07da"},
     {file = "markdown_it_py-2.1.0-py3-none-any.whl", hash = "sha256:93de681e5c021a432c63147656fe21790bc01231e0cd2da73626f1aa3ac0fe27"},
@@ -3101,6 +3162,7 @@ pandasql = [
 parse = [
     {file = "parse-1.19.0.tar.gz", hash = "sha256:9ff82852bcb65d139813e2a5197627a94966245c897796760a3a2a8eb66f020b"},
 ]
+parse-type = []
 pillow = [
     {file = "Pillow-9.1.1-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:42dfefbef90eb67c10c45a73a9bc1599d4dac920f7dfcbf4ec6b80cb620757fe"},
     {file = "Pillow-9.1.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ffde4c6fabb52891d81606411cbfaf77756e3b561b566efd270b3ed3791fde4e"},
@@ -3268,6 +3330,7 @@ pytest = [
     {file = "pytest-7.1.2-py3-none-any.whl", hash = "sha256:13d0e3ccfc2b6e26be000cb6568c832ba67ba32e719443bfe725814d3c42433c"},
     {file = "pytest-7.1.2.tar.gz", hash = "sha256:a06a0425453864a270bc45e71f783330a7428defb4230fb5e6a731fde06ecd45"},
 ]
+pytest-bdd = []
 pytest-logging = [
     {file = "pytest-logging-2015.11.4.tar.gz", hash = "sha256:cec5c85ecf18aab7b2ead5498a31b9f758680ef5a902b9054ab3f2bdbb77c896"},
 ]
