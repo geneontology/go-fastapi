@@ -138,5 +138,7 @@ def test_get_go_subsets():
     assert "GO_0003674" in subset_sparql
 
 
-def test_go_summary():
-    assert False
+def test_create_go_summary_sparql():
+    go_summary_sparql = ou.create_go_summary_sparql(goid="GO:0003674")
+    assert go_summary_sparql is not None
+    assert "GO_0003674" in go_summary_sparql

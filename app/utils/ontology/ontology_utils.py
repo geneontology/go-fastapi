@@ -183,7 +183,7 @@ agr_slim_order = [
 ]
 
 
-def go_summary(goid):
+def create_go_summary_sparql(goid):
     goid = correct_goid(goid)
     return """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

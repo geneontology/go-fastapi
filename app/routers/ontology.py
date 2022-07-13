@@ -43,7 +43,7 @@ async def get_term_metadata_by_id(id: str):
     Returns meta data of an ontology term, e.g. GO:0003677
     """
     print(id)
-    query = ontology_utils.go_summary(id)
+    query = ontology_utils.create_go_summary_sparql(id)
     results = run_sparql_on(query, EOntology.GO)
     return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
 
