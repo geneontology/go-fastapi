@@ -7,18 +7,18 @@ EXTRA_TYPES = {
     'String': str,
 }
 
-
-@scenario('../features/bioentityfunction.feature', 'test function endpoint')
-def test_zfin():
-    # boilerplate
-    pass
-
-
-# @scenario("../features/bioentityfunction.feature", 'User fetches all GO functional assignments for a human gene '
-#                                                    'using an HGNC id')
-# def test_hgnc():
+#
+# @scenario('../features/bioentityfunction.feature', 'test function endpoint')
+# def test_zfin():
 #     # boilerplate
 #     pass
+
+
+@scenario("../features/bioentityfunction.feature", 'User fetches all GO functional assignments for a human gene '
+                                                   'using an HGNC id')
+def test_hgnc():
+    # boilerplate
+    pass
 
 
 # Given Steps
@@ -45,6 +45,7 @@ def endpoint_retuns(result, term):
     data = result.json()
     found_it = False
     term = term.replace('"', '')
+    pprint(data)
     for association in data.get('associations'):
         if association.get('object').get('id') == term:
             found_it = True
