@@ -216,7 +216,7 @@ def correct_goid(goid):
     return goid.replace(":", "_")
 
 
-def get_go_subsets(goid):
+def get_go_subsets_sparql_query(goid):
     goid = correct_goid(goid)
     return """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

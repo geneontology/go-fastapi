@@ -133,7 +133,9 @@ def test_correct_goid():
 
 
 def test_get_go_subsets():
-    assert False
+    subset_sparql = ou.get_go_subsets_sparql_query(goid="GO:0003674")
+    assert subset_sparql is not None
+    assert "GO_0003674" in subset_sparql
 
 
 def test_go_summary():

@@ -100,7 +100,7 @@ async def get_subsets_by_term(id: str):
     """
         Returns subsets (slims) associated to an ontology term
         """
-    query = ontology_utils.get_go_subsets(id)
+    query = ontology_utils.get_go_subsets_sparql_query(id)
     results = run_sparql_on(query, EOntology.GO)
     results = transformArray(results, [])
     results = replace(results, "subset", "OBO:go#", "")
