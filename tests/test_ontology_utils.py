@@ -127,9 +127,9 @@ def test_get_ontology_subsets_by_id():
             assert len(ribbon_category.get('terms')) == 16
 
 
-
 def test_correct_goid():
-    assert False
+    corrected_id = ou.correct_goid(goid="GO:00012345")
+    assert corrected_id == "GO_00012345"
 
 
 def test_get_go_subsets():
