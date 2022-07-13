@@ -119,7 +119,7 @@ def test_rgd_ribbon():
     response = test_client.get(f"/api/ontology/ribbon/", params=data)
     for subject in response.json().get('subjects'):
         assert subject.get('label') == 'Hamp'
-        assert subject.get('taxon_label') == 'Rattus nov'
+        assert subject.get('taxon_label') == 'Rattus norvegicus'
         assert(subject.get('groups').get('GO:0003674'))
         assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 6)
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 59)
