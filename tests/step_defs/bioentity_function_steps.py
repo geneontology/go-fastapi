@@ -13,6 +13,7 @@ EXTRA_TYPES = {
 def test_add():
     pass
 
+
 # Given Steps
 
 
@@ -31,7 +32,9 @@ def response_code(result, code):
     assert result.status_code == code
 
 
-@then('the response contains results for a GO:0030500')
-def endpoint_retuns(result):
+@then(parsers.cfparse('the response contains results for a {term:String}',
+                      extra_types=EXTRA_TYPES))
+def endpoint_retuns(result, term):
+    print(term)
     data = result.json()
     pprint(data)
