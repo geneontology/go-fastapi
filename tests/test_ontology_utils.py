@@ -14,6 +14,7 @@ def test_get_ontology():
 
 
 def test_get_category_terms():
+    return_value = ou.get_category_terms("")
     assert False
 
 

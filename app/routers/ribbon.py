@@ -29,14 +29,6 @@ aspect_map = {
 }
 
 
-def get_category_terms(category):
-    terms = []
-    for group in category["groups"]:
-        if group["type"] == "Term":
-            terms.append(group)
-    return terms
-
-
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_ontology_subsets_by_go_term_id(id: str = Query(None,
                                                              description="'CURIE identifier of a GO term,"
@@ -86,7 +78,7 @@ async def get_ribbon_results(subset: str = Query(None,
     print(subset)
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
     for category in categories:
-
+        print(category)
         category["groups"] = category["terms"]
         del category["terms"]
 
