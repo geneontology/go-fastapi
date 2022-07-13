@@ -120,7 +120,12 @@ def test_get_category_terms():
 
 
 def test_get_ontology_subsets_by_id():
-    assert False
+    ribbon_categories = ou.get_ontology_subsets_by_id("goslim_agr")
+    assert len(ribbon_categories) == 3
+    for ribbon_category in ribbon_categories:
+        if ribbon_category.get('annotation_class') == 'GO:0003674':
+            assert len(ribbon_category.get('terms')) == 16
+
 
 
 def test_correct_goid():
