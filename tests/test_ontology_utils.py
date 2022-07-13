@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 from app.main import app
 import app.utils.ontology.ontology_utils as ou
 from ontobio.sparql.sparql_ontology import EagerRemoteSparqlOntology
-from pprint import pprint
 
 test_client = TestClient(app)
 
