@@ -12,10 +12,14 @@ all: install start export-requirements
 start:
 	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
 
+run:
+	start
+
 test: unit-tests
 
 unit-tests:
-	poetry run pytest tests/*.py
+	poetry run pytest tests/unit/*.py
+	poetry run pytest tests/integration/step_defs/*.py
 
 export-requirements:
 	poetry export -f requirements.txt --output requirements.txt

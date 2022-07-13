@@ -1,9 +1,7 @@
-import pytest
 from pytest_bdd import scenarios, given, then, parsers, scenario
 from app.main import app
 from fastapi.testclient import TestClient
-from pprint import pprint
-import json
+
 
 EXTRA_TYPES = {
     'String': str,
@@ -11,14 +9,22 @@ EXTRA_TYPES = {
 
 
 @scenario('../features/bioentityfunction.feature', 'test function endpoint')
-def test_add():
+def test_function():
+    # boilerplate
+    pass
+
+
+@scenario("../features/bioentityfunction.feature", 'User fetches all GO functional assignments '
+                                                   'for a human gene using a NCBI ID, note GO may annotate to UniProt')
+def test_ncbi():
+    # boilerplate
     pass
 
 
 # Given Steps
 
 
-@given(parsers.cfparse('the API is queried with "{bioentity_id:String}"',
+@given(parsers.cfparse('the bioentity/gene/id/function endpoint is queried with "{bioentity_id:String}"',
                        extra_types=EXTRA_TYPES), target_fixture='result')
 def api_result(bioentity_id):
     test_client = TestClient(app)
@@ -33,7 +39,7 @@ def response_code(result, code):
     assert result.status_code == code
 
 
-@then(parsers.cfparse('the response contains results for a {term:String}',
+@then(parsers.cfparse('the response contains an association with object.id of {term:String}',
                       extra_types=EXTRA_TYPES))
 def endpoint_retuns(result, term):
     data = result.json()
