@@ -11,16 +11,16 @@ def test_add():
     pass
 
 
-@given("the go-fastapi test-client is queried with a value")
+@given("the queried test-client endpoint returns", target_fixture='result')
 def api_result():
     test_client = TestClient(app)
     response = test_client.get(f"/api/bioentity/gene/ZFIN%3AZDB-GENE-050417-357/function")
+    assert response.status_code == 200
     return response.json()
 
 
 @then("the endpoint should return successfully")
-def endpoint_retuns():
-    test_client = TestClient(app)
-    response = test_client.get(f"/api/bioentity/gene/ZFIN%3AZDB-GENE-050417-357/function")
-    assert response.status_code == 200
+def endpoint_retuns(result):
+    print(result)
+
 
