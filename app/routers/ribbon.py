@@ -75,10 +75,8 @@ async def get_ribbon_results(subset: str = Query(None,
     """
 
     # Step 1: create the categories
-    print(subset)
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
     for category in categories:
-        print(category)
         category["groups"] = category["terms"]
         del category["terms"]
 
@@ -191,7 +189,8 @@ async def get_ribbon_results(subset: str = Query(None,
                 entity['nb_annotations'] += 1
 
         for cat in categories:
-
+            print("here is the cat")
+            print(cat)
             for gp in cat['groups']:
                 group = gp['id']
 
