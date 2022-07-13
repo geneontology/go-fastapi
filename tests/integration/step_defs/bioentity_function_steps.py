@@ -43,13 +43,12 @@ def response_code(result, code):
                       extra_types=EXTRA_TYPES))
 def endpoint_retuns(result, term):
     data = result.json()
-    terms = []
-    #for association in data.get('associations'):
-        #pprint(association)
-        #print(association.get('object').get('id'))
-        #terms.append(association.get('object').get('id'))
-    # this is a hack - I don't know why term is being passed as "GO:xxx" instead of 'GO:xxx'
-    #assert term in terms
+    found_it = False
+    term = term.replace('"', '')
+    for association in data.get('associations'):
+        if association.get('object').get('id') == term:
+            found_it = True
+    assert found_it
 
 
 @then(parsers.cfparse('the response should have an association with object.label of {name:String}',
