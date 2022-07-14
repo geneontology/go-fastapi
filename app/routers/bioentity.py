@@ -1,6 +1,6 @@
 import logging
 from typing import List
-from pydantic import BaseModel, Field
+from pprint import pprint
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import search_associations
 from .slimmer import gene_to_uniprot_from_mygene
@@ -240,14 +240,14 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
         object_category='function',
         subject_category='gene',
         subject=id,
-        sort="id asc",
         user_agent=USER_AGENT,
         url="http://golr-aux.geneontology.io/solr",
         start=start,
         rows=rows,
         slim=slim
     )
-
+    pprint("should be null assocs")
+    pprint(assocs)
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs['associations']) == 0:
@@ -255,24 +255,23 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
         # https://github.com/monarch-initiative/dipper/issues/461
         # prots = scigraph.gene_to_uniprot_proteins(id)
         prots = gene_to_uniprot_from_mygene(id)
-        prot_associations = []
-        num_found = 0
         for prot in prots:
             pr_assocs = search_associations(
-                subject_category='gene',
                 object_category='function',
                 subject=prot,
-                sort="id asc",
                 user_agent=USER_AGENT,
                 url="http://golr-aux.geneontology.io/solr",
                 start=start,
-                rows=rows
+                rows=rows,
+                slim=slim
             )
-            if pr_assocs.get('numFound') > 0:
-                prot_associations.append(pr_assocs.get('associations'))
+            num_found = pr_assocs.get('numFound')
+            if num_found > 0:
                 num_found = num_found + pr_assocs.get('numFound')
-            for pasc in prot_associations:
-                assocs['associations'].append(pasc)
             # TODO need to filter out duplicates
             assocs['numFound'] = num_found
+            for asc in pr_assocs['associations']:
+                pprint(asc)
+                assocs['associations'].append(asc)
+    pprint(assocs)
     return assocs

@@ -7,11 +7,11 @@ EXTRA_TYPES = {
     'String': str,
 }
 
-#
-# @scenario('../features/bioentityfunction.feature', 'test function endpoint')
-# def test_zfin():
-#     # boilerplate
-#     pass
+
+@scenario('../features/bioentityfunction.feature', 'test function endpoint')
+def test_zfin():
+    # boilerplate
+    pass
 
 
 @scenario("../features/bioentityfunction.feature", 'User fetches all GO functional assignments for a human gene '
