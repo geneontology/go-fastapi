@@ -273,5 +273,4 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
             for asc in pr_assocs['associations']:
                 pprint(asc)
                 assocs['associations'].append(asc)
-    pprint(assocs)
     return assocs
