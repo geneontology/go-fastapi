@@ -55,7 +55,7 @@ def response_code(result, code):
 
 @then(parsers.cfparse('the response contains an association with object.id of {term:String}',
                       extra_types=EXTRA_TYPES))
-def endpoint_retuns(result, term):
+def endpoint_returns(result, term):
     data = result.json()
     found_it = False
     term = term.replace('"', '')
@@ -68,7 +68,7 @@ def endpoint_retuns(result, term):
 
 @then(parsers.cfparse('the response should have an association with object.label of {name:String}',
                       extra_types=EXTRA_TYPES))
-def endpoint_retuns(result, name):
+def endpoint_returns(result, name):
     data = result.json()
     found_it = False
     for association in data.get('associations'):
