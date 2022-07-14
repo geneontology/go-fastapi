@@ -271,7 +271,8 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
             if pr_assocs.get('numFound') > 0:
                 prot_associations.append(pr_assocs.get('associations'))
                 num_found = num_found + pr_assocs.get('numFound')
-            assocs['associations'] = prot_associations
+            for pasc in prot_associations:
+                assocs['associations'].append(pasc)
             # TODO need to filter out duplicates
             assocs['numFound'] = num_found
     return assocs
