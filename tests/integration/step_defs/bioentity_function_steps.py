@@ -21,6 +21,20 @@ def test_hgnc():
     pass
 
 
+@scenario("../features/bioentityfunction.feature", 'User fetches all GO functional assignments for a '
+                                                   'human gene using a NCBI ID')
+def test_ncbi():
+    # boilerplate
+    pass
+
+
+@scenario("../features/bioentityfunction.feature", 'User fetches GO functional assignments and '
+                                                   'wishes to filter negated results')
+def test_negated():
+    # boilerplate
+    pass
+
+
 # Given Steps
 
 
@@ -64,3 +78,26 @@ def endpoint_retuns(result, name):
     assert found_it
 
 
+@then(parsers.cfparse('the response should have an association with qualifiers of {qualifier:String}',
+                      extra_types=EXTRA_TYPES))
+def endpoint_retuns(result, qualifier):
+    data = result.json()
+    found_it = False
+    pprint(data)
+    for association in data.get('associations'):
+        qualifier = qualifier.replace('"', '')
+        if qualifier == str(association.get('qualfier')):
+            found_it = True
+    assert found_it
+
+
+@then(parsers.cfparse('the response should have an association with associations.negated is {qualifier:String}',
+                      extra_types=EXTRA_TYPES))
+def endpoint_retuns(result, qualifier):
+    data = result.json()
+    found_it = False
+    for association in data.get('associations'):
+        qualifier = qualifier.replace('"', '')
+        if qualifier == str(association.get('negated')):
+            found_it = True
+    assert found_it

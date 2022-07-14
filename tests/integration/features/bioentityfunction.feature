@@ -13,13 +13,13 @@ Feature: bioentity function (GO) routes work as expected
      And the response should have an association with object.label of "insulin receptor binding"
 
   Scenario: User fetches all GO functional assignments for a human gene using a NCBI ID
-     Given a path "/bioentity/gene/id/function endpoint" is queried with "NCBIGene:6469"
+     Given the "/bioentity/gene/id/function endpoint" is queried with "NCBIGene:6469"
      Then the response status code is "200"
      And the response contains an association with object.id of "GO:0001755"
      And the response should have an association with object.label of "neural crest cell migration"
 
   Scenario: User fetches GO functional assignments and wishes to filter negated results
-     Given a path "/bioentity/gene/id/function endpoint" is queried with "MGI:1332638"
+     Given the "/bioentity/gene/id/function endpoint" is queried with "MGI:1332638"
      Then the response status code is "200"
      And the response contains an association with object.id of "GO:0005730"
      And the response should have an association with qualifiers of "not"
