@@ -38,7 +38,7 @@ def test_negated():
 # Given Steps
 
 
-@given(parsers.cfparse('the "{endpoint:String} is queried with "{bioentity_id:String}"',
+@given(parsers.cfparse('the "{endpoint:String}" is queried with "{bioentity_id:String}"',
                        extra_types=EXTRA_TYPES), target_fixture='result')
 def api_result(bioentity_id):
     test_client = TestClient(app)

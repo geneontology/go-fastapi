@@ -13,11 +13,13 @@ def test_identifiers():
     # boilerplate
     pass
 
-
-@scenario('../features/prefixes.feature', 'Contract a GO URI to a GO OBO-style ID')
-def test_go_obo_style_uri():
-    # boilerplate
-    pass
+#
+# @scenario('../features/prefixes.feature', 'Contract a GO URI to a GO OBO-style ID')
+# def test_go_obo_style_uri():
+#     # boilerplate
+#     pass
+#
+#
 
 
 @scenario('../features/prefixes.feature', 'Expand a GO ID to a URI')
@@ -26,15 +28,14 @@ def test_exand_uri():
     pass
 
 
-@given(parsers.cfparse('the "/identifier/prefixes" is queried"',
-                       extra_types=EXTRA_TYPES), target_fixture='result')
-def api_result():
+@given(parsers.cfparse('the {endpoint:String} is queried', extra_types=EXTRA_TYPES), target_fixture='result')
+def api_result(endpoint):
     test_client = TestClient(app)
     response = test_client.get(f"/api/identifier/prefixes")
     return response
 
 
-@given(parsers.cfparse('the "{endpoint:String} endpoint is queried with "{thing:String}"',
+@given(parsers.cfparse('the "{endpoint:String}" endpoint is queried with "{thing:String}"',
                        extra_types=EXTRA_TYPES), target_fixture='result')
 def api_result(endpoint, thing):
     test_client = TestClient(app)
@@ -46,7 +47,6 @@ def api_result(endpoint, thing):
 
 
 # Then Steps
-
 
 @then(parsers.parse('the response status code is "{code:d}"'))
 def response_code(result, code):

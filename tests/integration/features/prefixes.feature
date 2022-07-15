@@ -2,6 +2,7 @@ Feature: Expansion and contraction of URIs
 
  Scenario: Client code requires list of all prefixes in use
     Given the "/api/identifier/prefixes" is queried
+    Then the response status code is "200"
     Then the content should contain "UBERON"
 
 ### GO connections
@@ -12,6 +13,6 @@ Feature: Expansion and contraction of URIs
     Then the content should contain "GO:0008150"
 
  Scenario: Expand a GO ID to a URI
-    Given the "/api/identifier/prefixes/expand/" is queried with "GO:0008150"
+    Given the "/api/identifier/prefixes/expand/" endpoint is queried with "GO:0008150"
     Then the response status code is "200"
     Then the content should contain "http://purl.obolibrary.org/obo/GO_0008150"
