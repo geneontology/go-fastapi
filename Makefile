@@ -15,11 +15,13 @@ start:
 run:
 	start
 
-test: unit-tests
+test: unit-tests integration-tests
+
+integration-tests:
+	poetry run pytest tests/integration/step_defs/*.py
 
 unit-tests:
-	poetry run pytest tests/unit/*.py
-	poetry run pytest tests/integration/step_defs/*.py
+       poetry run pytest tests/unit/*.py
 
 export-requirements:
 	poetry export -f requirements.txt --output requirements.txt

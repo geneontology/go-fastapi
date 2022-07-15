@@ -16,6 +16,7 @@ pandas = "^1.4.2"
 go-library = "^0.1.0"
 Oak = "^0.1.8"
 pytest-bdd = "^6.0.1"
+Sphinx = "^5.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
