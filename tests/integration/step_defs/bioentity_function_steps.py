@@ -83,11 +83,12 @@ def endpoint_returns(result, name):
 def endpoint_retuns(result, qualifier):
     data = result.json()
     found_it = False
-    pprint(data)
     for association in data.get('associations'):
         qualifier = qualifier.replace('"', '')
-        if qualifier == str(association.get('qualfier')):
-            found_it = True
+        if "qualifier" in association:
+            for item in association.get('qualifier'):
+                if qualifier == item:
+                    found_it = True
     assert found_it
 
 
@@ -98,6 +99,8 @@ def endpoint_retuns(result, qualifier):
     found_it = False
     for association in data.get('associations'):
         qualifier = qualifier.replace('"', '')
-        if qualifier == str(association.get('negated')):
-            found_it = True
+        if "negated" in association:
+            negated = association.get('negated')
+            if negated:
+                found_it = True
     assert found_it
