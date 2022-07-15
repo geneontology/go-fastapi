@@ -54,7 +54,6 @@ async def autocomplete_term(term: str = Query(..., description="example: `biolog
     q = GolrSearchQuery(term, user_agent=USER_AGENT)
     results = q.autocomplete()
     docs = []
-    result = {}
     for item in results.get('docs'):
         auto_result = {"id": item.id,
                        "label": item.label,
