@@ -198,5 +198,5 @@ def test_autocomplete():
 
 def test_autocomplete_go():
     response = test_client.get(f"/api/search/entity/autocomplete/go")
-    pprint(response.json())
+    print(response.json())
     assert response.status_code == 200

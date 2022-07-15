@@ -17,16 +17,15 @@ def search(term, args):
     return q.search()
 
 
-class AutocompleteResult(BaseModel):
+class TestResult(BaseModel):
     id: Union[str, None] = None
-    label: List[str]
+    label: List[str] = []
     match: Union[str, None] = None
-    category: List[str]
+    category: List[str] = []
     taxon: Union[str, None] = None
     taxon_label: Union[str, None] = None
     highlight: Union[str, None] = None
     has_highlight: Union[str, None] = None
-
 
 
 @router.get("/api/search/entity/{term}", tags=["search"])
@@ -42,7 +41,7 @@ async def search_term(term: str):
     return results
 
 
-@router.get('/api/search/entity/autocomplete/{term}', tags=["search"], response_model=AutocompleteResult)
+@router.get('/api/search/entity/autocomplete/{term}', tags=["search"], response_model=TestResult)
 async def autocomplete_term(term: str = Query(..., description="example: `biological`")):
     """
         Returns list of matching concepts or entities using lexical search
@@ -51,20 +50,3 @@ async def autocomplete_term(term: str = Query(..., description="example: `biolog
     results = q.autocomplete()
     pprint(results)
     return results
-
- #
- # {
- #      "id": "NCBIGene:49413",
- #      "label": [
- #        "Go"
- #      ],
- #      "match": "Go",
- #      "category": [
- #        "gene",
- #        "sequence feature"
- #      ],
- #      "taxon": "NCBITaxon:7227",
- #      "taxon_label": "Drosophila melanogaster",
- #      "highlight": "<em class=\"hilite\">Go</em>",
- #      "has_highlight": true
- #    },
