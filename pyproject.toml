@@ -19,6 +19,7 @@ pytest-bdd = "^6.0.1"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^1.0.0"
 sphinxcontrib-napoleon = "^0.7"
+BaseModel = "^20190604.1625"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

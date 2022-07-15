@@ -1,7 +1,9 @@
 import logging
+from typing import List, Union
 from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import GolrSearchQuery
 from fastapi import APIRouter, Query
+from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
@@ -12,6 +14,18 @@ router = APIRouter()
 def search(term, args):
     q = GolrSearchQuery(term, args)
     return q.search()
+
+
+class AutocompleteResult(BaseModel):
+    id: str
+    label: List[str]
+    match: str
+    category: List[str]
+    taxon: str
+    taxon_label: str
+    highlight: str
+    has_highlight: str
+
 
 
 @router.get("/api/search/entity/{term}", tags=["search"])

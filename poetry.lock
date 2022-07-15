@@ -131,6 +131,17 @@ python-versions = ">=3.6"
 pytz = ">=2015.7"
 
 [[package]]
+name = "basemodel"
+version = "20190604.1625"
+description = "SqlAlchemy's spuer class"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+sqlalchemy = "*"
+
+[[package]]
 name = "bcp47"
 version = "0.0.4"
 description = "Language tags made easy"
@@ -2351,7 +2362,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "c71512b397014326f47686e83c39f4da244871038f879493cab1acfe443b31fa"
+content-hash = "8be89b682518bb54930ac1a0d8e163df150491c6ed90e87fce4d571f3e75d324"
 
 [metadata.files]
 aiohttp = [
@@ -2471,6 +2482,7 @@ babel = [
     {file = "Babel-2.10.3-py3-none-any.whl", hash = "sha256:ff56f4892c1c4bf0d814575ea23471c230d544203c7748e8c68f0089478d48eb"},
     {file = "Babel-2.10.3.tar.gz", hash = "sha256:7614553711ee97490f732126dc077f8d0ae084ebc6a96e23db1482afabdb2c51"},
 ]
+basemodel = []
 bcp47 = [
     {file = "bcp47-0.0.4-py3-none-any.whl", hash = "sha256:309d3bbaef8d6c9ac59d37ba2167cc6620b4e7467ec8f1e09641b659bb1c0c6d"},
     {file = "bcp47-0.0.4.tar.gz", hash = "sha256:4878d2f3e697ef39ef3891a147280705e4377d5a8d7eb0702129b8d4a3718702"},
