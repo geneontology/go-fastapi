@@ -187,7 +187,6 @@ def test_search_entity():
         'id': 'ssh'
     }
     response = test_client.get(f"/api/search/entity/ssh", params=data)
-    pprint(response.json())
     assert response.status_code == 200
 
 

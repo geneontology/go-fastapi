@@ -28,10 +28,10 @@ async def search_term(term: str):
     q = GolrSearchQuery(term, user_agent=USER_AGENT)
     results = q.search()
     print(results)
-    auto_result = {"docs": results.get('docs'),
-                   "numFound": results.get('numFound'),
-                   "facet_counts": results.get('facet_counts'),
-                   "highlighting": results.get('highlighting')
+    auto_result = {"docs": results.docs,
+                   "numFound": results.numFound,
+                   "facet_counts": results.facet_counts,
+                   "highlighting": results.highlighting
                    }
     return auto_result
 
