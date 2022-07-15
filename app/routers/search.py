@@ -17,7 +17,7 @@ def search(term, args):
     return q.search()
 
 
-class TestResult(BaseModel):
+class AResult(BaseModel):
     id: Union[str, None] = None
     label: List[str] = []
     match: Union[str, None] = None
@@ -26,6 +26,10 @@ class TestResult(BaseModel):
     taxon_label: Union[str, None] = None
     highlight: Union[str, None] = None
     has_highlight: Union[str, None] = None
+
+
+class TestResult(BaseModel):
+    docs: List[AResult] = []
 
 
 @router.get("/api/search/entity/{term}", tags=["search"])
@@ -41,7 +45,7 @@ async def search_term(term: str):
     return results
 
 
-@router.get('/api/search/entity/autocomplete/{term}', tags=["search"], response_model=TestResult)
+@router.get('/api/search/entity/autocomplete/{term}', tags=["search"], response_model=List[TestResult])
 async def autocomplete_term(term: str = Query(..., description="example: `biological`")):
     """
         Returns list of matching concepts or entities using lexical search
