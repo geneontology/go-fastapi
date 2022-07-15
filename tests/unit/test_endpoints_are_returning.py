@@ -68,10 +68,7 @@ def test_prefixes_endpoint():
 
 
 def test_prefixes_contract_endpoint():
-    data = {
-        "uri": "https://www.informatics.jax.org/accession/MGI:1"
-    }
-    response = test_client.get('/api/identifier/prefixes/contract/{uri}', params=data)
+    response = test_client.get('/api/identifier/prefixes/contract/http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150')
     print(response.json())
     assert response.status_code == 200
 
