@@ -9,6 +9,7 @@ gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
+uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 @pytest.mark.parametrize("id", gene_ids)
@@ -67,8 +68,9 @@ def test_prefixes_endpoint():
     assert response.status_code == 200
 
 
-def test_prefixes_contract_endpoint():
-    response = test_client.get('/api/identifier/prefixes/contract/http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150')
+@pytest.mark.parametrize("uri", uris)
+def test_prefixes_contract_endpoint(uri):
+    response = test_client.get(f"/api/identifier/prefixes/contract/{uri}")
     print(response.json())
     assert response.status_code == 200
 

@@ -21,4 +21,5 @@ async def get_expand_curie(id: str = Query(None, description="identifier in CURI
 
 @router.get("/api/identifier/prefixes/contract/{uri}", tags=["identifier/prefixes"])
 async def get_contract_uri(uri: str = Query(None, description="full URI of the identified resource")):
+    print(uri)
     return contract_uri(uri)
