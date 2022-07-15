@@ -194,3 +194,9 @@ def test_search_entity():
 def test_autocomplete():
     response = test_client.get(f"/api/search/entity/autocomplete/biological")
     assert response.status_code == 200
+
+
+def test_autocomplete_go():
+    response = test_client.get(f"/api/search/entity/autocomplete/go")
+    pprint(response.json())
+    assert response.status_code == 200
