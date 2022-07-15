@@ -30,12 +30,9 @@ async def search_term(term: str):
     auto_result = {"docs": results.get('docs'),
                        "numFound": results.get('numFound'),
                        "facet_counts": results.get('facet_counts'),
-                       "highlighting": item.taxon
+                       "highlighting": results.get('highlighting')
                    }
-        docs.append(auto_result)
-    result = {"docs": docs}
-
-    return results
+    return auto_result
 
 
 @router.get('/api/search/entity/autocomplete/{term}', tags=["search"])
