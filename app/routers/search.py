@@ -1,5 +1,6 @@
 import logging
 from typing import List, Union
+from pprint import pprint
 from ontobio.util.user_agent import get_user_agent
 from ontobio.golr.golr_query import GolrSearchQuery
 from fastapi import APIRouter, Query
@@ -17,14 +18,14 @@ def search(term, args):
 
 
 class AutocompleteResult(BaseModel):
-    id: str
+    id: Union[str, None] = None
     label: List[str]
-    match: str
+    match: Union[str, None] = None
     category: List[str]
-    taxon: str
-    taxon_label: str
-    highlight: str
-    has_highlight: str
+    taxon: Union[str, None] = None
+    taxon_label: Union[str, None] = None
+    highlight: Union[str, None] = None
+    has_highlight: Union[str, None] = None
 
 
 
@@ -41,13 +42,14 @@ async def search_term(term: str):
     return results
 
 
-@router.get('/api/search/entity/autocomplete/{term}', tags=["search"])
+@router.get('/api/search/entity/autocomplete/{term}', tags=["search"], response_model=AutocompleteResult)
 async def autocomplete_term(term: str = Query(..., description="example: `biological`")):
     """
         Returns list of matching concepts or entities using lexical search
         """
     q = GolrSearchQuery(term, user_agent=USER_AGENT)
     results = q.autocomplete()
+    pprint(results)
     return results
 
  #
