@@ -17,22 +17,6 @@ def search(term, args):
     return q.search()
 
 
-class AResult(BaseModel):
-    id: Union[str, None] = None
-    label: List[str] = []
-    match: Union[str, None] = None
-    category: List[str] = []
-    taxon: Union[str, None] = None
-    taxon_label: Union[str, None] = None
-    highlight: Union[str, None] = None
-    has_highlight: Union[str, None] = None
-
-
-class TestResult(BaseModel):
-    docs: List[AResult] = []
-
-# {docs: [AutocompleteResult]}
-
 @router.get("/api/search/entity/{term}", tags=["search"])
 async def search_term(term: str):
     """
