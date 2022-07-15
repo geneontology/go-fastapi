@@ -27,7 +27,6 @@ async def search_term(term: str):
     """
     q = GolrSearchQuery(term, user_agent=USER_AGENT)
     results = q.search()
-    print(results)
     auto_result = {"docs": results.docs,
                    "numFound": results.numFound,
                    "facet_counts": results.facet_counts,
