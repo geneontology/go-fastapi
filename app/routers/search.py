@@ -16,7 +16,6 @@ def search(term, args):
 
 @router.get("/api/search/entity/{term}", tags=["search"])
 async def search_term(term: str):
-    # TODO @api.marshal_with(search_result)
     """
     Returns list of matching concepts or entities using lexical search
 
@@ -36,3 +35,20 @@ async def autocomplete_term(term: str = Query(..., description="example: `biolog
     q = GolrSearchQuery(term, user_agent=USER_AGENT)
     results = q.autocomplete()
     return results
+
+ #
+ # {
+ #      "id": "NCBIGene:49413",
+ #      "label": [
+ #        "Go"
+ #      ],
+ #      "match": "Go",
+ #      "category": [
+ #        "gene",
+ #        "sequence feature"
+ #      ],
+ #      "taxon": "NCBITaxon:7227",
+ #      "taxon_label": "Drosophila melanogaster",
+ #      "highlight": "<em class=\"hilite\">Go</em>",
+ #      "has_highlight": true
+ #    },

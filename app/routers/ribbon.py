@@ -189,8 +189,6 @@ async def get_ribbon_results(subset: str = Query(None,
                 entity['nb_annotations'] += 1
 
         for cat in categories:
-            print("here is the cat")
-            print(cat)
             for gp in cat['groups']:
                 group = gp['id']
 

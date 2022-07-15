@@ -118,7 +118,9 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
             slim=slim,
             taxon=taxon,
             relation=relation,
-            url="http://golr-aux.geneontology.io/solr"
+            url="http://golr-aux.geneontology.io/solr",
+            start=start,
+            rows=rows
         )
     elif relationship_type == INVOLVED_IN_REGULATION_OF:
         # Temporary fix until https://github.com/geneontology/amigo/pull/469
@@ -136,7 +138,9 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
             taxon=taxon,
             slim=slim,
             relation=relation,
-            url="http://golr-aux.geneontology.io/solr"
+            url="http://golr-aux.geneontology.io/solr",
+            start=start,
+            rows=rows
         )
     elif relationship_type == INVOLVED_IN:
         return search_associations(
@@ -159,11 +163,6 @@ async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identif
                                                                          "specific publication or other supporting "
                                                                          "object, e.g. ZFIN:ZDB-PUB-060503-2"),
                                  start: int = 0, rows: int = 100,
-                                 facet: bool = Query(False, include_in_schema=False),
-                                 unselect_evidence: bool = Query(False, include_in_schema=False),
-                                 exclude_automatic_assertions: bool = Query(False, include_in_schema=False),
-                                 fetch_objects: bool = Query(False, include_in_schema=False),
-                                 use_compact_associations: bool = Query(False, include_in_schema=False)
                                  ):
     """
     Returns taxons associated to a GO term
@@ -240,7 +239,8 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs['associations']) == 0:
-        # Note that GO currently uses UniProt as primary ID for some sources: https://github.com/biolink/biolink-api/issues/66
+        # Note that GO currently uses UniProt as primary ID for some
+        # sources: https://github.com/biolink/biolink-api/issues/66
         # https://github.com/monarch-initiative/dipper/issues/461
         # prots = scigraph.gene_to_uniprot_proteins(id)
         prots = gene_to_uniprot_from_mygene(id)
@@ -257,7 +257,6 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
             num_found = pr_assocs.get('numFound')
             if num_found > 0:
                 num_found = num_found + pr_assocs.get('numFound')
-            # TODO need to filter out duplicates
             assocs['numFound'] = num_found
             for asc in pr_assocs['associations']:
                 pprint(asc)
