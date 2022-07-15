@@ -68,11 +68,11 @@ def test_prefixes_endpoint():
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("uri", uris)
-def test_prefixes_contract_endpoint(uri):
-    response = test_client.get(f"/api/identifier/prefixes/contract/{uri}")
-    print(response.json())
-    assert response.status_code == 200
+# @pytest.mark.parametrize("uri", uris)
+# def test_prefixes_contract_endpoint(uri):
+#     response = test_client.get(f"/api/identifier/prefixes/contract/{uri}")
+#     print(response.json())
+#     assert response.status_code == 200
 
 
 @pytest.mark.parametrize("id", gene_ids)
