@@ -55,8 +55,7 @@ async def autocomplete_term(term: str = Query(..., description="example: `biolog
     results = q.autocomplete()
     pprint(results)
     docs = []
-    auto_result = {}
-    for item in results.docs:
+    for item in results.get('docs'):
         auto_result = {"id": item.id,
                        "label": item.label,
                        "match": item.match,
@@ -66,5 +65,4 @@ async def autocomplete_term(term: str = Query(..., description="example: `biolog
                        "highlight": item.highlight,
                        "has_highlight": item.has_highlight}
         docs.append(auto_result)
-    print(docs)
     return results
