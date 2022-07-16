@@ -33,6 +33,7 @@ async def search_term(term: str):
         "facet_counts": results.facet_counts,
         "highlighting": results.highlighting
     }
+    pprint(auto_result)
     return auto_result
 
 
