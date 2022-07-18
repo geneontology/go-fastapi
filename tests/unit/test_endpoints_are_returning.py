@@ -176,6 +176,8 @@ def test_ontology_term_subsets(id):
     assert response.status_code == 200
 
 
+@pytest.mark.skip(reason="currently this endpoint is disabled because we "
+                         "have no 'facet_pivot' attribute in GOlr")
 def test_search_entity():
     data = {
         'term': 'ssh',

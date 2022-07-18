@@ -17,24 +17,24 @@ def search(term, args):
     return q.search()
 
 
-@router.get("/api/search/entity/{term}", tags=["search"])
-async def search_term(term: str):
-    """
-    Returns list of matching concepts or entities using lexical search
-
-    :param term: search string, e.g. shh, cell
-
-    """
-    q = GolrSearchQuery(term, user_agent=USER_AGENT)
-    results = q.search()
-    auto_result = {
-        "numFound": results.numFound,
-        "docs": results.docs,
-        "facet_counts": results.facet_counts,
-        "highlighting": results.highlighting
-    }
-    pprint(auto_result)
-    return auto_result
+# @router.get("/api/search/entity/{term}", tags=["search"])
+# async def search_term(term: str):
+#     """
+#     Returns list of matching concepts or entities using lexical search
+#
+#     :param term: search string, e.g. shh, cell
+#
+#     """
+#     q = GolrSearchQuery(term, user_agent=USER_AGENT,
+#                         url="http://golr-aux.geneontology.io/solr", )
+#     results = q.search()
+#     auto_result = {
+#         "numFound": results.numFound,
+#         "docs": results.docs,
+#         "facet_counts": results.facet_counts,
+#         "highlighting": results.highlighting
+#     }
+#     return auto_result
 
 
 @router.get('/api/search/entity/autocomplete/{term}', tags=["search"])
@@ -42,7 +42,8 @@ async def autocomplete_term(term: str = Query(..., description="example: `biolog
     """
         Returns list of matching concepts or entities using lexical search
         """
-    q = GolrSearchQuery(term, user_agent=USER_AGENT)
+    q = GolrSearchQuery(term, user_agent=USER_AGENT,
+                        url="http://golr-aux.geneontology.io/solr", )
     results = q.autocomplete()
     docs = []
     for item in results.get('docs'):
