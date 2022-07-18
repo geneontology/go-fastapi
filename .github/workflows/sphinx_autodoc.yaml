@@ -1,51 +1,35 @@
-name: Run-tests
+name: Sphinx Documentation
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  test:
+  build-docs:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.9]
-
     steps:
-
-      #----------------------------------------------
-      #       check-out repo and set-up python
-      #----------------------------------------------
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - name: Checkout
+        uses: actions/checkout@main
         with:
-          python-version: ${{ matrix.python-version }}
+          fetch-depth: 0
 
-      #----------------------------------------------
-      #          install & configure poetry
-      #----------------------------------------------
-      - name: Install Poetry
+      - name: Set up Python 3.
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+
+      - name: Install Poetry.
         uses: snok/install-poetry@v1.3
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
 
-      #----------------------------------------------
-      # install dependencies if cache does not exist
-      #----------------------------------------------
-      - name: Install dependencies
-        run: poetry install --no-interaction
+      - name: install
+        run: poetry install -E docs
 
       - name: Build documentation.
         run: |
-          poetry run mkdir gh-pages
-          poetry run touch gh-pages/.nojekyll
-          poetry run cd docs/
-          poetry run make clean html
-          poetry run cp -r _build/html/* ../gh-pages/
-
+          mkdir gh-pages
+          touch gh-pages/.nojekyll
+          cd docs/
+          poetry run sphinx-build -b html . _build
+          cp -r _build/* ../gh-pages/
       - name: Deploy documentation.
         if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4.3.0
