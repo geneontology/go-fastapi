@@ -39,16 +39,13 @@ jobs:
         if: step_defs.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
 
-      #----------------------------------------------
-      #              run test suite
-      #----------------------------------------------
       - name: Build documentation.
-      run: |
-        poetry run mkdir gh-pages
-        poetry run touch gh-pages/.nojekyll
-        poetry run cd docs/
-        poetry run make clean html
-        poetry run cp -r _build/html/* ../gh-pages/
+        run: |
+          poetry run mkdir gh-pages
+          poetry run touch gh-pages/.nojekyll
+          poetry run cd docs/
+          poetry run make clean html
+          poetry run cp -r _build/html/* ../gh-pages/
 
       - name: Deploy documentation.
         if: ${{ github.event_name == 'push' }}
