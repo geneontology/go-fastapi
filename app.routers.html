@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.routers package &mdash; go-fastapi 0.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="app package" href="app.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> go-fastapi
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">go-fastapi</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="app.html">app package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="app.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">app.routers package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#app-main-module">app.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#module-app">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">go-fastapi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">go-fastapi</a> &raquo;</li>
+          <li><a href="app.html">app package</a> &raquo;</li>
+      <li>app.routers package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com//go-fastapi/blob/main/docs//main/docs/app.routers.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="app-routers-package">
+<h1>app.routers package<a class="headerlink" href="#app-routers-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-app.routers.bioentity">
+<span id="app-routers-bioentity-module"></span><h2>app.routers.bioentity module<a class="headerlink" href="#module-app.routers.bioentity" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.routers.bioentity.RelationshipType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">RelationshipType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.RelationshipType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.bioentity.RelationshipType.ACTS_UPSTREAM_OF_OR_WITHIN">
+<span class="sig-name descname"><span class="pre">ACTS_UPSTREAM_OF_OR_WITHIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'acts_upstream_of_or_within'</span></em><a class="headerlink" href="#app.routers.bioentity.RelationshipType.ACTS_UPSTREAM_OF_OR_WITHIN" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.bioentity.RelationshipType.INVOLVED_IN">
+<span class="sig-name descname"><span class="pre">INVOLVED_IN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'involved_in'</span></em><a class="headerlink" href="#app.routers.bioentity.RelationshipType.INVOLVED_IN" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.bioentity.RelationshipType.INVOLVED_IN_REGULATION_OF">
+<span class="sig-name descname"><span class="pre">INVOLVED_IN_REGULATION_OF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'involved_in_regulation_of'</span></em><a class="headerlink" href="#app.routers.bioentity.RelationshipType.INVOLVED_IN_REGULATION_OF" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.bioentity.get_annotations_by_gene_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_annotations_by_gene_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_annotations_by_gene_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns GO terms associated to a gene.</p>
+<p>Note: currently this is implemented as a query to the GO/AmiGO solr instance.
+This directly supports IDs such as:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ZFIN e.g. ZFIN:ZDB-GENE-050417-357</p></li>
+</ul>
+</div></blockquote>
+<p>Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However,
+the standard for biolink is MGI:nnnn, so you should use this (will be transparently
+mapped to legacy ID)</p>
+<p>Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
+Again, this should be transparently handled; e.g. you can use NCBIGene:6469, and this will be
+mapped behind the scenes for querying.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.bioentity.get_annotations_by_goterm_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_annotations_by_goterm_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_annotations_by_goterm_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns annotations associated to a GO term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.bioentity.get_bioentity_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_bioentity_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_bioentity_by_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.bioentity.get_genes_by_goterm_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_genes_by_goterm_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taxon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relationship_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#app.routers.bioentity.RelationshipType" title="app.routers.bioentity.RelationshipType"><span class="pre">RelationshipType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(involved_in)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_genes_by_goterm_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns genes associated to a GO term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.bioentity.get_taxon_by_goterm_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_taxon_by_goterm_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_taxon_by_goterm_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns taxons associated to a GO term</p>
+</dd></dl>
+
+</section>
+<section id="module-app.routers.labeler">
+<span id="app-routers-labeler-module"></span><h2>app.routers.labeler module<a class="headerlink" href="#module-app.routers.labeler" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.labeler.expand_curie">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.labeler.</span></span><span class="sig-name descname"><span class="pre">expand_curie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.labeler.expand_curie" title="Permalink to this definition"></a></dt>
+<dd><p>Fetches a map from CURIEs/IDs to labels</p>
+</dd></dl>
+
+</section>
+<section id="module-app.routers.ontology">
+<span id="app-routers-ontology-module"></span><h2>app.routers.ontology module<a class="headerlink" href="#module-app.routers.ontology" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.routers.ontology.GraphType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">GraphType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.GraphType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.ontology.GraphType.neighborhood_graph">
+<span class="sig-name descname"><span class="pre">neighborhood_graph</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'neighborhood_graph'</span></em><a class="headerlink" href="#app.routers.ontology.GraphType.neighborhood_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.ontology.GraphType.regulates_transitivity_graph">
+<span class="sig-name descname"><span class="pre">regulates_transitivity_graph</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'regulates_transitivity_graph'</span></em><a class="headerlink" href="#app.routers.ontology.GraphType.regulates_transitivity_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.ontology.GraphType.topology_graph">
+<span class="sig-name descname"><span class="pre">topology_graph</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'topology_graph'</span></em><a class="headerlink" href="#app.routers.ontology.GraphType.topology_graph" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.routers.ontology.RelationshipType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">RelationshipType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.RelationshipType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.ontology.RelationshipType.IS_A">
+<span class="sig-name descname"><span class="pre">IS_A</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'isa'</span></em><a class="headerlink" href="#app.routers.ontology.RelationshipType.IS_A" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.ontology.RelationshipType.IS_A_PART_OF">
+<span class="sig-name descname"><span class="pre">IS_A_PART_OF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'isa_partof'</span></em><a class="headerlink" href="#app.routers.ontology.RelationshipType.IS_A_PART_OF" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.ontology.RelationshipType.REGULATES">
+<span class="sig-name descname"><span class="pre">REGULATES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'regulates'</span></em><a class="headerlink" href="#app.routers.ontology.RelationshipType.REGULATES" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_ancestors_shared_by_two_terms">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_ancestors_shared_by_two_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_ancestors_shared_by_two_terms" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the ancestor ontology terms shared by two ontology terms</p>
+<p>subject: ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0006259">GO:0006259</a>’
+object: ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0046483">GO:0046483</a>’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_subgraph_by_term_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_subgraph_by_term_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_ancestors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(True)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_descendants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(True)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(['subClassOf',</span> <span class="pre">'BFO:0000050'])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_meta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(False)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_subgraph_by_term_id" title="Permalink to this definition"></a></dt>
+<dd><p>Extract a subgraph from an ontology term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_subset_metadata_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_subset_metadata_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_subset_metadata_by_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns meta data of an ontology subset (slim)
+id is the name of a slim subset, e.g., goslim_agr, goslim_generic</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_subsets_by_term">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_subsets_by_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_subsets_by_term" title="Permalink to this definition"></a></dt>
+<dd><p>Returns subsets (slims) associated to an ontology term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_term_graph_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_term_graph_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#app.routers.ontology.GraphType" title="app.routers.ontology.GraphType"><span class="pre">GraphType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(topology_graph)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_term_graph_by_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns graph of an ontology term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_term_metadata_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_term_metadata_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_term_metadata_by_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns meta data of an ontology term, e.g. <a class="reference external" href="GO:0003677">GO:0003677</a></p>
+</dd></dl>
+
+</section>
+<section id="module-app.routers.prefixes">
+<span id="app-routers-prefixes-module"></span><h2>app.routers.prefixes module<a class="headerlink" href="#module-app.routers.prefixes" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.prefixes.get_all_prefixes">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.prefixes.</span></span><span class="sig-name descname"><span class="pre">get_all_prefixes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.prefixes.get_all_prefixes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.prefixes.get_contract_uri">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.prefixes.</span></span><span class="sig-name descname"><span class="pre">get_contract_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.prefixes.get_contract_uri" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.prefixes.get_expand_curie">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.prefixes.</span></span><span class="sig-name descname"><span class="pre">get_expand_curie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.prefixes.get_expand_curie" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-app.routers.ribbon">
+<span id="app-routers-ribbon-module"></span><h2>app.routers.ribbon module<a class="headerlink" href="#module-app.routers.ribbon" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ribbon.get_ontology_subsets_by_go_term_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ribbon.</span></span><span class="sig-name descname"><span class="pre">get_ontology_subsets_by_go_term_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ribbon.get_ontology_subsets_by_go_term_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns subsets (slims) associated to an ontology term</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ribbon.get_ribbon_results">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ribbon.</span></span><span class="sig-name descname"><span class="pre">get_ribbon_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_IBA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(False)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_PB</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(False)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_aspect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(False)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ribbon.get_ribbon_results" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch the summary of annotations for a given gene or set of genes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ribbon.get_subset_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ribbon.</span></span><span class="sig-name descname"><span class="pre">get_subset_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ribbon.get_subset_by_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-app.routers.search">
+<span id="app-routers-search-module"></span><h2>app.routers.search module<a class="headerlink" href="#module-app.routers.search" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.search.autocomplete_term">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">autocomplete_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.autocomplete_term" title="Permalink to this definition"></a></dt>
+<dd><p>Returns list of matching concepts or entities using lexical search</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.search.search">
+<span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.search" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.search.search_term">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">search_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.search_term" title="Permalink to this definition"></a></dt>
+<dd><p>Returns list of matching concepts or entities using lexical search</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>term</strong> – search string, e.g. shh, cell</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.routers.slimmer">
+<span id="app-routers-slimmer-module"></span><h2>app.routers.slimmer module<a class="headerlink" href="#module-app.routers.slimmer" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.routers.slimmer.RelationshipType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.slimmer.</span></span><span class="sig-name descname"><span class="pre">RelationshipType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.slimmer.RelationshipType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.slimmer.RelationshipType.acts_upstream_of_or_within">
+<span class="sig-name descname"><span class="pre">acts_upstream_of_or_within</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'acts_upstream_of_or_within'</span></em><a class="headerlink" href="#app.routers.slimmer.RelationshipType.acts_upstream_of_or_within" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.slimmer.RelationshipType.involved_in">
+<span class="sig-name descname"><span class="pre">involved_in</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'involved_in'</span></em><a class="headerlink" href="#app.routers.slimmer.RelationshipType.involved_in" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.slimmer.gene_to_uniprot_from_mygene">
+<span class="sig-prename descclassname"><span class="pre">app.routers.slimmer.</span></span><span class="sig-name descname"><span class="pre">gene_to_uniprot_from_mygene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.slimmer.gene_to_uniprot_from_mygene" title="Permalink to this definition"></a></dt>
+<dd><p>Query MyGeneInfo with a gene and get its corresponding UniProt ID</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.slimmer.slimmer_function">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.slimmer.</span></span><span class="sig-name descname"><span class="pre">slimmer_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relationship_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#app.routers.slimmer.RelationshipType" title="app.routers.slimmer.RelationshipType"><span class="pre">RelationshipType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(acts_upstream_of_or_within)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_automatic_assertions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.slimmer.slimmer_function" title="Permalink to this definition"></a></dt>
+<dd><p>For a given gene(s), summarize its annotations over a defined set of slim</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.slimmer.uniprot_to_gene_from_mygene">
+<span class="sig-prename descclassname"><span class="pre">app.routers.slimmer.</span></span><span class="sig-name descname"><span class="pre">uniprot_to_gene_from_mygene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.slimmer.uniprot_to_gene_from_mygene" title="Permalink to this definition"></a></dt>
+<dd><p>Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene</p>
+</dd></dl>
+
+</section>
+<section id="module-app.routers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.routers" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="app.html" class="btn btn-neutral float-left" title="app package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Sierra Moxon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
