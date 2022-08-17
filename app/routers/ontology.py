@@ -17,14 +17,10 @@ router = APIRouter()
 
 # Some query parameters & parsers
 TOPOLOGY = "topology_graph"
-REGULATES_TRANSITIVITY = "regulates_transitivity_graph"
-NEIGHBORHOOD_GRAPH = "neighborhood_graph"
 
 
 class GraphType(str, Enum):
     topology_graph = TOPOLOGY
-    regulates_transitivity_graph = REGULATES_TRANSITIVITY
-    neighborhood_graph = NEIGHBORHOOD_GRAPH
 
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
