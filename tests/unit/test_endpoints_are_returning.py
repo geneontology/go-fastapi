@@ -42,9 +42,29 @@ def test_bioenty_gene_function_endpoints(id):
 
 @pytest.mark.parametrize("id", go_ids)
 def test_bioenty_gene_function_endpoints(id):
-    response = test_client.get(f"/api/bioentity/function/{id}/taxons")
+    response = test_client.get(f"/api/bioentity/function/{id}/genes")
     assert response.status_code == 200
     assert len(response.json()) >= 4
+
+
+example = ["GO:0002544"]
+
+
+@pytest.mark.parametrize("id", example)
+def test_bioenty_gene_function_taxon_endpoint(id):
+    data = {
+        'taxon': 'NCBITaxon:9606'
+    }
+    response = test_client.get(f"/api/bioentity/function/{id}/genes", params=data)
+    assert response.status_code == 200
+    assert len(response.json()) >= 4
+    pprint(response.json())
+
+
+@pytest.mark.parametrize("id", go_ids)
+def test_bioenty_gene_function_endpoints(id):
+    response = test_client.get(f"/api/bioentity/function/{id}/taxons")
+    assert response.status_code == 200
 
 
 @pytest.mark.parametrize(
