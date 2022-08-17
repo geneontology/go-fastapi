@@ -13,15 +13,6 @@ log = logging.getLogger(__name__)
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
-# Some query parameters & parsers
-IS_A = "isa"
-IS_A_PART_OF = "isa_partof"
-REGULATES = "regulates"
-TOPOLOGY = "topology_graph"
-REGULATES_TRANSITIVITY = "regulates_transitivity_graph"
-NEIGHBORHOOD_GRAPH = "neighborhood_graph"
-NEIGHBORHOOD_LIMITED_GRAPH = "neighborhood_limited_graph"
-
 aspect_map = {
     "P": "GO:0008150",
     "F": "GO:0003674",
