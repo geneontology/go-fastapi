@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 from app.main import app
-from pprint import pprint
 test_client = TestClient(app)
 
 
