@@ -1,9 +1,7 @@
 name: link-checker
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
-  push:
-    branches: [ main ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:
@@ -41,15 +39,5 @@ jobs:
         if: step_defs.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
 
-
       - name: Check code quality with flake8
         run: poetry run tox -e flake8
-
-      - name: Check package metadata with Pyroma
-        run: poetry run tox -e pyroma
-
-      - name: Check static typing with MyPy
-        run: poetry run tox -e mypy
-
-      - name: Test with pytest and generate coverage file
-        run: poetry run tox -e py
