@@ -1,35 +1,51 @@
-name: code quality
-
+name: link-checker
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.9", "3.10" ]
+        python-version: [3.9]
 
     steps:
-      - uses: actions/checkout@v3.0.2
+
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Check out repository
+        uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
+      #----------------------------------------------
+      #          install & configure poetry
+      #----------------------------------------------
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3.1
+        uses: snok/install-poetry@v1.3
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      #----------------------------------------------
+      # install dependencies if cache does not exist
+      #----------------------------------------------
       - name: Install dependencies
-        run: poetry install --no-interaction
+        if: step_defs.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
 
       - name: Check code quality with flake8
         run: poetry run tox -e flake8
+
       - name: Check package metadata with Pyroma
         run: poetry run tox -e pyroma
+
       - name: Check static typing with MyPy
         run: poetry run tox -e mypy
 
