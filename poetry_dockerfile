@@ -1,88 +1,50 @@
-# `python-base` sets up all our shared environment variables
-FROM python:3.8.5-slim as python-base
+###############################################
+# Base Image
+###############################################
+FROM python:3.9-slim as python-base
 
-    # python
 ENV PYTHONUNBUFFERED=1 \
-    # prevents python creating .pyc files
     PYTHONDONTWRITEBYTECODE=1 \
-    \
-    # pip
-    PIP_NO_CACHE_DIR=on \
+    PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    \
-    # poetry
-    # https://python-poetry.org/docs/configuration/#using-environment-variables
-    POETRY_VERSION=1.1.13 \
-    # make poetry install to this location
+    POETRY_VERSION=1.2.2  \
     POETRY_HOME="/opt/poetry" \
-    # make poetry create the virtual environment in the project's root
-    # it gets named `.venv`
     POETRY_VIRTUALENVS_IN_PROJECT=true \
-    # do not ask any interactive question
     POETRY_NO_INTERACTION=1 \
-    \
-    # paths
-    # this is where our requirements + virtual environment will live
     PYSETUP_PATH="/opt/pysetup" \
     VENV_PATH="/opt/pysetup/.venv"
-
 
 # prepend poetry and venv to path
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
-
-# `builder-base` stage is used to build deps + create our virtual environment
+###############################################
+# Builder Image
+###############################################
 FROM python-base as builder-base
-RUN apt-get update \
-    && apt-get install -y \
-        # deps for installing poetry
-        curl \
-        # deps for building python deps
-        build-essentials
+
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+    curl build-essential
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+RUN curl -sSL https://install.python-poetry.org | python3
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
-COPY go_fastapi/* poetry.lock pyproject.toml ./
+COPY poetry.lock pyproject.toml ./
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN poetry install -vvv
+RUN poetry install
 
-# `development` image is used during development / testing
-FROM python-base as development
-ENV FASTAPI_ENV=development
-WORKDIR $PYSETUP_PATH
+###############################################
+# Production Image
+###############################################
 
-# copy in our built poetry + venv
-COPY --from=builder-base $POETRY_HOME $POETRY_HOME
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+#FROM python-base as production
+FROM builder-base as production
 
-# quicker install as runtime deps are already installed
-RUN poetry install -vvv
+COPY . /opt/go-fastapi
+WORKDIR /opt/go-fastapi
 
-# will become mountpoint of our code
-WORKDIR go_fastapi
-
-EXPOSE 8000
-CMD ["uvicorn", "--reload", "go_fastapi.main:app"]
-
-
-# # `production` image used for runtime
-# FROM python-base as production
-# ENV FASTAPI_ENV=production
-# COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-# COPY ./go_fastapi go_fastapi/
-# WORKDIR go_fastapi
-# CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app"]
-
-
-# docker build -t go-fastapi . (names image and stores it)
-# docker run -d --name go-fastapi -p 8000:8000 go-fastapi  (expose ports and name the container)
-# docker rm go-fastapi (removes image)
-# docker port go-fastapi (see the port mapping)
-
-# regular run:
-# poetry run uvicorn --reload go_fastapi.main:app
+CMD ["/opt/poetry/bin/poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
