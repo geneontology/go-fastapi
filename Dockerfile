@@ -1,7 +1,9 @@
 ###############################################
 # Base Image
 ###############################################
-FROM ubuntu:18.04 as python-base
+FROM ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -19,12 +21,12 @@ ENV PYTHONUNBUFFERED=1 \
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 RUN apt-get update \
-    && apt-get install -y make git curl less emacs \
+    && apt-get install -y make git curl less emacs python3 \
     && apt-get install --no-install-recommends -y \
     build-essential
 
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://install.python-poetry.org | python
+RUN curl -sSL https://install.python-poetry.org | python3
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR opt
