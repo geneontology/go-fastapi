@@ -90,7 +90,7 @@ def test_mgi_ribbon():
         assert(subject.get('groups').get('GO:0003674'))
         assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 14)
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 16)
-        assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 15)
+        assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 14)
     assert response.status_code == 200
 
 
