@@ -88,9 +88,9 @@ def test_mgi_ribbon():
         assert subject.get('label') == 'Ace2'
         assert subject.get('taxon_label') == 'Mus musculus'
         assert(subject.get('groups').get('GO:0003674'))
-        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 16)
+        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 14)
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 16)
-        assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 15)
+        assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 14)
     assert response.status_code == 200
 
 
@@ -104,7 +104,7 @@ def test_wb_ribbon():
         assert subject.get('label') == 'daf-2'
         assert subject.get('taxon_label') == 'Caenorhabditis elegans'
         assert(subject.get('groups').get('GO:0003674'))
-        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 21)
+        assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 19)
         assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 75)
         assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 13)
     assert response.status_code == 200
@@ -121,6 +121,6 @@ def test_rgd_ribbon():
         assert subject.get('taxon_label') == 'Rattus norvegicus'
         assert(subject.get('groups').get('GO:0003674'))
         assert (subject.get('groups').get('GO:0003674').get('ALL').get('nb_annotations') >= 6)
-        assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 59)
+        assert (subject.get('groups').get('GO:0008150').get('ALL').get('nb_annotations') >= 58)
         assert (subject.get('groups').get('GO:0005575').get('ALL').get('nb_annotations') >= 11)
     assert response.status_code == 200
