@@ -41,3 +41,13 @@ CMD ["/bin/bash"]
 # to build these images:
 # from the go-fastapi directory checkout
 # docker build --no-cache -f Dockerfile --tag geneontology/go-fastapi:latest .
+
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+# docker build -t go-fastapi . (names image and stores it)
+# docker run -d --name go-fastapi -p 8000:8000 go-fastapi  (expose ports and name the container)
+# docker rm go-fastapi (removes image)
+# docker port go-fastapi (see the port mapping)
+
+# regular run:
+# poetry run uvicorn --reload app.main:app
