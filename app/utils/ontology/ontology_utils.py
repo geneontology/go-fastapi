@@ -82,6 +82,7 @@ def get_ontology_subsets_by_id(id: str):
 
     return result
 
+
 def get_category_terms(category):
     terms = []
     for group in category["groups"]:
