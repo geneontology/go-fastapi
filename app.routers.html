@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>app.routers package &mdash; go-fastapi 0.1.0 documentation</title>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -27,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> go-fastapi
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            go-fastapi
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -67,10 +72,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="modules.html">go-fastapi</a> &raquo;</li>
-          <li><a href="app.html">app package</a> &raquo;</li>
-      <li>app.routers package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">go-fastapi</a></li>
+          <li class="breadcrumb-item"><a href="app.html">app package</a></li>
+      <li class="breadcrumb-item active">app.routers package</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com//go-fastapi/blob/main/docs//main/docs/app.routers.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -113,6 +118,8 @@
 <dt class="sig sig-object py" id="app.routers.bioentity.get_annotations_by_gene_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_annotations_by_gene_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_annotations_by_gene_id" title="Permalink to this definition"></a></dt>
 <dd><p>Returns GO terms associated to a gene.</p>
+<section id="implementation-details">
+<h3>IMPLEMENTATION DETAILS<a class="headerlink" href="#implementation-details" title="Permalink to this heading"></a></h3>
 <p>Note: currently this is implemented as a query to the GO/AmiGO solr instance.
 This directly supports IDs such as:</p>
 <blockquote>
@@ -126,6 +133,7 @@ mapped to legacy ID)</p>
 <p>Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
 Again, this should be transparently handled; e.g. you can use NCBIGene:6469, and this will be
 mapped behind the scenes for querying.</p>
+</section>
 </dd></dl>
 
 <dl class="py function">

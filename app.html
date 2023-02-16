@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>app package &mdash; go-fastapi 0.1.0 documentation</title>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -28,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> go-fastapi
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            go-fastapi
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -68,9 +73,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="modules.html">go-fastapi</a> &raquo;</li>
-      <li>app package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">go-fastapi</a></li>
+      <li class="breadcrumb-item active">app package</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com//go-fastapi/blob/main/docs//main/docs/app.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -88,13 +93,65 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="app.routers.html">app.routers package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.bioentity">app.routers.bioentity module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.labeler">app.routers.labeler module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.ontology">app.routers.ontology module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.prefixes">app.routers.prefixes module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.ribbon">app.routers.ribbon module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.search">app.routers.search module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.slimmer">app.routers.slimmer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.bioentity">app.routers.bioentity module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.bioentity.RelationshipType"><code class="docutils literal notranslate"><span class="pre">RelationshipType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.bioentity.RelationshipType.ACTS_UPSTREAM_OF_OR_WITHIN"><code class="docutils literal notranslate"><span class="pre">RelationshipType.ACTS_UPSTREAM_OF_OR_WITHIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.bioentity.RelationshipType.INVOLVED_IN"><code class="docutils literal notranslate"><span class="pre">RelationshipType.INVOLVED_IN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.bioentity.RelationshipType.INVOLVED_IN_REGULATION_OF"><code class="docutils literal notranslate"><span class="pre">RelationshipType.INVOLVED_IN_REGULATION_OF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.bioentity.get_annotations_by_gene_id"><code class="docutils literal notranslate"><span class="pre">get_annotations_by_gene_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.bioentity.get_annotations_by_goterm_id"><code class="docutils literal notranslate"><span class="pre">get_annotations_by_goterm_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.bioentity.get_bioentity_by_id"><code class="docutils literal notranslate"><span class="pre">get_bioentity_by_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.bioentity.get_genes_by_goterm_id"><code class="docutils literal notranslate"><span class="pre">get_genes_by_goterm_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.bioentity.get_taxon_by_goterm_id"><code class="docutils literal notranslate"><span class="pre">get_taxon_by_goterm_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.labeler">app.routers.labeler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.labeler.expand_curie"><code class="docutils literal notranslate"><span class="pre">expand_curie()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.ontology">app.routers.ontology module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.GraphType"><code class="docutils literal notranslate"><span class="pre">GraphType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GraphType.topology_graph"><code class="docutils literal notranslate"><span class="pre">GraphType.topology_graph</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.get_ancestors_shared_by_two_terms"><code class="docutils literal notranslate"><span class="pre">get_ancestors_shared_by_two_terms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.get_subgraph_by_term_id"><code class="docutils literal notranslate"><span class="pre">get_subgraph_by_term_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.get_subset_metadata_by_id"><code class="docutils literal notranslate"><span class="pre">get_subset_metadata_by_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.get_subsets_by_term"><code class="docutils literal notranslate"><span class="pre">get_subsets_by_term()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.get_term_graph_by_id"><code class="docutils literal notranslate"><span class="pre">get_term_graph_by_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.get_term_metadata_by_id"><code class="docutils literal notranslate"><span class="pre">get_term_metadata_by_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.prefixes">app.routers.prefixes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.prefixes.get_all_prefixes"><code class="docutils literal notranslate"><span class="pre">get_all_prefixes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.prefixes.get_contract_uri"><code class="docutils literal notranslate"><span class="pre">get_contract_uri()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.prefixes.get_expand_curie"><code class="docutils literal notranslate"><span class="pre">get_expand_curie()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.ribbon">app.routers.ribbon module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ribbon.get_ontology_subsets_by_go_term_id"><code class="docutils literal notranslate"><span class="pre">get_ontology_subsets_by_go_term_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ribbon.get_ribbon_results"><code class="docutils literal notranslate"><span class="pre">get_ribbon_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ribbon.get_subset_by_id"><code class="docutils literal notranslate"><span class="pre">get_subset_by_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.search">app.routers.search module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.search.autocomplete_term"><code class="docutils literal notranslate"><span class="pre">autocomplete_term()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.search.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.slimmer">app.routers.slimmer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.slimmer.RelationshipType"><code class="docutils literal notranslate"><span class="pre">RelationshipType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.slimmer.RelationshipType.acts_upstream_of_or_within"><code class="docutils literal notranslate"><span class="pre">RelationshipType.acts_upstream_of_or_within</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.slimmer.RelationshipType.involved_in"><code class="docutils literal notranslate"><span class="pre">RelationshipType.involved_in</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.slimmer.gene_to_uniprot_from_mygene"><code class="docutils literal notranslate"><span class="pre">gene_to_uniprot_from_mygene()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.slimmer.slimmer_function"><code class="docutils literal notranslate"><span class="pre">slimmer_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.slimmer.uniprot_to_gene_from_mygene"><code class="docutils literal notranslate"><span class="pre">uniprot_to_gene_from_mygene()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers">Module contents</a></li>
 </ul>
 </li>
