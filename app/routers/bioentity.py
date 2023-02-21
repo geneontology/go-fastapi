@@ -6,8 +6,10 @@ from typing import List
 from fastapi import APIRouter, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
-from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.util.user_agent import get_user_agent
+
+from app.utils.golr.golr_utls import run_solr_text_on
 
 from .slimmer import gene_to_uniprot_from_mygene
 
