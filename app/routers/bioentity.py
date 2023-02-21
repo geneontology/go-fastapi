@@ -1,25 +1,27 @@
 import logging
-from typing import List
-from pprint import pprint
-from fastapi import APIRouter, Query
-from ontobio.golr.golr_associations import search_associations
-from .slimmer import gene_to_uniprot_from_mygene
-from ontobio.util.user_agent import get_user_agent
-from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
-from ontobio.config import get_config
 from enum import Enum
+from pprint import pprint
+from typing import List
+
+from fastapi import APIRouter, Query
+from ontobio.config import get_config
+from ontobio.golr.golr_associations import search_associations
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
+from ontobio.util.user_agent import get_user_agent
+
+from .slimmer import gene_to_uniprot_from_mygene
 
 log = logging.getLogger(__name__)
 
-INVOLVED_IN = 'involved_in'
-ACTS_UPSTREAM_OF_OR_WITHIN = 'acts_upstream_of_or_within'
-FUNCTION_CATEGORY = 'function'
-ANATOMY_CATEGORY = 'anatomy'
-INVOLVED_IN_REGULATION_OF = 'involved_in_regulation_of'
-TYPE_GENE = 'gene'
-TYPE_GOTERM = 'goterm'
-TYPE_PATHWAY = 'pathway'
-TYPE_PUBLICATION = 'publication'
+INVOLVED_IN = "involved_in"
+ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
+FUNCTION_CATEGORY = "function"
+ANATOMY_CATEGORY = "anatomy"
+INVOLVED_IN_REGULATION_OF = "involved_in_regulation_of"
+TYPE_GENE = "gene"
+TYPE_GOTERM = "goterm"
+TYPE_PATHWAY = "pathway"
+TYPE_PUBLICATION = "publication"
 
 categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
@@ -35,9 +37,15 @@ router = APIRouter()
 
 
 @router.get("/api/bioentity/{id}", tags=["bioentity"])
-async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
-                                                               "(e.g. GO:0044598)`"),
-                              start: int = 0, rows: int = 100):
+async def get_bioentity_by_id(
+    id: str = Query(
+        ...,
+        description="example: `CURIE identifier of a function term "
+        "(e.g. GO:0044598)`",
+    ),
+    start: int = 0,
+    rows: int = 100,
+):
     # fields is translated to fl in solr, which determines which stored fields should be returned with
     # the query
     fields = "id,bioentity_name,synonym,taxon,taxon_label"
@@ -49,68 +57,93 @@ async def get_bioentity_by_id(id: str = Query(..., description="example: `CURIE 
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
-    bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
+    bioentity = run_solr_text_on(
+        ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals
+    )
     return bioentity
 
 
 @router.get("/api/bioentity/function/{id}", tags=["bioentity"])
-async def get_annotations_by_goterm_id(id: str = Query(..., description="example: `CURIE identifier of a function term "
-                                                                        "(e.g. GO:0044598)`"),
-                                       evidence: List[str] = Query(None), start: int = 0, rows: int = 100):
+async def get_annotations_by_goterm_id(
+    id: str = Query(
+        ...,
+        description="example: `CURIE identifier of a function term "
+        "(e.g. GO:0044598)`",
+    ),
+    evidence: List[str] = Query(None),
+    start: int = 0,
+    rows: int = 100,
+):
     """
     Returns annotations associated to a GO term
     """
 
     # dictates the fields to return, annotation_class,aspect
-    fields = "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon," \
-             "taxon_label,panther_family,panther_family_label,evidence,evidence_type," \
-             "reference,annotation_extension_class,annotation_extension_class_label"
+    fields = (
+        "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon,"
+        "taxon_label,panther_family,panther_family_label,evidence,evidence_type,"
+        "reference,annotation_extension_class,annotation_extension_class_label"
+    )
 
     # boost fields %5E2 -> ^2, %5E1 -> ^1
-    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=" \
-                    "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=" \
-                    "annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=" \
-                    "reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=" \
-                    "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    query_filters = (
+        "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf="
+        "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf="
+        "annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf="
+        "reference_searchable%5E1&qf=panther_family_searchable%5E1&qf="
+        "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    )
 
     evidences = evidence
     evidence = ""
     if evidences is not None:
         evidence = "&fq=evidence_closure:("
         for ev in evidences:
-            evidence += "\"" + ev + "\","
+            evidence += '"' + ev + '",'
         evidence = evidence[:-1]
         evidence += ")"
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    data = run_solr_text_on(
+        ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
+    )
 
     return data
 
 
 @router.get("/api/bioentity/function/{id}/genes", tags=["bioentity"])
-async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term"),
-                                 taxon: List[str] = Query(default=None, description="One or more taxon CURIE to filter "
-                                                                                    "associations by subject taxon"),
-                                 relationship_type: RelationshipType = Query(default=RelationshipType.INVOLVED_IN,
-                                                                             description="relationship type ('involved_in’,"
-                                                                                         "‘involved_in_regulation_of’ or "
-                                                                                         "‘acts_upstream_of_or_within’),"),
-                                 relation: str = Query(None, description="A relation CURIE to filter associations"),
-                                 slim: List[str] = Query(default=None,
-                                                         description="Map objects up slim to a higher level"
-                                                                     " category. Value can be ontology "
-                                                                     "class ID or subset ID"),
-                                 start: int = 0, rows: int = 100):
+async def get_genes_by_goterm_id(
+    id: str = Query(..., description="CURIE identifier of a GO term"),
+    taxon: List[str] = Query(
+        default=None,
+        description="One or more taxon CURIE to filter "
+        "associations by subject taxon",
+    ),
+    relationship_type: RelationshipType = Query(
+        default=RelationshipType.INVOLVED_IN,
+        description="relationship type ('involved_in’,"
+        "‘involved_in_regulation_of’ or "
+        "‘acts_upstream_of_or_within’),",
+    ),
+    relation: str = Query(None, description="A relation CURIE to filter associations"),
+    slim: List[str] = Query(
+        default=None,
+        description="Map objects up slim to a higher level"
+        " category. Value can be ontology "
+        "class ID or subset ID",
+    ),
+    start: int = 0,
+    rows: int = 100,
+):
     """
-        Returns genes associated to a GO term
-        """
+    Returns genes associated to a GO term
+    """
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         return search_associations(
-            subject_category='gene',
-            object_category='function',
+            subject_category="gene",
+            object_category="function",
             fq={
-                'regulates_closure': id,
+                "regulates_closure": id,
             },
             subject_taxon=taxon,
             invert_subject_object=True,
@@ -120,17 +153,17 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
             relation=relation,
             url="http://golr-aux.geneontology.io/solr",
             start=start,
-            rows=rows
+            rows=rows,
         )
     elif relationship_type == INVOLVED_IN_REGULATION_OF:
         # Temporary fix until https://github.com/geneontology/amigo/pull/469
         # and https://github.com/owlcollab/owltools/issues/241 are resolved
         return search_associations(
-            subject_category='gene',
-            object_category='function',
+            subject_category="gene",
+            object_category="function",
             fq={
-                'regulates_closure': id,
-                '-isa_partof_closure': id,
+                "regulates_closure": id,
+                "-isa_partof_closure": id,
             },
             subject_taxon=taxon,
             invert_subject_object=True,
@@ -140,30 +173,34 @@ async def get_genes_by_goterm_id(id: str = Query(..., description="CURIE identif
             relation=relation,
             url="http://golr-aux.geneontology.io/solr",
             start=start,
-            rows=rows
+            rows=rows,
         )
     elif relationship_type == INVOLVED_IN:
         return search_associations(
-            subject_category='gene',
-            object_category='function',
+            subject_category="gene",
+            object_category="function",
             subject=id,
             subject_taxon=taxon,
             invert_subject_object=True,
             taxon=taxon,
             user_agent=USER_AGENT,
-            url="http://golr-aux.geneontology.io/solr"
+            url="http://golr-aux.geneontology.io/solr",
         )
 
 
 @router.get("/api/bioentity/function/{id}/taxons", tags=["bioentity"])
-async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
-                                 evidence: List[str] = Query(default=None,
-                                                             description="Object id, e.g. ECO:0000501 (for IEA; "
-                                                                         "Includes inferred by default) or a "
-                                                                         "specific publication or other supporting "
-                                                                         "object, e.g. ZFIN:ZDB-PUB-060503-2"),
-                                 start: int = 0, rows: int = 100,
-                                 ):
+async def get_taxon_by_goterm_id(
+    id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+    evidence: List[str] = Query(
+        default=None,
+        description="Object id, e.g. ECO:0000501 (for IEA; "
+        "Includes inferred by default) or a "
+        "specific publication or other supporting "
+        "object, e.g. ZFIN:ZDB-PUB-060503-2",
+    ),
+    start: int = 0,
+    rows: int = 100,
+):
     """
     Returns taxons associated to a GO term
     """
@@ -176,7 +213,7 @@ async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identif
     if evidences is not None:
         evidence = "&fq=evidence_closure:("
         for ev in evidences:
-            evidence += "\"" + ev + "\","
+            evidence += '"' + ev + '",'
         evidence = evidence[:-1]
         evidence += ")"
 
@@ -185,25 +222,38 @@ async def get_taxon_by_goterm_id(id: str = Query(..., description="CURIE identif
     if cfg.taxon_restriction is not None:
         taxon_restrictions = "&fq=taxon_subset_closure:("
         for c in cfg.taxon_restriction:
-            taxon_restrictions += "\"" + c + "\","
+            taxon_restrictions += '"' + c + '",'
         taxon_restrictions = taxon_restrictions[:-1]
         taxon_restrictions += ")"
 
-    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    optionals = (
+        "&defType=edismax&start="
+        + str(start)
+        + "&rows="
+        + str(rows)
+        + evidence
+        + taxon_restrictions
+    )
+    data = run_solr_text_on(
+        ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
+    )
 
     return data
 
 
 @router.get("/api/bioentity/gene/{id}/function", tags=["bioentity"])
-async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
-                                     # ... in query means "required" parameter.
-                                     slim: List[str] = Query(default=None,
-                                                             description="Map objects up slim to a higher level"
-                                                                         " category. Value can be ontology "
-                                                                         "class ID or subset ID"),
-
-                                     start: int = 0, rows: int = 100):
+async def get_annotations_by_gene_id(
+    id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+    # ... in query means "required" parameter.
+    slim: List[str] = Query(
+        default=None,
+        description="Map objects up slim to a higher level"
+        " category. Value can be ontology "
+        "class ID or subset ID",
+    ),
+    start: int = 0,
+    rows: int = 100,
+):
     """
     Returns GO terms associated to a gene.
 
@@ -225,20 +275,20 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
     """
 
     assocs = search_associations(
-        object_category='function',
-        subject_category='gene',
+        object_category="function",
+        subject_category="gene",
         subject=id,
         user_agent=USER_AGENT,
         url="http://golr-aux.geneontology.io/solr",
         start=start,
         rows=rows,
-        slim=slim
+        slim=slim,
     )
     pprint("should be null assocs")
     pprint(assocs)
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
-    if len(assocs['associations']) == 0:
+    if len(assocs["associations"]) == 0:
         # Note that GO currently uses UniProt as primary ID for some
         # sources: https://github.com/biolink/biolink-api/issues/66
         # https://github.com/monarch-initiative/dipper/issues/461
@@ -246,19 +296,19 @@ async def get_annotations_by_gene_id(id: str = Query(..., description="CURIE ide
         prots = gene_to_uniprot_from_mygene(id)
         for prot in prots:
             pr_assocs = search_associations(
-                object_category='function',
+                object_category="function",
                 subject=prot,
                 user_agent=USER_AGENT,
                 url="http://golr-aux.geneontology.io/solr",
                 start=start,
                 rows=rows,
-                slim=slim
+                slim=slim,
             )
-            num_found = pr_assocs.get('numFound')
+            num_found = pr_assocs.get("numFound")
             if num_found > 0:
-                num_found = num_found + pr_assocs.get('numFound')
-            assocs['numFound'] = num_found
-            for asc in pr_assocs['associations']:
+                num_found = num_found + pr_assocs.get("numFound")
+            assocs["numFound"] = num_found
+            for asc in pr_assocs["associations"]:
                 pprint(asc)
-                assocs['associations'].append(asc)
+                assocs["associations"].append(asc)
     return assocs

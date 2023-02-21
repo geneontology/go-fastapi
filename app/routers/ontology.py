@@ -1,14 +1,17 @@
-import logging
 import json
-from ontobio.sparql.sparql_ontol_utils import run_sparql_on, EOntology, transform, transformArray
-from ontobio.golr.golr_query import run_solr_on, replace
-from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-import app.utils.ontology.ontology_utils as ontology_utils
-from typing import List
-from fastapi import APIRouter, Query
-from ontobio.util.user_agent import get_user_agent
-from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
+import logging
 from enum import Enum
+from typing import List
+
+from fastapi import APIRouter, Query
+from ontobio.golr.golr_query import (ESOLR, ESOLRDoc, replace, run_solr_on,
+                                     run_solr_text_on)
+from ontobio.io.ontol_renderers import OboJsonGraphRenderer
+from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
+                                               transform, transformArray)
+from ontobio.util.user_agent import get_user_agent
+
+import app.utils.ontology.ontology_utils as ontology_utils
 
 log = logging.getLogger(__name__)
 
@@ -31,14 +34,19 @@ async def get_term_metadata_by_id(id: str):
     print(id)
     query = ontology_utils.create_go_summary_sparql(id)
     results = run_sparql_on(query, EOntology.GO)
-    return transform(results[0], ['synonyms', 'relatedSynonyms', 'alternativeIds', 'xrefs', 'subsets'])
+    return transform(
+        results[0],
+        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
+    )
 
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
-async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.topology_graph)):
+async def get_term_graph_by_id(
+    id: str, graph_type: GraphType = Query(GraphType.topology_graph)
+):
     """
-        Returns graph of an ontology term
-        """
+    Returns graph of an ontology term
+    """
 
     graph_type = graph_type + "_json"  # GOLR field names
     print(graph_type)
@@ -51,16 +59,17 @@ async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.
 
 
 @router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
-async def get_subgraph_by_term_id(id: str,
-                                  cnode: str = Query(None, include_in_schema=False),
-                                  include_ancestors: bool = Query(True, include_in_schema=False),
-                                  include_descendants: bool = Query(True, include_in_schema=False),
-                                  relation: List[str] = Query(['subClassOf', 'BFO:0000050'], include_in_schema=False),
-                                  include_meta: bool = Query(False, include_in_schema=False)
-                                  ):
+async def get_subgraph_by_term_id(
+    id: str,
+    cnode: str = Query(None, include_in_schema=False),
+    include_ancestors: bool = Query(True, include_in_schema=False),
+    include_descendants: bool = Query(True, include_in_schema=False),
+    relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
+    include_meta: bool = Query(False, include_in_schema=False),
+):
     """
-        Extract a subgraph from an ontology term
-        """
+    Extract a subgraph from an ontology term
+    """
     qnodes = [id]
     if cnode is not None:
         qnodes += cnode
@@ -69,10 +78,9 @@ async def get_subgraph_by_term_id(id: str,
     ont = ontology_utils.get_ontology("go")
     relations = relation
     print("Traversing: {} using {}".format(qnodes, relations))
-    nodes = ont.traverse_nodes(qnodes,
-                               up=include_ancestors,
-                               down=include_descendants,
-                               relations=relations)
+    nodes = ont.traverse_nodes(
+        qnodes, up=include_ancestors, down=include_descendants, relations=relations
+    )
 
     subont = ont.subontology(nodes, relations=relations)
     # TODO: meta is included regardless of whether include_meta is True or False
@@ -84,8 +92,8 @@ async def get_subgraph_by_term_id(id: str,
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subsets_by_term(id: str):
     """
-        Returns subsets (slims) associated to an ontology term
-        """
+    Returns subsets (slims) associated to an ontology term
+    """
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = run_sparql_on(query, EOntology.GO)
     results = transformArray(results, [])
@@ -96,9 +104,9 @@ async def get_subsets_by_term(id: str):
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
     """
-        Returns meta data of an ontology subset (slim)
-        id is the name of a slim subset, e.g., goslim_agr, goslim_generic
-        """
+    Returns meta data of an ontology subset (slim)
+    id is the name of a slim subset, e.g., goslim_agr, goslim_generic
+    """
 
     q = "*:*"
     qf = ""
@@ -107,21 +115,20 @@ async def get_subset_metadata_by_id(id: str):
 
     # This is a temporary fix while waiting for the PR of the AGR slim on go-ontology
     if id == "goslim_agr":
-
         terms_list = set()
         for section in ontology_utils.agr_slim_order:
-            terms_list.add(section['category'])
-            for term in section['terms']:
+            terms_list.add(section["category"])
+            for term in section["terms"]:
                 terms_list.add(term)
 
-        goslim_agr_ids = "\" \"".join(terms_list)
-        fq = "&fq=annotation_class:(\"" + goslim_agr_ids + "\")&rows=1000"
+        goslim_agr_ids = '" "'.join(terms_list)
+        fq = '&fq=annotation_class:("' + goslim_agr_ids + '")&rows=1000'
 
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 
     tr = {}
     for term in data:
-        source = term['source']
+        source = term["source"]
         if source not in tr:
             tr[source] = {"annotation_class_label": source, "terms": []}
         ready_term = term.copy()
@@ -151,13 +158,13 @@ async def get_subset_metadata_by_id(id: str):
     if id == "goslim_agr":
         temp = []
         for agr_category in ontology_utils.agr_slim_order:
-            cat = agr_category['category']
+            cat = agr_category["category"]
             for category in result:
-                if category['annotation_class'] == cat:
+                if category["annotation_class"] == cat:
                     ordered_terms = []
-                    for ot in agr_category['terms']:
-                        for uot in category['terms']:
-                            if uot['annotation_class'] == ot:
+                    for ot in agr_category["terms"]:
+                        for uot in category["terms"]:
+                            if uot["annotation_class"] == ot:
                                 ordered_terms.append(uot)
                                 break
                     category["terms"] = ordered_terms
@@ -170,11 +177,11 @@ async def get_subset_metadata_by_id(id: str):
 @router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_ancestors_shared_by_two_terms(subject: str, object: str):
     """
-        Returns the ancestor ontology terms shared by two ontology terms
+    Returns the ancestor ontology terms shared by two ontology terms
 
-        subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
-        object: 'CURIE identifier of a GO term, e.g. GO:0046483'
-        """
+    subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
+    object: 'CURIE identifier of a GO term, e.g. GO:0046483'
+    """
 
     print(subject)
     print(object)
@@ -188,12 +195,12 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
 
     shared = []
     shared_labels = []
-    for i in range(0, len(subres['isa_partof_closure'])):
-        sub = subres['isa_partof_closure'][i]
+    for i in range(0, len(subres["isa_partof_closure"])):
+        sub = subres["isa_partof_closure"][i]
         found = False
-        if sub in objres['isa_partof_closure']:
+        if sub in objres["isa_partof_closure"]:
             found = True
         if found:
             shared.append(sub)
-            shared_labels.append(subres['isa_partof_closure_label'][i])
+            shared_labels.append(subres["isa_partof_closure_label"][i])
     return {"goids": shared, "gonames: ": shared_labels}

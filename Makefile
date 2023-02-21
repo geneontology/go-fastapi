@@ -10,7 +10,7 @@ all: install start export-requirements
 # note: using root path below means we need a proxy server out front to strip the prefix else, teh docs don't work.
 # https://fastapi.tiangolo.com/advanced/behind-a-proxy/
 start:
-	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
+	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080
 
 run:
 	start

@@ -1,18 +1,15 @@
 import logging
 
-from ontobio.sparql.sparql_ontol_utils import SEPARATOR
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
+from ontobio.sparql.sparql_ontol_utils import SEPARATOR
+
 from ..settings import get_biolink_config
-from ontobio.golr.golr_query import run_solr_text_on, ESOLR, ESOLRDoc
 
 cfg = get_biolink_config()
 omap = {}
 
-aspect_map = {
-    "P": "GO:0008150",
-    "F": "GO:0003674",
-    "C": "GO:0005575"
-}
+aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 
 def get_ontology_subsets_by_id(id: str):
@@ -23,21 +20,20 @@ def get_ontology_subsets_by_id(id: str):
 
     # This is a temporary fix while waiting for the PR of the AGR slim on go-ontology
     if id == "goslim_agr":
-
         terms_list = set()
         for section in agr_slim_order:
-            terms_list.add(section['category'])
-            for term in section['terms']:
+            terms_list.add(section["category"])
+            for term in section["terms"]:
                 terms_list.add(term)
 
-        goslim_agr_ids = "\" \"".join(terms_list)
-        fq = "&fq=annotation_class:(\"" + goslim_agr_ids + "\")&rows=1000"
+        goslim_agr_ids = '" "'.join(terms_list)
+        fq = '&fq=annotation_class:("' + goslim_agr_ids + '")&rows=1000'
 
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 
     tr = {}
     for term in data:
-        source = term['source']
+        source = term["source"]
         if source not in tr:
             tr[source] = {"annotation_class_label": source, "terms": []}
         ready_term = term.copy()
@@ -67,13 +63,13 @@ def get_ontology_subsets_by_id(id: str):
     if id == "goslim_agr":
         temp = []
         for agr_category in agr_slim_order:
-            cat = agr_category['category']
+            cat = agr_category["category"]
             for category in result:
-                if category['annotation_class'] == cat:
+                if category["annotation_class"] == cat:
                     ordered_terms = []
-                    for ot in agr_category['terms']:
-                        for uot in category['terms']:
-                            if uot['annotation_class'] == ot:
+                    for ot in agr_category["terms"]:
+                        for uot in category["terms"]:
+                            if uot["annotation_class"] == ot:
                                 ordered_terms.append(uot)
                                 break
                     category["terms"] = ordered_terms
@@ -93,10 +89,10 @@ def get_category_terms(category):
 
 def get_ontology(id):
     handle = id
-    for c in cfg['ontologies']:
-        if c['id'] == id:
+    for c in cfg["ontologies"]:
+        if c["id"] == id:
             logging.info("getting handle for id: {} from cfg".format(id))
-            handle = c['handle']
+            handle = c["handle"]
 
     if handle not in omap:
         logging.info("Creating a new ontology object for {}".format(handle))
@@ -129,10 +125,9 @@ agr_slim_order = [
             "GO:0046872",
             "GO:0030246",
             "GO:0097367",
-            "GO:0008289"
-        ]
+            "GO:0008289",
+        ],
     },
-
     {
         "category": "GO:0008150",
         "terms": [
@@ -156,10 +151,9 @@ agr_slim_order = [
             "GO:0006629",
             "GO:0042592",
             "GO:0009056",
-            "GO:0007610"
-        ]
+            "GO:0007610",
+        ],
     },
-
     {
         "category": "GO:0005575",
         "terms": [
@@ -178,27 +172,40 @@ agr_slim_order = [
             "GO:0005634",
             "GO:0005694",
             "GO:0005856",
-            "GO:0032991"
-        ]
-    }
+            "GO:0032991",
+        ],
+    },
 ]
 
 
 def create_go_summary_sparql(goid):
     goid = correct_goid(goid)
-    return """
+    return (
+        """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
     PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
 
-    SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator='""" + SEPARATOR + """') as ?synonyms)
-                                                                (GROUP_CONCAT(distinct ?relatedSynonym;separator='""" + SEPARATOR + """') as ?relatedSynonyms)
-                                                                (GROUP_CONCAT(distinct ?alternativeId;separator='""" + SEPARATOR + """') as ?alternativeIds)
-                                                                (GROUP_CONCAT(distinct ?xref;separator='""" + SEPARATOR + """') as ?xrefs)
-                                                                (GROUP_CONCAT(distinct ?subset;separator='""" + SEPARATOR + """') as ?subsets)
+    SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator='"""
+        + SEPARATOR
+        + """') as ?synonyms)
+                                                                (GROUP_CONCAT(distinct ?relatedSynonym;separator='"""
+        + SEPARATOR
+        + """') as ?relatedSynonyms)
+                                                                (GROUP_CONCAT(distinct ?alternativeId;separator='"""
+        + SEPARATOR
+        + """') as ?alternativeIds)
+                                                                (GROUP_CONCAT(distinct ?xref;separator='"""
+        + SEPARATOR
+        + """') as ?xrefs)
+                                                                (GROUP_CONCAT(distinct ?subset;separator='"""
+        + SEPARATOR
+        + """') as ?subsets)
 
     WHERE {
-        BIND(<http://purl.obolibrary.org/obo/""" + goid + """> as ?goid) .
+        BIND(<http://purl.obolibrary.org/obo/"""
+        + goid
+        + """> as ?goid) .
         optional { ?goid rdfs:label ?label } .
         optional { ?goid definition: ?definition } .
         optional { ?goid rdfs:comment ?comment } .
@@ -211,6 +218,7 @@ def create_go_summary_sparql(goid):
     }
     GROUP BY ?goid ?label ?definition ?comment ?creation_date
     """
+    )
 
 
 def correct_goid(goid):
@@ -219,15 +227,19 @@ def correct_goid(goid):
 
 def get_go_subsets_sparql_query(goid):
     goid = correct_goid(goid)
-    return """
+    return (
+        """
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
 
     SELECT ?label ?subset
 
     WHERE {
-        BIND(<http://purl.obolibrary.org/obo/""" + goid + """> as ?goid) .
+        BIND(<http://purl.obolibrary.org/obo/"""
+        + goid
+        + """> as ?goid) .
         optional { ?goid obo:inSubset ?subset .
                    ?subset rdfs:comment ?label } .
     }
     """
+    )

@@ -17,37 +17,15 @@ RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 RUN poetry self add "poetry-dynamic-versioning[plugin]"
 WORKDIR /code
-COPY pyproject.toml poetry.lock README.md .
+COPY Makefile pyproject.toml poetry.lock README.md .
 COPY ./.git /.git
 COPY app app/
 COPY static static/
-EXPOSE 8080 8000
-RUN poetry build
+EXPOSE 8000 8080
+RUN poetry install
 
-CMD ["/bin/bash"]
+# CMD runs by default when no other commands are passed to a docker run directive from the command line.
+CMD ["make start"]
 
-#######################################
-# FROM builder as runner
-#
-# RUN useradd --create-home gofastapiuser
-# WORKDIR /home/gofastapiuser
-# USER gofastapiuser
-# ENV PATH="${PATH}:/home/gofastapiuser/.local/bin"
-# COPY --from=builder /code/dist/*.whl /tmp
-# RUN pip3 install --user /tmp/*.whl
 
-# CMD ["make start"]
 
-# to build these images:
-# from the go-fastapi directory checkout
-# docker build --no-cache -f Dockerfile --tag geneontology/go-fastapi:latest .
-
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
-
-# docker build -t go-fastapi . (names image and stores it)
-# docker run -d --name go-fastapi -p 8000:8000 go-fastapi  (expose ports and name the container)
-# docker rm go-fastapi (removes image)
-# docker port go-fastapi (see the port mapping)
-
-# regular run:
-# poetry run uvicorn --reload app.main:app

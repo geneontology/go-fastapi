@@ -5,29 +5,25 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
-from app.routers import bioentity
-from app.routers import labeler
-from app.routers import ontology
-from app.routers import ribbon
-from app.routers import prefixes
-from app.routers import search
-from app.routers import slimmer
+
+from app.routers import (bioentity, labeler, ontology, prefixes, ribbon,
+                         search, slimmer)
 
 log = logging.getLogger(__name__)
 
-app = FastAPI(title="GO API",
-              description="Gene Ontology API based on the BioLink Model, an integration layer for linked biological "
-                          "objects.\n\n __Source:__ 'https://github.com/geneontology/go-fastapi'",
-              version="1.0.0",
-              terms_of_service="http://example.com/terms/",
-              contact={
-                  "name": "Gene Ontology Consortium Software Development Team",
-                  "url": "https://help.geneontology.org",
-                  "email": "help@geneontology.org",
-              },
-              license_info={
-                  "name": "BSD3"
-              }, )
+app = FastAPI(
+    title="GO API",
+    description="Gene Ontology API based on the BioLink Model, an integration layer for linked biological "
+    "objects.\n\n __Source:__ 'https://github.com/geneontology/go-fastapi'",
+    version="1.0.0",
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "Gene Ontology Consortium Software Development Team",
+        "url": "https://help.geneontology.org",
+        "email": "help@geneontology.org",
+    },
+    license_info={"name": "BSD3"},
+)
 app.include_router(bioentity.router)
 app.include_router(slimmer.router)
 app.include_router(prefixes.router)
@@ -53,4 +49,4 @@ app.add_middleware(
 #     return FileResponse('static/index.html')
 
 if __name__ == "__main__":
-    uvicorn.run('main:app', host="0.0.0.0", port=8080)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080)
