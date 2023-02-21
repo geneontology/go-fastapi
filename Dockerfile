@@ -13,7 +13,7 @@ ENV PYTHONFAULTHANDLER=1 \
   POETRY_VERSION=1.2.1
 
 # Install Poetry
-RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10-venv nano make bash
+RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10-venv nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 RUN poetry self add "poetry-dynamic-versioning[plugin]"
 WORKDIR /code

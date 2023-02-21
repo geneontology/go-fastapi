@@ -1,7 +1,9 @@
-from fastapi.testclient import TestClient
-from app.main import app
-import pytest
 from pprint import pprint
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.main import app
 
 test_client = TestClient(app)
 
@@ -52,9 +54,7 @@ example = ["GO:0002544"]
 
 @pytest.mark.parametrize("id", example)
 def test_bioenty_gene_function_taxon_endpoint(id):
-    data = {
-        'taxon': 'NCBITaxon:9606'
-    }
+    data = {"taxon": "NCBITaxon:9606"}
     response = test_client.get(f"/api/bioentity/function/{id}/genes", params=data)
     assert response.status_code == 200
     assert len(response.json()) >= 4
@@ -67,16 +67,11 @@ def test_bioenty_gene_function_endpoints(id):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(
-    "endpoint",
-    [
-        "/api/bioentityset/slimmer/function"
-    ]
-)
+@pytest.mark.parametrize("endpoint", ["/api/bioentityset/slimmer/function"])
 def test_slimmer_endpoint(endpoint):
     data = {
-        'subject': 'ZFIN:ZDB-GENE-980526-388',
-        'slim': ['GO:0003674', 'GO:0008150', 'GO:0005575']
+        "subject": "ZFIN:ZDB-GENE-980526-388",
+        "slim": ["GO:0003674", "GO:0008150", "GO:0005575"],
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
@@ -97,7 +92,6 @@ def test_prefixes_endpoint():
 
 @pytest.mark.parametrize("id", gene_ids)
 def test_expander_endpoint(id):
-
     response = test_client.get(f"/api/identifier/prefixes/expand/{id}")
     print(response.json())
     assert response.status_code == 200
@@ -107,17 +101,14 @@ def test_expander_endpoint(id):
     "endpoint",
     [
         "/api/ontol/labeler",
-
-    ]
+    ],
 )
 def test_labeler_endpoint(endpoint):
-    data = {
-        "id": "GO:0003677"
-    }
+    data = {"id": "GO:0003677"}
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
     map_response = response.json()
-    assert map_response['GO:0003677'] == 'DNA binding'
+    assert map_response["GO:0003677"] == "DNA binding"
 
 
 @pytest.mark.parametrize("id", go_ids)
@@ -142,22 +133,18 @@ def test_term_by_subset_endpoint(id):
     "endpoint",
     [
         "/api/ontology/ribbon/",
-
-    ]
+    ],
 )
 def test_ribbon_endpoint(endpoint):
-    data = {
-        "subset": "goslim_agr",
-        "subject": ["RGD:620474"]
-    }
+    data = {"subset": "goslim_agr", "subject": ["RGD:620474"]}
     response = test_client.get(endpoint, params=data)
     pprint(response.json())
     assert response.status_code == 200
 
 
 def test_ontology_ancestors_shared_sub_obj():
-    subject = 'GO:0006259'
-    object = 'GO:0046483'
+    subject = "GO:0006259"
+    object = "GO:0046483"
     response = test_client.get(f"/api/ontology/shared/{subject}/{object}")
     assert response.status_code == 200
 
@@ -182,9 +169,7 @@ def test_ontology_term_graph(id):
 
 @pytest.mark.parametrize("id", go_ids)
 def test_ontology_term_subgraph(id):
-    data = {
-        "graph_type": "topology_graph"
-    }
+    data = {"graph_type": "topology_graph"}
     response = test_client.get(f"/api/ontology/term/{id}/graph", params=data)
     print(response.json())
     assert response.status_code == 200
@@ -196,17 +181,19 @@ def test_ontology_term_subsets(id):
     assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="currently this endpoint is disabled because we "
-                         "have no 'facet_pivot' attribute in GOlr")
+@pytest.mark.skip(
+    reason="currently this endpoint is disabled because we "
+    "have no 'facet_pivot' attribute in GOlr"
+)
 def test_search_entity():
     data = {
-        'term': 'ssh',
-        'category': 'gene',
-        'boost_fix': '0',
-        'boost_q': '0',
-        'taxon': 'NCBITaxon:7955',
-        'highlight_class': 'gene',
-        'id': 'ssh'
+        "term": "ssh",
+        "category": "gene",
+        "boost_fix": "0",
+        "boost_q": "0",
+        "taxon": "NCBITaxon:7955",
+        "highlight_class": "gene",
+        "id": "ssh",
     }
     response = test_client.get(f"/api/search/entity/ssh", params=data)
     assert response.status_code == 200

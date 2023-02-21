@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
 from ontobio.util.user_agent import get_user_agent
 
