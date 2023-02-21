@@ -2,12 +2,13 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_query import ESOLR, ESOLRDoc, replace, run_solr_text_on
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc, replace
 from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
                                                transform, transformArray)
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
+from app.utils.golr.golr_utls import run_solr_text_on
 
 from .slimmer import gene_to_uniprot_from_mygene
 

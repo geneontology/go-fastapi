@@ -4,14 +4,14 @@ from enum import Enum
 from typing import List
 
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_query import (ESOLR, ESOLRDoc, replace, run_solr_on,
-                                     run_solr_text_on)
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc, replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
                                                transform, transformArray)
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
+from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
 
 log = logging.getLogger(__name__)
 
