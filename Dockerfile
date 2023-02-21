@@ -24,21 +24,24 @@ COPY static static/
 EXPOSE 8000 8080
 RUN poetry install
 
+#CMD ["guvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+
+CMD ["make start"]
+
+
 # CMD runs by default when no other commands are passed to a docker run directive from the command line.
-# CMD ["make start"]
 # to build these images:
 # from the go-fastapi directory checkout
-
-CMD ["guvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
-# CMD ["make start"]
-
-
 # docker build -t go-fastapi . (names image and stores it)
 # docker run -i -t --name go-fastapi -p 8000:8000 -p 8080:8080 go-fastapi bash (expose ports and name the container)
+
+# to remove images and containers:
 # docker rm -vf $(docker ps -aq) (removes all images)
 # docker rmi -f $(docker images -aq) (removes all containers)
+
+# to check port mapping
 # docker port go-fastapi (see the port mapping)
 
-# regular run:
+# without docker:
 # poetry run uvicorn --reload app.main:app
 # docker build --no-cache -f Dockerfile --tag geneontology/go-fastapi:latest .
