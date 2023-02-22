@@ -19,9 +19,15 @@
 ```bash
 docker build -t go-fastapi .
 ```
-2) run the docker image interactively
+2) run the docker image
+`-d` tells docker to run the image in the background (the image includes a command to start the API), so this
+will run the image and start the API server but give the control of the terminal back to the local user.
+3) 
+`-p` tells docker to map the container port 8080 to the host port 8080.  This way the user can access the API docker
+version of the running API from their local browser via: http://127.0.0.1:8080/docs
+
 ```bash
-docker run -i -t --name go-fastapi -p 8000:8000 -p 8080:8080 go-fastapi bash
+docker run -d -p 8080:8080 go-fastapi
 ```
 
 3) start the API

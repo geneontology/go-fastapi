@@ -33,7 +33,7 @@ EXPOSE 8000 8080
 RUN poetry install
 
 # CMD runs by default when no other commands are passed to a docker run directive from the command line.
-CMD ["make start"]
+CMD make start
 
 
 
