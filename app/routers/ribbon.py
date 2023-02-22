@@ -9,8 +9,8 @@ from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_text_on
-# from app.utils.settings import ESOLR
+# from app.utils.golr.golr_utls import run_solr_text_on
+from app.utils.settings import ESOLR
 from ontobio.golr.golr_query import ESOLR
 from .slimmer import gene_to_uniprot_from_mygene
 
