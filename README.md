@@ -31,7 +31,7 @@ version of the running API from their local browser via: http://127.0.0.1:8080/d
 docker run -d -p 8080:8080 go-fastapi
 ```
 
-### Deploying a change in the API code:
+### Deploying a change in the API code to docker image:
 To remove images and containers:
 `docker rm -vf $(docker ps -aq)` (removes all local images)
 `docker rmi -f $(docker images -aq)` (removes all local containers)
