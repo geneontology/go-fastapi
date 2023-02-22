@@ -1,7 +1,7 @@
 ###############################################
 # Base Image
 ###############################################
-FROM ubuntu:20.04 as builder
+FROM ubuntu:22.04 as builder
 
 # https://stackoverflow.com/questions/53835198/integrating-python-poetry-with-docker
 ENV PYTHONFAULTHANDLER=1 \
@@ -20,7 +20,7 @@ ENV PYTHONFAULTHANDLER=1 \
 # PIP_DISABLE_PIP_VERSION_CHECK - avoid warning that pip is out of date
 
 # Install Poetry
-RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.9-venv nano make
+RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10-venv nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 # RUN poetry self add "poetry-dynamic-versioning[plugin]"
 WORKDIR /code
