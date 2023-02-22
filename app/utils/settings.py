@@ -6,11 +6,6 @@ CONFIG = path.join(path.dirname(path.abspath(__file__)), "../conf/config.yaml")
 golr_config = None
 route_mapping = None
 
-class ESOLRDoc(Enum):
-    ONTOLOGY = "ontology_class"
-    ANNOTATION = "annotation"
-    BIOENTITY = "bioentity"
-
 
 def get_golr_config():
     global golr_config
@@ -18,3 +13,14 @@ def get_golr_config():
         with open(CONFIG, "r") as f:
             golr_config = yaml.load(f, Loader=yaml.FullLoader)
     return golr_config
+
+
+class ESOLRDoc(Enum):
+    ONTOLOGY = "ontology_class"
+    ANNOTATION = "annotation"
+    BIOENTITY = "bioentity"
+
+
+class ESOLR(Enum):
+    GOLR = get_golr_config()["solr_url"]["url"]
+

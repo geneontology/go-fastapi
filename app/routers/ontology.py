@@ -12,7 +12,7 @@ from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import get_golr_config, ESOLRDoc
+from app.utils.settings import ESOLRDoc, ESOLR
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +21,6 @@ router = APIRouter()
 
 # Some query parameters & parsers
 TOPOLOGY = "topology_graph"
-golr = get_golr_config()["solr_url"]["url"]
 
 
 class GraphType(str, Enum):
@@ -53,7 +52,7 @@ async def get_term_graph_by_id(
     graph_type = graph_type + "_json"  # GOLR field names
     print(graph_type)
 
-    data = run_solr_on(golr, ESOLRDoc.ONTOLOGY, id, graph_type)
+    data = run_solr_on(GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are stringified in the json
     data[graph_type] = json.loads(data[graph_type])
 
@@ -126,7 +125,7 @@ async def get_subset_metadata_by_id(id: str):
         goslim_agr_ids = '" "'.join(terms_list)
         fq = '&fq=annotation_class:("' + goslim_agr_ids + '")&rows=1000'
 
-    data = run_solr_text_on(golr, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 
     tr = {}
     for term in data:
@@ -142,7 +141,7 @@ async def get_subset_metadata_by_id(id: str):
         cats.append(category)
 
     fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
-    data = run_solr_text_on(golr, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 
     for category in tr:
         for temp in data:
@@ -189,8 +188,8 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
     print(object)
     fields = "isa_partof_closure,isa_partof_closure_label"
 
-    subres = run_solr_on(golr, ESOLRDoc.ONTOLOGY, subject, fields)
-    objres = run_solr_on(golr, ESOLRDoc.ONTOLOGY, object, fields)
+    subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+    objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
 
     print("SUBJECT: ", subres)
     print("OBJECT: ", objres)

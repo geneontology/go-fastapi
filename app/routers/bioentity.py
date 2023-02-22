@@ -7,9 +7,8 @@ from fastapi import APIRouter, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 from ontobio.util.user_agent import get_user_agent
-from app.utils.settings import ESOLRDoc
+from app.utils.settings import ESOLRDoc, ESOLR
 from app.utils.golr.golr_utls import run_solr_text_on
-from app.utils.settings import get_golr_config
 
 from .slimmer import gene_to_uniprot_from_mygene
 
@@ -27,7 +26,6 @@ TYPE_PUBLICATION = "publication"
 
 categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
-golr = get_golr_config()["solr_url"]["url"]
 
 
 class RelationshipType(str, Enum):
@@ -61,7 +59,7 @@ async def get_bioentity_by_id(
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
     bioentity = run_solr_text_on(
-        golr, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals
+        ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals
     )
     return bioentity
 
@@ -108,7 +106,7 @@ async def get_annotations_by_goterm_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
     data = run_solr_text_on(
-        golr, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
+        ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
     )
 
     return data
@@ -154,7 +152,7 @@ async def get_genes_by_goterm_id(
             slim=slim,
             taxon=taxon,
             relation=relation,
-            url=golr,
+            url=ESOLR.GOLR,
             start=start,
             rows=rows,
         )
@@ -174,7 +172,7 @@ async def get_genes_by_goterm_id(
             taxon=taxon,
             slim=slim,
             relation=relation,
-            url=golr,
+            url=ESOLR.GOLR,
             start=start,
             rows=rows,
         )
@@ -187,7 +185,7 @@ async def get_genes_by_goterm_id(
             invert_subject_object=True,
             taxon=taxon,
             user_agent=USER_AGENT,
-            url=golr,
+            url=ESOLR.GOLR,
         )
 
 
@@ -238,7 +236,7 @@ async def get_taxon_by_goterm_id(
         + taxon_restrictions
     )
     data = run_solr_text_on(
-        golr, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
+        ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
     )
 
     return data
@@ -282,7 +280,7 @@ async def get_annotations_by_gene_id(
         subject_category="gene",
         subject=id,
         user_agent=USER_AGENT,
-        url=golr,
+        url=ESOLR.GOLR,
         start=start,
         rows=rows,
         slim=slim,
@@ -302,7 +300,7 @@ async def get_annotations_by_gene_id(
                 object_category="function",
                 subject=prot,
                 user_agent=USER_AGENT,
-                url=golr,
+                url=ESOLR.GOLR,
                 start=start,
                 rows=rows,
                 slim=slim,
