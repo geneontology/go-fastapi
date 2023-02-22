@@ -2,7 +2,8 @@ from pprint import pprint
 
 import pytest
 from fastapi.testclient import TestClient
-
+from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
+# from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from app.main import app
 
 test_client = TestClient(app)
@@ -12,6 +13,11 @@ go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
+
+
+def test_golr_solr():
+    assert ESOLR.GOLR.value == 'http://golr-aux.geneontology.io/solr/'
+    assert ESOLRDoc.ONTOLOGY.value == 'ontology_class'
 
 
 @pytest.mark.parametrize("id", gene_ids)

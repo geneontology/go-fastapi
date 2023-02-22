@@ -6,9 +6,8 @@ from typing import List
 from fastapi import APIRouter, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
-from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.util.user_agent import get_user_agent
-
+from app.utils.settings import ESOLRDoc, ESOLR
 from app.utils.golr.golr_utls import run_solr_text_on
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -153,7 +152,7 @@ async def get_genes_by_goterm_id(
             slim=slim,
             taxon=taxon,
             relation=relation,
-            url="http://golr-aux.geneontology.io/solr",
+            url=ESOLR.GOLR,
             start=start,
             rows=rows,
         )
@@ -173,7 +172,7 @@ async def get_genes_by_goterm_id(
             taxon=taxon,
             slim=slim,
             relation=relation,
-            url="http://golr-aux.geneontology.io/solr",
+            url=ESOLR.GOLR,
             start=start,
             rows=rows,
         )
@@ -186,7 +185,7 @@ async def get_genes_by_goterm_id(
             invert_subject_object=True,
             taxon=taxon,
             user_agent=USER_AGENT,
-            url="http://golr-aux.geneontology.io/solr",
+            url=ESOLR.GOLR,
         )
 
 
@@ -281,7 +280,7 @@ async def get_annotations_by_gene_id(
         subject_category="gene",
         subject=id,
         user_agent=USER_AGENT,
-        url="http://golr-aux.geneontology.io/solr",
+        url=ESOLR.GOLR,
         start=start,
         rows=rows,
         slim=slim,
@@ -301,7 +300,7 @@ async def get_annotations_by_gene_id(
                 object_category="function",
                 subject=prot,
                 user_agent=USER_AGENT,
-                url="http://golr-aux.geneontology.io/solr",
+                url=ESOLR.GOLR,
                 start=start,
                 rows=rows,
                 slim=slim,

@@ -293,6 +293,17 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
+name = "enum"
+version = "0.4.7"
+description = "Robust enumerated type support in Python."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+setuptools = "*"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.1.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -1774,7 +1785,7 @@ docs = ["Sphinx", "sphinx-rtd-theme"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "a7289919867d48a3aece10f23a3652bbcf39e672ee7d69ba94a728cd1ea501d6"
+content-hash = "a9d15710d999b37c9b8de28fab61f53c849e306da1f5e010c5eb0a658a6df235"
 
 [metadata.files]
 alabaster = [
@@ -2098,6 +2109,9 @@ distlib = [
 docutils = [
     {file = "docutils-0.18.1-py2.py3-none-any.whl", hash = "sha256:23010f129180089fbcd3bc08cfefccb3b890b0050e1ca00c867036e9d161b98c"},
     {file = "docutils-0.18.1.tar.gz", hash = "sha256:679987caf361a7539d76e584cbeddc311e3aee937877c87346f31debc63e9d06"},
+]
+enum = [
+    {file = "enum-0.4.7.tar.gz", hash = "sha256:8c7cf3587eda51008bcc1eed99ea2c331ccd265c231dbaa95ec5258d3dc03100"},
 ]
 exceptiongroup = [
     {file = "exceptiongroup-1.1.0-py3-none-any.whl", hash = "sha256:327cbda3da756e2de031a3107b81ab7b3770a602c4d16ca618298c526f4bec1e"},

@@ -4,9 +4,9 @@ from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
-from ..settings import get_biolink_config
+from ..settings import get_golr_config
 
-cfg = get_biolink_config()
+cfg = get_golr_config()
 omap = {}
 
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}

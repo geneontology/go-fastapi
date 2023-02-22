@@ -4,7 +4,7 @@ from enum import Enum
 from typing import List
 
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_query import ESOLR, ESOLRDoc, replace
+from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
                                                transform, transformArray)
@@ -12,18 +12,16 @@ from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
+from app.utils.settings import ESOLRDoc, ESOLR
 
 log = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
-# Some query parameters & parsers
-TOPOLOGY = "topology_graph"
-
 
 class GraphType(str, Enum):
-    topology_graph = TOPOLOGY
+    topology_graph = "topology_graph"
 
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
