@@ -2,14 +2,15 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_query import ESOLR, ESOLRDoc, replace
+from app.utils.settings import ESOLRDoc
+from ontobio.golr.golr_query import replace
 from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
                                                transform, transformArray)
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_text_on
-
+from app.utils.settings import get_golr_config
 from .slimmer import gene_to_uniprot_from_mygene
 
 log = logging.getLogger(__name__)
@@ -18,6 +19,7 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
+golr = get_golr_config()["solr_url"]["url"]
 
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
@@ -178,7 +180,7 @@ async def get_ribbon_results(
             fq += '&fq=!annotation_class:"GO:0005515"'
         print(fq)
 
-        data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
+        data = run_solr_text_on(golr, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
 
         # compute number of terms and annotations
         for annot in data:
@@ -300,7 +302,7 @@ async def get_ribbon_results(
     qf = ""
     fq = '&fq=bioentity:("' + '" or "'.join(mod_ids) + '")&rows=100000'
     fields = "bioentity,bioentity_label,taxon,taxon_label"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, q, qf, fields, fq)
+    data = run_solr_text_on(golr, ESOLRDoc.BIOENTITY, q, qf, fields, fq)
 
     for entity in subjects:
         for entity_detail in data:

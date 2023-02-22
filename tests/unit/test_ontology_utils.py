@@ -3,8 +3,13 @@ from ontobio.sparql.sparql_ontology import EagerRemoteSparqlOntology
 
 import app.utils.ontology.ontology_utils as ou
 from app.main import app
-
+from app.utils.settings import get_golr_config
 test_client = TestClient(app)
+
+
+def test_get_ontology_config():
+    golr_url = get_golr_config()["solr_url"]["url"]
+    assert "golr-aux.geneontology.io" in golr_url
 
 
 def test_get_ontology():
