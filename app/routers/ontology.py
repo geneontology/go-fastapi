@@ -12,7 +12,6 @@ from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-#from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from app.utils.settings import ESOLRDoc, ESOLR
 
 log = logging.getLogger(__name__)
