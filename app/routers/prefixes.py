@@ -1,12 +1,10 @@
 import logging
 
 from fastapi import APIRouter, Query
-from ontobio.util.user_agent import get_user_agent
 from prefixcommons.curie_util import contract_uri, expand_uri, get_prefixes
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
 
