@@ -19,21 +19,21 @@ ENV PYTHONFAULTHANDLER=1 \
 # PIP_NO_CACHE_DIR - cache the pip whl and tar files to speed up builder
 # PIP_DISABLE_PIP_VERSION_CHECK - avoid warning that pip is out of date
 
-
 # Install Poetry
 RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.9-venv nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 # RUN poetry self add "poetry-dynamic-versioning[plugin]"
 WORKDIR /code
 COPY Makefile pyproject.toml poetry.lock README.md .
-COPY ./.git /.git
-COPY app app/
-COPY static static/
-EXPOSE 8000 8080
+COPY . .
+# remove local .venv so we can respect the version of python installed via ubuntu:20.04 package manager
+# but still have all the necessary code to run tests locally to docker container if necessary. (python 3.8.10)
+# with the smallest number of layers possible (each COPY command creates a new layer)
+RUN rm -rf .venv
+EXPOSE 8081 8080
 RUN poetry install
 
 # CMD runs by default when no other commands are passed to a docker run directive from the command line.
 CMD make start
-
 
 
