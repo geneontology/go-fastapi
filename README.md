@@ -31,16 +31,37 @@ version of the running API from their local browser via: http://127.0.0.1:8080/d
 docker run -d -p 8080:8080 go-fastapi
 ```
 
-3) start the API
-
-Running the container with parameters above will override the default CMD in the Dockerfile
-`make start` in the docker container will start the API server and by exposing 8080, the API on the
-container can be accessed locally via: http://127.0.0.1:8080/docs
-
-### Helpful commands:
+### Deploying a change in the API code:
 To remove images and containers:
 `docker rm -vf $(docker ps -aq)` (removes all local images)
 `docker rmi -f $(docker images -aq)` (removes all local containers)
 
 Check the port mapping:
 `docker port go-fastapi` (see the port mapping)
+
+1) checkout and build the API code locally
+
+This should result in a locally running API server on port 8081 (note the port difference from the docker version)
+
+```bash
+git clone https://github.com/geneontology/go-fastapi
+cd go-fastapi
+make dev
+```
+localhost:8081/docs will be available for testing the API locally if the commands above are successful.
+
+2) make a change to the API code
+3) test the API changes
+```bash
+make test
+```
+4) rebuild the docker image with the changed code
+```bash
+docker build -t go-fastapi .
+```
+5) test the rebuilt docker image
+```bash
+docker run -i -t --name go-fastapi -p 8000:8000 -p 8080:8080 go-fastapi bash
+make start
+make test
+```
