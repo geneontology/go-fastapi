@@ -15,12 +15,12 @@ def get_golr_config():
     return golr_config
 
 
+class ESOLR(Enum):
+    GOLR = get_golr_config()["solr_url"]["url"]
+
+
 class ESOLRDoc(Enum):
     ONTOLOGY = "ontology_class"
     ANNOTATION = "annotation"
     BIOENTITY = "bioentity"
-
-
-class ESOLR(Enum):
-    GOLR = get_golr_config()["solr_url"]["url"]
 

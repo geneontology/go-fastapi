@@ -12,19 +12,17 @@ from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLRDoc, ESOLR
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc
+#from app.utils.settings import ESOLRDoc, ESOLR
 
 log = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
 router = APIRouter()
 
-# Some query parameters & parsers
-TOPOLOGY = "topology_graph"
-
 
 class GraphType(str, Enum):
-    topology_graph = TOPOLOGY
+    topology_graph = "topology_graph"
 
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
@@ -52,7 +50,7 @@ async def get_term_graph_by_id(
     graph_type = graph_type + "_json"  # GOLR field names
     print(graph_type)
 
-    data = run_solr_on(GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
+    data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are stringified in the json
     data[graph_type] = json.loads(data[graph_type])
 
