@@ -17,7 +17,7 @@
 
 1) build the docker image
 ```bash
-docker build -t go_fastapi .
+docker build -t go-fastapi .
 ```
 2) run the docker image interactively
 ```bash
