@@ -61,7 +61,7 @@ docker build -t geneontology/go-fastapi .
 ```
 5) test the rebuilt docker image
 ```bash
-docker run -i -t --name geneontology/go-fastapi -p 8000:8000 -p 8080:8080 geneontology/go-fastapi bash
+docker run -i -t --name geneontology/go-fastapi -p 8080:8080 geneontology/go-fastapi bash
 make start
 make test
 ```
