@@ -2,6 +2,8 @@ name: Build Docker Image
 
 on:
   push:
+    branches:
+      - "main"
     tags:
       - "v*"
 
@@ -33,7 +35,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: cjmungall
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3
