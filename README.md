@@ -17,7 +17,7 @@
 
 1) build the docker image
 ```bash
-docker build -t go-fastapi .
+docker build -t geneontology/go-fastapi .
 ```
 2) run the docker image
 
@@ -28,7 +28,7 @@ will run the image and start the API server but give the control of the terminal
 version of the running API from their local browser via: http://127.0.0.1:8080/docs
 
 ```bash
-docker run -d -p 8080:8080 go-fastapi
+docker run -d -p 8080:8080 geneontology/go-fastapi
 ```
 
 ### Deploying a change in the API code to docker image:
@@ -57,11 +57,11 @@ make test
 ```
 4) rebuild the docker image with the changed code
 ```bash
-docker build -t go-fastapi .
+docker build -t geneontology/go-fastapi .
 ```
 5) test the rebuilt docker image
 ```bash
-docker run -i -t --name go-fastapi -p 8000:8000 -p 8080:8080 go-fastapi bash
+docker run -i -t --name geneontology/go-fastapi -p 8000:8000 -p 8080:8080 geneontology/go-fastapi bash
 make start
 make test
 ```
