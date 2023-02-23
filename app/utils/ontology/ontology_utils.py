@@ -3,6 +3,7 @@ import logging
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
+from app.utils.golr.golr_utls import run_sparql
 
 from ..settings import get_golr_config
 
@@ -10,6 +11,21 @@ cfg = get_golr_config()
 omap = {}
 
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
+
+
+def anyont_fetch_label(id):
+    """
+    fetch all rdfs:label assertions for a URI
+    """
+    iri = expand_uri(id, strict=False)
+    query = """
+    SELECT ?label WHERE {{
+    <{iri}> rdfs:label ?label
+    }}
+    """.format(iri=iri)
+    bindings = run_sparql(query)
+    rows = [r['label']['value'] for r in bindings]
+    return rows[0]
 
 
 def get_ontology_subsets_by_id(id: str):

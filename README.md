@@ -65,3 +65,16 @@ docker run -i -t --name geneontology/go-fastapi -p 8080:8080 geneontology/go-fas
 make start
 make test
 ```
+
+
+### Pushing to Dockerhub
+
+GitHub Actions will automatically build and push the docker image to Dockerhub when a new versioned tag is created.
+To do this manually, run the following commands, replacing [tag_name] with the tag or version number:
+
+```bash
+docker login
+docker build -t geneontology/go-fastapi .
+docker tag geneontology/go-fastapi:latest geneontology/go-fastapi:[tag_name]
+docker push geneontology/go-fastapi:[tag_name]
+```
