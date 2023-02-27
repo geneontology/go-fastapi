@@ -213,3 +213,13 @@ def test_autocomplete():
 def test_autocomplete_go():
     response = test_client.get(f"/api/search/entity/autocomplete/go")
     assert response.status_code == 200
+
+
+def test_models_size_endpoint():
+    data = {
+        "start": "1",
+        "size": "10",
+    }
+    response = test_client.get(f"/api/models", params=data)
+    print(response.json())
+    assert response.status_code == 200

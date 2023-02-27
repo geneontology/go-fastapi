@@ -29,6 +29,7 @@ app.include_router(labeler.router)
 app.include_router(ontology.router)
 app.include_router(ribbon.router)
 app.include_router(search.router)
+app.include_router(models.router)
 
 # CORS
 app.add_middleware(
