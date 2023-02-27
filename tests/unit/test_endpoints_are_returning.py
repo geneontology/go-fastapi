@@ -217,7 +217,7 @@ def test_autocomplete_go():
 
 def test_models_size_endpoint():
     data = {
-        "start": "1",
+        "start": "32",
         "size": "10",
     }
     response = test_client.get(f"/api/models", params=data)

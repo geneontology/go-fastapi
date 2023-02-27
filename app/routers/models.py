@@ -35,14 +35,13 @@ async def get_model_by_start_size(start: int, size: int, last: int = None):
     query = """
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
     	PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
   
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="` + separator + `") AS ?orcids) 
-                                    (GROUP_CONCAT(distinct ?name;separator="` + separator + `") AS ?names)
-							        (GROUP_CONCAT(distinct ?providedBy;separator="` + separator + `") AS ?groupids) 
-							        (GROUP_CONCAT(distinct ?providedByLabel;separator="` + separator + `") AS ?groupnames) 
+        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="` + @|@ + `") AS ?orcids) 
+                                    (GROUP_CONCAT(distinct ?name;separator="` + @|@ + `") AS ?names)
+							        (GROUP_CONCAT(distinct ?providedBy;separator="` + @|@ + `") AS ?groupids) 
+							        (GROUP_CONCAT(distinct ?providedByLabel;separator="` + @|@ + `") AS ?groupnames) 
         
         WHERE 
         {
@@ -72,9 +71,9 @@ async def get_model_by_start_size(start: int, size: int, last: int = None):
         ORDER BY DESC(?date)
         """
     if size:
-        query += "\nLIMIT " + size
+        query += "\nLIMIT " + str(size)
     if start:
-        query += "\nOFFSET " + start
+        query += "\nOFFSET " + str(start)
     results = si._query(query)
-    results = transformArray(results, [])
+    results = transformArray(results, ["orcids", "names", "groupids", "groupnames"])
     return results
