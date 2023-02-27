@@ -221,5 +221,6 @@ def test_models_size_endpoint():
         "size": "10",
     }
     response = test_client.get(f"/api/models", params=data)
-    print(response.json())
+    for record in response.json():
+        assert type(record.get("orcids")) == list
     assert response.status_code == 200
