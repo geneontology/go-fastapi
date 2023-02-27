@@ -22,7 +22,7 @@ ENV PYTHONFAULTHANDLER=1 \
 # Install Poetry
 RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10-venv nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
-# RUN poetry self add "poetry-dynamic-versioning[plugin]"
+RUN poetry self add "poetry-dynamic-versioning[plugin]"
 WORKDIR /code
 COPY Makefile pyproject.toml poetry.lock README.md .
 COPY . .

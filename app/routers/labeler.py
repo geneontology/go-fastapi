@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Query
-from ontobio.sparql.sparql_ontol_utils import batch_fetch_labels
+from app.utils.ontology.ontology_utils import batch_fetch_labels
 from ontobio.util.user_agent import get_user_agent
 
 log = logging.getLogger(__name__)

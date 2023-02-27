@@ -3,9 +3,12 @@ import logging
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
-from app.utils.golr.golr_utls import run_sparql
 
-from ..settings import get_golr_config
+from app.utils.settings import get_golr_config
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.resource import OntologyResource
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
 
 cfg = get_golr_config()
 omap = {}
@@ -13,17 +16,30 @@ omap = {}
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 
-def anyont_fetch_label(id):
+def batch_fetch_labels(ids):
+    """
+    fetch all rdfs:label assertions for a set of CURIEs
+    """
+    m = {}
+    for id in ids:
+        label = goont_fetch_label(id)
+        if label is not None:
+            m[id] = label
+    return m
+
+
+def goont_fetch_label(id):
     """
     fetch all rdfs:label assertions for a URI
     """
-    iri = expand_uri(id, strict=False)
-    query = """
-    SELECT ?label WHERE {{
-    <{iri}> rdfs:label ?label
-    }}
-    """.format(iri=iri)
-    bindings = run_sparql(query)
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    iri = ns.uri_for(id)
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    query = SparqlQuery(select=["?label"], where=["<"+iri+"> rdfs:label ?label"])
+    print(query.query_str())
+    bindings = si._query(query.query_str())
     rows = [r['label']['value'] for r in bindings]
     return rows[0]
 
