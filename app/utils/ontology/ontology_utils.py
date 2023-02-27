@@ -260,7 +260,6 @@ def get_go_subsets_sparql_query(goid):
     goid = correct_goid(goid)
     return (
         """
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
 
     SELECT ?label ?subset

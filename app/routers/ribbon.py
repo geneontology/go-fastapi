@@ -4,14 +4,18 @@ from typing import List
 from fastapi import APIRouter, Query
 from app.utils.settings import ESOLRDoc
 from ontobio.golr.golr_query import replace
-from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
-                                               transform, transformArray)
+from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
 from ontobio.util.user_agent import get_user_agent
 from app.utils.golr.golr_utls import run_solr_text_on
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.settings import ESOLR
 from ontobio.golr.golr_query import ESOLR
 from .slimmer import gene_to_uniprot_from_mygene
+
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.resource import OntologyResource
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +38,14 @@ async def get_ontology_subsets_by_go_term_id(
     # replace with OntologyFactory with ontobio - but config on startup
     # or use OAK  here and rewrite - still need to config on startup (SQLLite - up front to make
     # the latest version, etc)
-    results = run_sparql_on(query, EOntology.GO)
+
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    iri = ns.uri_for(id)
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    query = ontology_utils.create_go_summary_sparql(id)
+    results = si._query(query)
     results = transformArray(results, [])
     results = replace(results, "subset", "OBO:go#", "")
     return results
