@@ -17,7 +17,7 @@
 
 1) build the docker image
 ```bash
-docker build -t go-fastapi .
+docker build -t geneontology/go-fastapi .
 ```
 2) run the docker image
 
@@ -28,7 +28,7 @@ will run the image and start the API server but give the control of the terminal
 version of the running API from their local browser via: http://127.0.0.1:8080/docs
 
 ```bash
-docker run -d -p 8080:8080 go-fastapi
+docker run -d -p 8080:8080 geneontology/go-fastapi
 ```
 
 ### Deploying a change in the API code to docker image:
@@ -57,11 +57,24 @@ make test
 ```
 4) rebuild the docker image with the changed code
 ```bash
-docker build -t go-fastapi .
+docker build -t geneontology/go-fastapi .
 ```
 5) test the rebuilt docker image
 ```bash
-docker run -i -t --name go-fastapi -p 8000:8000 -p 8080:8080 go-fastapi bash
+docker run -i -t --name geneontology/go-fastapi -p 8080:8080 geneontology/go-fastapi bash
 make start
 make test
+```
+
+
+### Pushing to Dockerhub
+
+GitHub Actions will automatically build and push the docker image to Dockerhub when a new versioned tag is created.
+To do this manually, run the following commands, replacing [tag_name] with the tag or version number:
+
+```bash
+docker login
+docker build -t geneontology/go-fastapi .
+docker tag geneontology/go-fastapi:latest geneontology/go-fastapi:[tag_name]
+docker push geneontology/go-fastapi:[tag_name]
 ```

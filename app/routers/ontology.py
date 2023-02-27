@@ -6,8 +6,12 @@ from typing import List
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import (EOntology, run_sparql_on,
-                                               transform, transformArray)
+from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
+
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.resource import OntologyResource
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
@@ -29,13 +33,17 @@ async def get_term_metadata_by_id(id: str):
     """
     Returns meta data of an ontology term, e.g. GO:0003677
     """
-    print(id)
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    iri = ns.uri_for(id)
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
-    results = run_sparql_on(query, EOntology.GO)
+    results = si._query(query)
     return transform(
-        results[0],
-        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
-    )
+         results[0],
+         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
+     )
 
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
@@ -92,10 +100,15 @@ async def get_subsets_by_term(id: str):
     """
     Returns subsets (slims) associated to an ontology term
     """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    iri = ns.uri_for(id)
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
-    results = run_sparql_on(query, EOntology.GO)
+    results = si._query(query)
     results = transformArray(results, [])
-    results = replace(results, "subset", "OBO:go#", "")
+    results = (results, "subset", "OBO:go#", "")
     return results
 
 

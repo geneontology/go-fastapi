@@ -12,6 +12,11 @@ def test_get_ontology_config():
     assert "golr-aux.geneontology.io" in golr_url
 
 
+def test_go_sparql():
+    results = ou.goont_fetch_label("GO:0008150")
+    assert results == 'biological_process'
+
+
 def test_get_ontology():
     return_value = ou.get_ontology(id="go")
     assert type(return_value) is EagerRemoteSparqlOntology
