@@ -38,10 +38,10 @@ async def get_model_by_start_size(start: int, size: int, last: int = None):
     	PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
   
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="` + @|@ + `") AS ?orcids) 
-                                    (GROUP_CONCAT(distinct ?name;separator="` + @|@ + `") AS ?names)
-							        (GROUP_CONCAT(distinct ?providedBy;separator="` + @|@ + `") AS ?groupids) 
-							        (GROUP_CONCAT(distinct ?providedByLabel;separator="` + @|@ + `") AS ?groupnames) 
+        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids) 
+                                    (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
+							        (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids) 
+							        (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames) 
         
         WHERE 
         {
