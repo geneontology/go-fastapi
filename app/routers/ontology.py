@@ -6,8 +6,7 @@ from typing import List
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import (EOntology,
-                                               transform, transformArray)
+from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
 
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
