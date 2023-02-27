@@ -20,7 +20,7 @@ from app.utils.settings import ESOLRDoc, ESOLR
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
 
 

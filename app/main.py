@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import (bioentity, labeler, ontology, prefixes, ribbon,
-                         search, slimmer)
+                         search, slimmer, models)
 
 log = logging.getLogger(__name__)
 

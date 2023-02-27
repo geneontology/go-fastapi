@@ -20,7 +20,7 @@ from app.utils.settings import ESOLRDoc, ESOLR
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
 
 @router.get("/api/models", tags=["models"])
@@ -30,7 +30,6 @@ async def get_model_by_start_size(start: int, size: int, last: int = None):
     """
     ns = Namespaces()
     ns.add_prefixmap('go')
-    iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = """

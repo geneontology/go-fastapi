@@ -25,7 +25,7 @@ TYPE_PATHWAY = "pathway"
 TYPE_PUBLICATION = "publication"
 
 categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 
 
 class RelationshipType(str, Enum):

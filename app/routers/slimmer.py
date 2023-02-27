@@ -11,7 +11,7 @@ INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
 FUNCTION_CATEGORY = "function"
 ANATOMY_CATEGORY = "anatomy"
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 
 router = APIRouter()
 
