@@ -221,6 +221,15 @@ def test_gometadata_by_model_ids():
     assert len(response.json()) == 2
 
 
+def test_geneproductmetadata_by_model_ids():
+    data = {
+        "gocams": ["59a6110e00000067", "SYNGO_369"]
+    }
+    response = test_client.get("/api/models/gp", params=data)
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+
 def test_models_size_endpoint():
     data = {
         "start": "32",

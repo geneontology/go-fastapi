@@ -145,3 +145,68 @@ async def get_goterms_by_model_id(gocams: List[str] = Query(
     collated_results.append(collated)
     pprint(collated_results)
     return collated_results
+
+
+@router.get("/api/models/gp", tags=["models"])
+async def get_geneproducts_by_model_id(gocams: List[str] = Query(
+        None, description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))")):
+    """
+    Returns go term details based on a GO-CAM model ID
+    """
+    gocam = ""
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    for model in gocams:
+        if gocam == "":
+            gocam = "<http://model.geneontology.org/" + model +"> "
+        else:
+            gocam = gocam + "<http://model.geneontology.org/" + model +"> "
+    query = """
+            PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> 
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            PREFIX metago: <http://model.geneontology.org/>
+            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+            PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
+            SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier;separator="@|@") as ?gpids)
+            				(GROUP_CONCAT(distinct ?name;separator="@|@") as ?gpnames)
+            WHERE 
+            {
+                VALUES ?gocam { %s }
+
+                GRAPH ?gocam {
+                    ?s enabled_by: ?gpnode .    
+                    ?gpnode rdf:type ?identifier .
+                    FILTER(?identifier != owl:NamedIndividual) .         
+                }
+                optional {
+                    GRAPH <http://purl.obolibrary.org/obo/go/extensions/go-graphstore.owl> {
+                	    ?identifier rdfs:label ?name
+                    }
+                }
+            }
+            GROUP BY ?gocam
+    """ % gocam
+    summary_gocam = ""
+    collated = {}
+    collated_results = []
+    for result in results:
+        if summary_gocam == "":
+            collated["gpids"] = [result["gpids"].get("value")]
+            collated["gpnames"] = [result["gpnames"].get("value")]
+            collated["gocam"] = result["gocam"].get("value")
+            summary_gocam = result["gocam"].get("value")
+        elif summary_gocam == result["gocam"].get("value"):
+            collated["gpids"].append(result["gpids"].get("value"))
+            collated["gpnames"].append(result["gpnames"].get("value"))
+        else:
+            collated_results.append(collated)
+            collated = {}
+            summary_gocam = result["gocam"].get("value")
+            collated["gpids"] = [result["gpids"].get("value")]
+            collated["gpnames"] = [result["gpnames"].get("value")]
+            collated["gocam"] = result["gocam"].get("value")
+    collated_results.append(collated)
+    pprint(collated_results)
+    return collated_results
