@@ -261,3 +261,9 @@ def test_models_size_endpoint():
     for record in response.json():
         assert type(record.get("orcids")) == list
     assert response.status_code == 200
+
+
+def test_userlist():
+    response = test_client.get("/api/users")
+    assert len(response.json()) > 100
+    assert response.status_code == 200
