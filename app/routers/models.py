@@ -151,7 +151,7 @@ async def get_goterms_by_model_id(gocams: List[str] = Query(
 async def get_geneproducts_by_model_id(gocams: List[str] = Query(
         None, description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))")):
     """
-    Returns go term details based on a GO-CAM model ID
+    Returns gene product details based on a GO-CAM model ID
     """
     gocam = ""
     ns = Namespaces()
@@ -194,7 +194,7 @@ async def get_geneproducts_by_model_id(gocams: List[str] = Query(
 async def get_geneproducts_by_model_id(gocams: List[str] = Query(
         None, description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))")):
     """
-    Returns go term details based on a GO-CAM model ID
+    Returns pubmed details based on a GO-CAM model ID
     """
     gocam = ""
     ns = Namespaces()
@@ -226,3 +226,37 @@ async def get_geneproducts_by_model_id(gocams: List[str] = Query(
     results = si._query(query)
     results = transformArray(results, ["sources"])
     return results
+
+
+@router.get("/api/models/{id}", tags=["models"])
+async def get_geneproducts_by_model_id(id: str = Query(
+    None, description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968))")):
+    """
+    Returns term details based on a GO-CAM model ID
+    """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    query = """
+        PREFIX metago: <http://model.geneontology.org/>
+    
+        SELECT ?subject ?predicate ?object
+        WHERE 
+        {     
+            GRAPH metago:%s {
+                ?subject ?predicate ?object
+            }      
+        }
+    """ % id
+    results = si._query(query)
+    collated_results = []
+    collated = {}
+    for result in results:
+        collated = {
+            "subject": result["subject"].get("value"),
+            "predicate": result["predicate"].get("value"),
+            "object": result["object"].get("value")
+        }
+        collated_results.append(collated)
+    return collated_results

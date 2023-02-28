@@ -239,6 +239,19 @@ def test_pubmedmetadata_by_model_ids():
     assert len(response.json()) == 2
 
 
+@pytest.mark.parametrize("id", gene_ids)
+def test_bioenty_id_endpoints(id):
+    response = test_client.get(f"/api/bioentity/{id}")
+    assert response.status_code == 200
+    pprint(response.json())
+
+
+def test_gocam_by_model_ids():
+    response = test_client.get("/api/models/581e072c00000820")
+    assert len(response.json()) > 125
+    assert response.status_code == 200
+
+
 def test_models_size_endpoint():
     data = {
         "start": "32",
