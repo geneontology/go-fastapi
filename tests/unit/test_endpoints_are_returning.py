@@ -267,3 +267,9 @@ def test_userlist():
     response = test_client.get("/api/users")
     assert len(response.json()) > 100
     assert response.status_code == 200
+
+
+def test_grouplist():
+    response = test_client.get("/api/groups")
+    assert len(response.json()) > 15
+    assert response.status_code == 200
