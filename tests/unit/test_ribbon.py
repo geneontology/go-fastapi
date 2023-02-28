@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-
+import logging
 from app.main import app
 
 test_client = TestClient(app)
@@ -10,6 +10,7 @@ go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 
+logger = logging.getLogger(__name__)
 
 def test_zebrafish_ribbon():
     data = {"subset": "goslim_agr", "subject": ["ZFIN:ZDB-GENE-980526-166"]}

@@ -16,6 +16,8 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
 
 
+log = logging.getLogger(__name__)
+
 class RelationshipType(str, Enum):
     acts_upstream_of_or_within = (ACTS_UPSTREAM_OF_OR_WITHIN,)
     involved_in = INVOLVED_IN
@@ -97,7 +99,7 @@ def gene_to_uniprot_from_mygene(id):
         id = id.replace("NCBIGene", "entrezgene")
     try:
         results = mg.query(id, fields="uniprot")
-        logger.info("results from mygene for ", id, ": ", results)
+        log.info("results from mygene for ", id, ": ", results)
         if results["hits"]:
             for hit in results["hits"]:
                 if "uniprot" not in hit:

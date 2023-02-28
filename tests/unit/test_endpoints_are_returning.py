@@ -1,6 +1,7 @@
 from pprint import pprint
 import urllib.parse
 import pytest
+import logging
 from fastapi.testclient import TestClient
 from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
 # from ontobio.golr.golr_query import ESOLR, ESOLRDoc
@@ -14,6 +15,7 @@ subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
+logger = logging.getLogger(__name__)
 
 def test_golr_solr():
     assert ESOLR.GOLR.value == 'http://golr-aux.geneontology.io/solr/'

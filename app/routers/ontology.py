@@ -55,7 +55,7 @@ async def get_term_graph_by_id(
     """
 
     graph_type = graph_type + "_json"  # GOLR field names
-    logger.info(graph_type)
+    log.info(graph_type)
 
     data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are stringified in the json
@@ -83,7 +83,7 @@ async def get_subgraph_by_term_id(
     # COMMENT: based on the CURIE of the id, we should be able to find out the ontology automatically
     ont = ontology_utils.get_ontology("go")
     relations = relation
-    logger.info("Traversing: {} using {}".format(qnodes, relations))
+    log.info("Traversing: {} using {}".format(qnodes, relations))
     nodes = ont.traverse_nodes(
         qnodes, up=include_ancestors, down=include_descendants, relations=relations
     )
@@ -194,15 +194,15 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
     object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
 
-    logger.info(subject)
-    logger.info(object)
+    log.info(subject)
+    log.info(object)
     fields = "isa_partof_closure,isa_partof_closure_label"
 
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
     objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
 
-    logger.info("SUBJECT: ", subres)
-    logger.info("OBJECT: ", objres)
+    log.info("SUBJECT: ", subres)
+    log.info("OBJECT: ", objres)
 
     shared = []
     shared_labels = []

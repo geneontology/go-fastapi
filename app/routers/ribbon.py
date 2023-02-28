@@ -153,7 +153,7 @@ async def get_ribbon_results(
         else:
             slimmer_subjects.append(s)
 
-    logger.info("SLIMMER SUBS : ", slimmer_subjects)
+    log.info("SLIMMER SUBS : ", slimmer_subjects)
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject
@@ -188,7 +188,7 @@ async def get_ribbon_results(
             fq += "&fq=!evidence_type:IBA"
         if exclude_PB:
             fq += '&fq=!annotation_class:"GO:0005515"'
-        logger.info(fq)
+        log.info(fq)
 
         data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
 
