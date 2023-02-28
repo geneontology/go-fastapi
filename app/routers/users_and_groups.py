@@ -69,7 +69,7 @@ async def get_users():
 @router.get("/api/groups", tags=["users and groups"])
 async def get_groups():
     """
-    Returns meta data of all GO users
+    Returns meta data of a GO group
     """
     ns = Namespaces()
     ns.add_prefixmap('go')
@@ -96,3 +96,63 @@ async def get_groups():
         """
     results = si._query(query)
     return results
+
+
+@router.get("/api/groups/{name}", tags=["users and groups"])
+async def get_group_metadata_by_name(name: str = Query(
+    None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")):
+    """
+    Returns meta data of all GO users
+    """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    query = """
+     PREFIX metago: <http://model.geneontology.org/>
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+        PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+        PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066> 
+        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+        PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
+        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
+        PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
+            
+		SELECT ?url ?orcid ?name   (COUNT(distinct ?gocam) AS ?gocams) 
+									        (COUNT(distinct ?goid) AS ?bps)
+		WHERE {
+  
+            BIND(\"""" + name + """\"""" + """as ?groupName) .
+            ?url rdfs:label ?groupName .  
+        	?orcidIRI has_affiliation: ?url .
+  			?orcidIRI rdfs:label ?name
+  			GRAPH ?gocam {
+    			?gocam metago:graphType metago:noctuaCam ;
+    				   dc:contributor ?orcid .    
+    			BIND(IRI(?orcid) as ?contribIRI) .    
+                ?entity rdf:type owl:NamedIndividual .
+    			?entity rdf:type ?goid
+  			}
+    
+    		filter(?contribIRI = ?orcidIRI) .
+  			?contribIRI rdfs:label ?name .
+      
+    		?entity rdf:type BP: .
+  			
+  			filter(?goid != BP: )
+	    }
+	    GROUP BY ?url ?orcid ?name
+        
+        """
+    results = si._query(query)
+    collated_results = []
+    collated = {}
+    for result in results:
+        collated["name"] = result["name"].get("value")
+        collated["orcide"] = result["orcid"].get("value")
+        collated["gocams"] = result["gocams"].get("value")
+        collated["bps"] = result["bps"].get("value")
+        collated_results.append(collated)
+    return collated_results
+
