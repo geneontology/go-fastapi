@@ -277,6 +277,5 @@ def test_grouplist():
 
 def test_groups_by_name():
     response = test_client.get("/api/groups/MGI")
-    print(len(response.json()))
-    pprint(response.json())
+    assert len(response.json()) > 10
     assert response.status_code == 200
