@@ -253,3 +253,38 @@ async def get_go_term_detail_by_go_id(id: str = Query(
     results = si._query(query)
     results = transformArray(results, ["synonyms", "relatedSynonyms", "xrefs", "subsets", "alternativeIds"])
     return results
+
+@router.get("/api/go/{id}/hierarchy", tags=["ontology"])
+async def get_go_hierarchy_go_id(id: str = Query(
+    None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")):
+    """
+    Returns parent and children relationships for a given GO ID
+    """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    query = """
+        PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
+        SELECT ?hierarchy ?GO ?label WHERE {
+    		BIND(%s as ?goquery)
+  	    	{
+  		        {
+                  ?goquery rdfs:subClassOf+ ?GO .
+  	        	  ?GO rdfs:label ?label .
+	              FILTER (LANG(?label) != "en")    
+        	      BIND("parent" as ?hierarchy)
+            	}
+	        	UNION
+        		{
+                  ?GO rdfs:subClassOf* ?goquery .
+  		          ?GO rdfs:label ?label .    		
+        	      FILTER (LANG(?label) != "en")    
+ 	              BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
+        		}
+  	        }
+    	}
+    """ % id
+    results = si._query(query)
+    return results

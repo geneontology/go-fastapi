@@ -298,3 +298,9 @@ def test_get_go_term_detail_by_go_id():
     response = test_client.get("/api/go/GO_0008150")
     assert len(response.json()) == 1
     assert response.status_code == 200
+
+
+def test_get_go_hierarchy_go_id():
+    response = test_client.get("/api/go/GO_0008150/hierarchy")
+    assert len(response.json()) >= 27962
+    assert response.status_code == 200
