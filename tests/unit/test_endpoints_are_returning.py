@@ -1,5 +1,5 @@
 from pprint import pprint
-
+import urllib.parse
 import pytest
 from fastapi.testclient import TestClient
 from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
@@ -284,4 +284,11 @@ def test_groups_by_name():
 def test_get_modelid_by_pmid():
     response = test_client.get("/api/pmid/15314168/models")
     assert len(response.json()) == 1
+    assert response.status_code == 200
+
+
+def test_get_gocams_by_geneproduct_id():
+    id = urllib.parse.quote("MGI:3588192")
+    response = test_client.get(f"/api/gp/{id}/models")
+    assert len(response.json()) == 2
     assert response.status_code == 200

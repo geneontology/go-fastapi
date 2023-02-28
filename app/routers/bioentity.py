@@ -8,8 +8,13 @@ from ontobio.golr.golr_associations import search_associations
 from ontobio.util.user_agent import get_user_agent
 from app.utils.settings import ESOLRDoc, ESOLR
 from app.utils.golr.golr_utls import run_solr_text_on
-
+from pprint import pprint
 from .slimmer import gene_to_uniprot_from_mygene
+
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.resource import OntologyResource
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +58,7 @@ async def get_bioentity_by_id(
     # query_filters is translated to the qf solr parameter
     # boost fields %5E2 -> ^2, %5E1 -> ^1
     query_filters = "bioentity%5E2"
-    logger.info(id)
+    log.info(id)
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
@@ -284,8 +289,8 @@ async def get_annotations_by_gene_id(
         rows=rows,
         slim=slim,
     )
-    logger.info("should be null assocs")
-    logger.info(assocs)
+    log.info("should be null assocs")
+    log.info(assocs)
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs["associations"]) == 0:
@@ -309,6 +314,50 @@ async def get_annotations_by_gene_id(
                 num_found = num_found + pr_assocs.get("numFound")
             assocs["numFound"] = num_found
             for asc in pr_assocs["associations"]:
-                logger.info(asc)
+                log.info(asc)
                 assocs["associations"].append(asc)
     return assocs
+
+@router.get("/api/gp/{id}/models", tags=["bioentity"])
+async def get_gocams_by_geneproduct_id(id: str = Query(
+    None, description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)")):
+    """
+    Returns models for a given PMID
+    """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    # reformat curie into an identifiers.org URI
+    id = "http://identifiers.org/" + id.split(":")[0].lower() +"/" + id
+    log.info("reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint", id)
+    query = """
+        PREFIX metago: <http://model.geneontology.org/>
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+        
+        SELECT distinct ?gocam ?title
+        
+        WHERE 
+        {
+        
+          GRAPH ?gocam {
+            ?gocam metago:graphType metago:noctuaCam .    
+            ?s enabled_by: ?gpnode .    
+            ?gpnode rdf:type ?identifier .
+            ?gocam dc:title ?title .   
+            FILTER(?identifier = <%s>) .            
+          }
+        
+        }
+        ORDER BY ?gocam
+        
+    """ % id
+    results = si._query(query)
+    collated_results = []
+    collated = {}
+    for row in results:
+        collated['gocam'] = row['gocam'].get("value")
+        collated['title'] = row['title'].get("value")
+        collated_results.append(collated)
+    return collated_results
