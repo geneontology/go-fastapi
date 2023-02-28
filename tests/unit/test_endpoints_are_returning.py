@@ -99,7 +99,6 @@ def test_prefixes_endpoint():
 @pytest.mark.parametrize("id", gene_ids)
 def test_expander_endpoint(id):
     response = test_client.get(f"/api/identifier/prefixes/expand/{id}")
-    print(response.json())
     assert response.status_code == 200
 
 
@@ -177,7 +176,6 @@ def test_ontology_term_graph(id):
 def test_ontology_term_subgraph(id):
     data = {"graph_type": "topology_graph"}
     response = test_client.get(f"/api/ontology/term/{id}/graph", params=data)
-    print(response.json())
     assert response.status_code == 200
 
 
@@ -214,6 +212,12 @@ def test_autocomplete_go():
     response = test_client.get(f"/api/search/entity/autocomplete/go")
     assert response.status_code == 200
 
+def test_gometadata_by_model_ids():
+    data = {
+        "gocams": ["59a6110e00000067"],
+    }
+    response = test_client.get("/api/models/go", params=data)
+    assert response.status_code == 200
 
 def test_models_size_endpoint():
     data = {

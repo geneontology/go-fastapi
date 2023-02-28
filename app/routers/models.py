@@ -2,7 +2,7 @@ import json
 import logging
 from enum import Enum
 from typing import List
-
+from pprint import pprint
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
@@ -24,7 +24,7 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
 
 @router.get("/api/models", tags=["models"])
-async def get_model_by_start_size(start: int, size: int, last: int = None):
+async def get_model_by_start_size(start: int = None, size: int = None, last: int = None):
     """
     Returns meta data of an ontology term, e.g. GO:0003677
     """
@@ -77,3 +77,73 @@ async def get_model_by_start_size(start: int, size: int, last: int = None):
     results = si._query(query)
     results = transformArray(results, ["orcids", "names", "groupids", "groupnames"])
     return results
+
+@router.get("/api/models/go", tags=["models"])
+async def get_goterms_by_model_id(gocams: List[str] = Query(
+        None, description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))")):
+    """
+    Returns go term details based on a GO-CAM model ID
+    """
+    gocam = ""
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    for model in gocams:
+        if gocam == "":
+            gocam = "<http://model.geneontology.org/" + model +"> "
+        else:
+            gocam = gocam + "<http://model.geneontology.org/" + model +"> "
+    query = """
+            PREFIX metago: <http://model.geneontology.org/>
+            PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
+            PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
+            PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
+            PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
+    		SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
+            WHERE 
+            {
+    		    VALUES ?gocam { %s }
+      		    GRAPH ?gocam {
+                    ?entity rdf:type owl:NamedIndividual .
+        			?entity rdf:type ?goids
+                }
+
+                VALUES ?goclasses { BP: MF: CC:  } . 
+      			?goids rdfs:subClassOf+ ?goclasses .
+        		?goids rdfs:label ?gonames .
+      		    ?goids definition: ?definitions .
+            }
+    		ORDER BY DESC(?gocam)
+    """ % gocam
+    results = si._query(query)
+    # results = transformArray(results, ["goclasses", "goids", "gonames", "definitions"])
+    summary_gocam = ""
+    collated = {}
+    collated_results = []
+    for result in results:
+        if summary_gocam == "":
+            collated["goclasses"] = [result["goclasses"].get("value")]
+            collated["goids"] = [result["goclasses"].get("value")]
+            collated["gonames"] = [result["goclasses"].get("value")]
+            collated["definitions"] = [result["goclasses"].get("value")]
+            collated["gocam"] = [result["gocam"].get("value")]
+            summary_gocam = result["gocam"].get("value")
+        elif summary_gocam == result["gocam"].get("value"):
+            collated["goclasses"].append(result["goclasses"].get("value"))
+            collated["goids"].append(result["goclasses"].get("value"))
+            collated["gonames"].append(result["goclasses"].get("value"))
+            collated["definitions"].append(result["goclasses"].get("value"))
+            print("summary_gocam: " + summary_gocam)
+        else:
+            collated_results.append(collated)
+            collated = {}
+            summary_gocam = result["gocam"].get("value")
+            collated["goclasses"] = [result["goclasses"].get("value")]
+            collated["goids"] = [result["goclasses"].get("value")]
+            collated["gonames"] = [result["goclasses"].get("value")]
+            collated["definitions"] = [result["goclasses"].get("value")]
+            collated["gocam"] = result["gocam"].get("value")
+        collated_results.append(collated)
+    pprint(collated_results)
+    return collated_results
