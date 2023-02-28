@@ -164,8 +164,6 @@ async def get_geneproducts_by_model_id(gocams: List[str] = Query(
         else:
             gocam = gocam + "<http://model.geneontology.org/" + model +"> "
     query = """
-            PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> 
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
             PREFIX metago: <http://model.geneontology.org/>
             PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
             PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
@@ -188,6 +186,7 @@ async def get_geneproducts_by_model_id(gocams: List[str] = Query(
             }
             GROUP BY ?gocam
     """ % gocam
+    results = si._query(query)
     summary_gocam = ""
     collated = {}
     collated_results = []
