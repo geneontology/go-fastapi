@@ -18,7 +18,7 @@ import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
 from app.utils.settings import ESOLRDoc, ESOLR
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
@@ -117,32 +117,31 @@ async def get_goterms_by_model_id(gocams: List[str] = Query(
     		ORDER BY DESC(?gocam)
     """ % gocam
     results = si._query(query)
-    # results = transformArray(results, ["goclasses", "goids", "gonames", "definitions"])
     summary_gocam = ""
     collated = {}
     collated_results = []
     for result in results:
         if summary_gocam == "":
             collated["goclasses"] = [result["goclasses"].get("value")]
-            collated["goids"] = [result["goclasses"].get("value")]
-            collated["gonames"] = [result["goclasses"].get("value")]
-            collated["definitions"] = [result["goclasses"].get("value")]
-            collated["gocam"] = [result["gocam"].get("value")]
+            collated["goids"] = [result["goids"].get("value")]
+            collated["gonames"] = [result["gonames"].get("value")]
+            collated["definitions"] = [result["definitions"].get("value")]
+            collated["gocam"] = result["gocam"].get("value")
             summary_gocam = result["gocam"].get("value")
         elif summary_gocam == result["gocam"].get("value"):
             collated["goclasses"].append(result["goclasses"].get("value"))
-            collated["goids"].append(result["goclasses"].get("value"))
-            collated["gonames"].append(result["goclasses"].get("value"))
-            collated["definitions"].append(result["goclasses"].get("value"))
-            print("summary_gocam: " + summary_gocam)
+            collated["goids"].append(result["goids"].get("value"))
+            collated["gonames"].append(result["gonames"].get("value"))
+            collated["definitions"].append(result["definitions"].get("value"))
+            logger.info("summary_gocam: " + summary_gocam)
         else:
             collated_results.append(collated)
             collated = {}
             summary_gocam = result["gocam"].get("value")
             collated["goclasses"] = [result["goclasses"].get("value")]
-            collated["goids"] = [result["goclasses"].get("value")]
-            collated["gonames"] = [result["goclasses"].get("value")]
-            collated["definitions"] = [result["goclasses"].get("value")]
+            collated["goids"] = [result["goids"].get("value")]
+            collated["gonames"] = [result["gonames"].get("value")]
+            collated["definitions"] = [result["definitions"].get("value")]
             collated["gocam"] = result["gocam"].get("value")
         collated_results.append(collated)
     pprint(collated_results)

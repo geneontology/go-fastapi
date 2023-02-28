@@ -38,7 +38,7 @@ def goont_fetch_label(id):
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = SparqlQuery(select=["?label"], where=["<"+iri+"> rdfs:label ?label"])
-    print(query.query_str())
+    logger.info(query.query_str())
     bindings = si._query(query.query_str())
     rows = [r['label']['value'] for r in bindings]
     return rows[0]
