@@ -218,6 +218,9 @@ def test_gometadata_by_model_ids():
     }
     response = test_client.get("/api/models/go", params=data)
     assert response.status_code == 200
+    assert len(response.json()) == 1
+    pprint(response.json())
+
 
 def test_models_size_endpoint():
     data = {

@@ -133,9 +133,7 @@ async def get_goterms_by_model_id(gocams: List[str] = Query(
             collated["goids"].append(result["goids"].get("value"))
             collated["gonames"].append(result["gonames"].get("value"))
             collated["definitions"].append(result["definitions"].get("value"))
-            logger.info("summary_gocam: " + summary_gocam)
         else:
-            collated_results.append(collated)
             collated = {}
             summary_gocam = result["gocam"].get("value")
             collated["goclasses"] = [result["goclasses"].get("value")]
@@ -143,6 +141,5 @@ async def get_goterms_by_model_id(gocams: List[str] = Query(
             collated["gonames"] = [result["gonames"].get("value")]
             collated["definitions"] = [result["definitions"].get("value")]
             collated["gocam"] = result["gocam"].get("value")
-        collated_results.append(collated)
-    pprint(collated_results)
+    collated_results.append(collated)
     return collated_results
