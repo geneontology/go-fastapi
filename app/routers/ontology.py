@@ -287,4 +287,44 @@ async def get_go_hierarchy_go_id(id: str = Query(
     	}
     """ % id
     results = si._query(query)
-    return results
+    collated_results = []
+    collated = {}
+    for result in results:
+        collated['GO'] = result['GO'].get("value")
+        collated['label'] = result['label'].get("value")
+        collated['hierarchy'] = result['hierarchy'].get("value")
+        collated_results.append(collated)
+    return collated_results
+
+
+@router.get("/api/go/{id}/models", tags=["ontology"])
+async def get_gocam_models_by_go_id(id: str = Query(
+    None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")):
+    """
+    Returns parent and children relationships for a given GO ID
+    """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    query = """
+        PREFIX metago: <http://model.geneontology.org/>
+		SELECT distinct ?gocam
+        WHERE 
+        {
+	        GRAPH ?gocam {
+    	        ?gocam metago:graphType metago:noctuaCam .    
+                ?entity rdf:type owl:NamedIndividual .
+    			?entity rdf:type ?goid .
+                FILTER(?goid = %s)
+            }
+        }
+    """ % id
+    results = si._query(query)
+    collated_results = []
+    collated = {}
+    for result in results:
+        collated['gocam'] = result['gocam'].get("value")
+        collated_results.append(collated)
+    return collated_results
