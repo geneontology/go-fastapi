@@ -188,25 +188,41 @@ async def get_geneproducts_by_model_id(gocams: List[str] = Query(
     """ % gocam
     results = si._query(query)
     results = transformArray(results, ["gpids", "gpnames"])
-    # summary_gocam = ""
-    # collated = {}
-    # collated_results = []
-    # for result in results:
-    #     if summary_gocam == "":
-    #         collated["gpids"] = [result["gpids"].get("value")]
-    #         collated["gpnames"] = [result["gpnames"].get("value")]
-    #         collated["gocam"] = result["gocam"].get("value")
-    #         summary_gocam = result["gocam"].get("value")
-    #     elif summary_gocam == result["gocam"].get("value"):
-    #         collated["gpids"].append(result["gpids"].get("value"))
-    #         collated["gpnames"].append(result["gpnames"].get("value"))
-    #     else:
-    #         collated_results.append(collated)
-    #         collated = {}
-    #         summary_gocam = result["gocam"].get("value")
-    #         collated["gpids"] = [result["gpids"].get("value")]
-    #         collated["gpnames"] = [result["gpnames"].get("value")]
-    #         collated["gocam"] = result["gocam"].get("value")
-    # collated_results.append(collated)
-    # pprint(collated_results)
+    return results
+
+@router.get("/api/models/pmid", tags=["models"])
+async def get_geneproducts_by_model_id(gocams: List[str] = Query(
+        None, description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))")):
+    """
+    Returns go term details based on a GO-CAM model ID
+    """
+    gocam = ""
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    for model in gocams:
+        if gocam == "":
+            gocam = "<http://model.geneontology.org/" + model +"> "
+        else:
+            gocam = gocam + "<http://model.geneontology.org/" + model +"> "
+    query = """
+        PREFIX metago: <http://model.geneontology.org/>
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+  
+        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="@|@") as ?sources)              
+        WHERE 
+        {    
+            values ?gocam { %s }
+            GRAPH ?gocam {
+                ?s dc:source ?source .
+                BIND(REPLACE(?source, " ", "") AS ?source) .
+                FILTER((CONTAINS(?source, "PMID")))
+            }           
+        }
+        GROUP BY ?gocam
+         
+    """ % gocam
+    results = si._query(query)
+    results = transformArray(results, ["sources"])
     return results
