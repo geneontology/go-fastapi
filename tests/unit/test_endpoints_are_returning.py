@@ -279,3 +279,9 @@ def test_groups_by_name():
     response = test_client.get("/api/groups/MGI")
     assert len(response.json()) > 10
     assert response.status_code == 200
+
+
+def test_get_modelid_by_pmid():
+    response = test_client.get("/api/pmid/15314168/models")
+    assert len(response.json()) == 1
+    assert response.status_code == 200
