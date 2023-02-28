@@ -1,11 +1,13 @@
-from pprint import pprint
-import urllib.parse
-import pytest
 import logging
+import urllib.parse
+from pprint import pprint
+
+import pytest
 from fastapi.testclient import TestClient
-from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
+
 # from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from app.main import app
+from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
 
 test_client = TestClient(app)
 
@@ -17,9 +19,10 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 logger = logging.getLogger(__name__)
 
+
 def test_golr_solr():
-    assert ESOLR.GOLR.value == 'http://golr-aux.geneontology.io/solr/'
-    assert ESOLRDoc.ONTOLOGY.value == 'ontology_class'
+    assert ESOLR.GOLR.value == "http://golr-aux.geneontology.io/solr/"
+    assert ESOLRDoc.ONTOLOGY.value == "ontology_class"
 
 
 @pytest.mark.parametrize("id", gene_ids)
@@ -214,28 +217,23 @@ def test_autocomplete_go():
     response = test_client.get(f"/api/search/entity/autocomplete/go")
     assert response.status_code == 200
 
+
 def test_gometadata_by_model_ids():
-    data = {
-        "gocams": ["59a6110e00000067", "SYNGO_369"]
-    }
+    data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
     response = test_client.get("/api/models/go", params=data)
     assert response.status_code == 200
     assert len(response.json()) == 2
 
 
 def test_geneproductmetadata_by_model_ids():
-    data = {
-        "gocams": ["59a6110e00000067", "SYNGO_369"]
-    }
+    data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
     response = test_client.get("/api/models/gp", params=data)
     assert response.status_code == 200
     assert len(response.json()) == 2
 
 
 def test_pubmedmetadata_by_model_ids():
-    data = {
-        "gocams": ["59a6110e00000067", "SYNGO_369"]
-    }
+    data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
     response = test_client.get("/api/models/pmid", params=data)
     assert response.status_code == 200
     assert len(response.json()) == 2

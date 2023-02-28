@@ -1,14 +1,15 @@
 import logging
 
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
 from app.utils.settings import get_golr_config
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
 
 cfg = get_golr_config()
 omap = {}
@@ -34,14 +35,14 @@ def goont_fetch_label(id):
     fetch all rdfs:label assertions for a URI
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
-    query = SparqlQuery(select=["?label"], where=["<"+iri+"> rdfs:label ?label"])
+    query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
     logger.info(query.query_str())
     bindings = si._query(query.query_str())
-    rows = [r['label']['value'] for r in bindings]
+    rows = [r["label"]["value"] for r in bindings]
     return rows[0]
 
 

@@ -2,20 +2,20 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Query
-from app.utils.settings import ESOLRDoc
-from ontobio.golr.golr_query import replace
-from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
-from ontobio.util.user_agent import get_user_agent
-from app.utils.golr.golr_utls import run_solr_text_on
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.settings import ESOLR
-from ontobio.golr.golr_query import ESOLR
-from .slimmer import gene_to_uniprot_from_mygene
-
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.resource import OntologyResource
+from ontobio.golr.golr_query import ESOLR, replace
+from ontobio.sparql.sparql_ontol_utils import transform, transformArray
+from ontobio.util.user_agent import get_user_agent
+
+import app.utils.ontology.ontology_utils as ontology_utils
+from app.utils.golr.golr_utls import run_solr_text_on
+from app.utils.settings import ESOLR, ESOLRDoc
+
+from .slimmer import gene_to_uniprot_from_mygene
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ async def get_ontology_subsets_by_go_term_id(
     # the latest version, etc)
 
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)

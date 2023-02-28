@@ -1,22 +1,23 @@
 import json
 import logging
 from enum import Enum
-from typing import List
 from pprint import pprint
+from typing import List
+
 from fastapi import APIRouter, Query
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
-
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLRDoc, ESOLR
+from app.utils.settings import ESOLR, ESOLRDoc
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ async def get_users():
     Returns meta data of all GO users
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = """
@@ -60,10 +61,11 @@ async def get_users():
     results = transformArray(results, ["organizations", "affiliations"])
     return results
 
+
 # None of these currently return anything at all
-#/users/{orcid}
-#/users/{orcid}/gp
-#/users/{orcid}/models
+# /users/{orcid}
+# /users/{orcid}/gp
+# /users/{orcid}/models
 
 
 @router.get("/api/groups", tags=["users and groups"])
@@ -72,7 +74,7 @@ async def get_groups():
     Returns meta data of a GO group
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = """
@@ -99,16 +101,20 @@ async def get_groups():
 
 
 @router.get("/api/groups/{name}", tags=["users and groups"])
-async def get_group_metadata_by_name(name: str = Query(
-    None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")):
+async def get_group_metadata_by_name(
+    name: str = Query(
+        None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)"
+    )
+):
     """
     Returns meta data of all GO users
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
-    query = """
+    query = (
+        """
      PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
         PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
@@ -123,7 +129,10 @@ async def get_group_metadata_by_name(name: str = Query(
 									        (COUNT(distinct ?goid) AS ?bps)
 		WHERE {
   
-            BIND(\"""" + name + """\"""" + """as ?groupName) .
+            BIND(\""""
+        + name
+        + """\""""
+        + """as ?groupName) .
             ?url rdfs:label ?groupName .  
         	?orcidIRI has_affiliation: ?url .
   			?orcidIRI rdfs:label ?name
@@ -145,6 +154,7 @@ async def get_group_metadata_by_name(name: str = Query(
 	    GROUP BY ?url ?orcid ?name
         
         """
+    )
     results = si._query(query)
     collated_results = []
     collated = {}
@@ -155,4 +165,3 @@ async def get_group_metadata_by_name(name: str = Query(
         collated["bps"] = result["bps"].get("value")
         collated_results.append(collated)
     return collated_results
-

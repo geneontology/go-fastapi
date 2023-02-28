@@ -1,22 +1,23 @@
 import json
 import logging
 from enum import Enum
-from typing import List
 from pprint import pprint
+from typing import List
+
 from fastapi import APIRouter, Query
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
-
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLRDoc, ESOLR
+from app.utils.settings import ESOLR, ESOLRDoc
 
 log = logging.getLogger(__name__)
 
@@ -34,16 +35,16 @@ async def get_term_metadata_by_id(id: str):
     Returns meta data of an ontology term, e.g. GO:0003677
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._query(query)
     return transform(
-         results[0],
-         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
-     )
+        results[0],
+        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
+    )
 
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
@@ -101,7 +102,7 @@ async def get_subsets_by_term(id: str):
     Returns subsets (slims) associated to an ontology term
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
@@ -218,17 +219,19 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
 
 
 @router.get("/api/go/{id}", tags=["ontology"])
-async def get_go_term_detail_by_go_id(id: str = Query(
-    None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")):
+async def get_go_term_detail_by_go_id(
+    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+):
     """
     Returns models for a given PMID
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
-    query = """
+    query = (
+        """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
 		PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator="@|@") as ?synonyms)
@@ -249,23 +252,30 @@ async def get_go_term_detail_by_go_id(id: str = Query(
 			optional { ?goid obo:inSubset ?subset } .
     	}
 		GROUP BY ?goid ?label ?definition ?comment ?creation_date
-    """ % id
+    """
+        % id
+    )
     results = si._query(query)
-    results = transformArray(results, ["synonyms", "relatedSynonyms", "xrefs", "subsets", "alternativeIds"])
+    results = transformArray(
+        results, ["synonyms", "relatedSynonyms", "xrefs", "subsets", "alternativeIds"]
+    )
     return results
 
+
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
-async def get_go_hierarchy_go_id(id: str = Query(
-    None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")):
+async def get_go_hierarchy_go_id(
+    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+):
     """
     Returns parent and children relationships for a given GO ID
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
-    query = """
+    query = (
+        """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         SELECT ?hierarchy ?GO ?label WHERE {
     		BIND(%s as ?goquery)
@@ -285,30 +295,34 @@ async def get_go_hierarchy_go_id(id: str = Query(
         		}
   	        }
     	}
-    """ % id
+    """
+        % id
+    )
     results = si._query(query)
     collated_results = []
     collated = {}
     for result in results:
-        collated['GO'] = result['GO'].get("value")
-        collated['label'] = result['label'].get("value")
-        collated['hierarchy'] = result['hierarchy'].get("value")
+        collated["GO"] = result["GO"].get("value")
+        collated["label"] = result["label"].get("value")
+        collated["hierarchy"] = result["hierarchy"].get("value")
         collated_results.append(collated)
     return collated_results
 
 
 @router.get("/api/go/{id}/models", tags=["ontology"])
-async def get_gocam_models_by_go_id(id: str = Query(
-    None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")):
+async def get_gocam_models_by_go_id(
+    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+):
     """
     Returns parent and children relationships for a given GO ID
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
-    query = """
+    query = (
+        """
         PREFIX metago: <http://model.geneontology.org/>
 		SELECT distinct ?gocam
         WHERE 
@@ -320,11 +334,13 @@ async def get_gocam_models_by_go_id(id: str = Query(
                 FILTER(?goid = %s)
             }
         }
-    """ % id
+    """
+        % id
+    )
     results = si._query(query)
     collated_results = []
     collated = {}
     for result in results:
-        collated['gocam'] = result['gocam'].get("value")
+        collated["gocam"] = result["gocam"].get("value")
         collated_results.append(collated)
     return collated_results
