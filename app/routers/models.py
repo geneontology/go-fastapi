@@ -187,25 +187,26 @@ async def get_geneproducts_by_model_id(gocams: List[str] = Query(
             GROUP BY ?gocam
     """ % gocam
     results = si._query(query)
-    summary_gocam = ""
-    collated = {}
-    collated_results = []
-    for result in results:
-        if summary_gocam == "":
-            collated["gpids"] = [result["gpids"].get("value")]
-            collated["gpnames"] = [result["gpnames"].get("value")]
-            collated["gocam"] = result["gocam"].get("value")
-            summary_gocam = result["gocam"].get("value")
-        elif summary_gocam == result["gocam"].get("value"):
-            collated["gpids"].append(result["gpids"].get("value"))
-            collated["gpnames"].append(result["gpnames"].get("value"))
-        else:
-            collated_results.append(collated)
-            collated = {}
-            summary_gocam = result["gocam"].get("value")
-            collated["gpids"] = [result["gpids"].get("value")]
-            collated["gpnames"] = [result["gpnames"].get("value")]
-            collated["gocam"] = result["gocam"].get("value")
-    collated_results.append(collated)
-    pprint(collated_results)
-    return collated_results
+    results = transformArray(results, ["gpids", "gpnames"])
+    # summary_gocam = ""
+    # collated = {}
+    # collated_results = []
+    # for result in results:
+    #     if summary_gocam == "":
+    #         collated["gpids"] = [result["gpids"].get("value")]
+    #         collated["gpnames"] = [result["gpnames"].get("value")]
+    #         collated["gocam"] = result["gocam"].get("value")
+    #         summary_gocam = result["gocam"].get("value")
+    #     elif summary_gocam == result["gocam"].get("value"):
+    #         collated["gpids"].append(result["gpids"].get("value"))
+    #         collated["gpnames"].append(result["gpnames"].get("value"))
+    #     else:
+    #         collated_results.append(collated)
+    #         collated = {}
+    #         summary_gocam = result["gocam"].get("value")
+    #         collated["gpids"] = [result["gpids"].get("value")]
+    #         collated["gpnames"] = [result["gpnames"].get("value")]
+    #         collated["gocam"] = result["gocam"].get("value")
+    # collated_results.append(collated)
+    # pprint(collated_results)
+    return results
