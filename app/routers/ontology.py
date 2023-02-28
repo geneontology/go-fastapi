@@ -2,7 +2,7 @@ import json
 import logging
 from enum import Enum
 from typing import List
-
+from pprint import pprint
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
@@ -215,3 +215,41 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
             shared.append(sub)
             shared_labels.append(subres["isa_partof_closure_label"][i])
     return {"goids": shared, "gonames: ": shared_labels}
+
+
+@router.get("/api/go/{id}", tags=["ontology"])
+async def get_go_term_detail_by_go_id(id: str = Query(
+    None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")):
+    """
+    Returns models for a given PMID
+    """
+    ns = Namespaces()
+    ns.add_prefixmap('go')
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    query = """
+        PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
+		PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+        SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator="@|@") as ?synonyms)
+																	(GROUP_CONCAT(distinct ?relatedSynonym;separator="@|@") as ?relatedSynonyms)
+																	(GROUP_CONCAT(distinct ?alternativeId;separator="@|@") as ?alternativeIds)
+																	(GROUP_CONCAT(distinct ?xref;separator="@|@") as ?xrefs)
+																	(GROUP_CONCAT(distinct ?subset;separator="@|@") as ?subsets)
+		WHERE {
+			BIND(%s as ?goid) .
+			optional { ?goid rdfs:label ?label } .
+			optional { ?goid definition: ?definition } .
+			optional { ?goid rdfs:comment ?comment } .
+			optional { ?goid obo:creation_date ?creation_date } .
+			optional { ?goid obo:hasAlternativeId ?alternativeId } .
+			optional { ?goid obo:hasRelatedSynonym ?relatedSynonym } .
+			optional { ?goid obo:hasExactSynonym ?synonym } .
+			optional { ?goid obo:hasDbXref ?xref } .
+			optional { ?goid obo:inSubset ?subset } .
+    	}
+		GROUP BY ?goid ?label ?definition ?comment ?creation_date
+    """ % id
+    results = si._query(query)
+    results = transformArray(results, ["synonyms", "relatedSynonyms", "xrefs", "subsets", "alternativeIds"])
+    return results
