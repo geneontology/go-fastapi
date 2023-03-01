@@ -5,7 +5,6 @@ from pprint import pprint
 import pytest
 from fastapi.testclient import TestClient
 
-# from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from app.main import app
 from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
 
@@ -210,6 +209,7 @@ def test_search_entity():
 
 def test_autocomplete():
     response = test_client.get(f"/api/search/entity/autocomplete/biological")
+    print(response.json())
     assert response.status_code == 200
 
 

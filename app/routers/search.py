@@ -13,11 +13,6 @@ USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
 
 
-def search(term, args):
-    q = GolrSearchQuery(term, args)
-    return q.search()
-
-
 # @router.get("/api/search/entity/{term}", tags=["search"])
 # async def search_term(term: str):
 #     """
@@ -45,13 +40,15 @@ async def autocomplete_term(
     """
     Returns list of matching concepts or entities using lexical search
     """
+    print(term)
     q = GolrSearchQuery(
         term,
         user_agent=USER_AGENT,
         url="http://golr-aux.geneontology.io/solr",
     )
+    print(q.term)
+    print(q.solr_params())
     results = q.autocomplete()
-    docs = []
     for item in results.get("docs"):
         auto_result = {
             "id": item.id,
