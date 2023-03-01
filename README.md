@@ -10,8 +10,10 @@
 `poetry install`
 3) start the API server
 `make start`
-4) run the tests 
+4) run the tests
 `make test`
+
+Note: tests will run with or without a functioning server locally.
 
 ### Alternate development environment - Using Docker
 
