@@ -10,6 +10,7 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
+  # TODO: check if this is still needed, or can use 1.2
   POETRY_VERSION=1.3.2 \
   DEBIAN_FRONTEND=noninteractive
 
@@ -20,9 +21,13 @@ ENV PYTHONFAULTHANDLER=1 \
 # PIP_DISABLE_PIP_VERSION_CHECK - avoid warning that pip is out of date
 
 # Install Poetry
-RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10-venv nano make
+RUN apt-get update && apt-get install -y curl git python3-pip python3 nano make
+# TODO: try to conver to python3 without the 10, python2 is default on ubuntu.
+# RUN apt-get update && apt-get install -y curl git python3-pip python3 python3-venv nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 RUN poetry self add "poetry-dynamic-versioning[plugin]"
+RUN poetry config virtualenvs.in-project true
+RUN poetry config virtualenvs.prefer-active-python true
 WORKDIR /code
 COPY Makefile pyproject.toml poetry.lock README.md .
 COPY . .
