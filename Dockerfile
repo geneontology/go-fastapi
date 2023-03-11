@@ -22,17 +22,11 @@ ENV PYTHONFAULTHANDLER=1 \
 
 # Install Poetry
 RUN apt-get update && apt-get install -y curl git python3-pip python3 nano make
-# TODO: try to conver to python3 without the 10, python2 is default on ubuntu.
-# RUN apt-get update && apt-get install -y curl git python3-pip python3 python3-venv nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 RUN poetry self add "poetry-dynamic-versioning[plugin]"
-RUN poetry config virtualenvs.in-project true
-RUN poetry config virtualenvs.prefer-active-python true
 WORKDIR /code
 COPY Makefile pyproject.toml poetry.lock README.md .
 COPY . .
-# remove local .venv so we can respect the version of python installed via ubuntu:20.04 package manager
-# but still have all the necessary code to run tests locally to docker container if necessary. (python 3.8.10)
 # with the smallest number of layers possible (each COPY command creates a new layer)
 RUN rm -rf .venv
 EXPOSE 8081 8080
