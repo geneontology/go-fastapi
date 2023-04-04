@@ -154,6 +154,12 @@ mapped behind the scenes for querying.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="app.routers.bioentity.get_gocams_by_geneproduct_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_gocams_by_geneproduct_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_gocams_by_geneproduct_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns models for a given PMID</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="app.routers.bioentity.get_taxon_by_goterm_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.bioentity.</span></span><span class="sig-name descname"><span class="pre">get_taxon_by_goterm_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.bioentity.get_taxon_by_goterm_id" title="Permalink to this definition"></a></dt>
 <dd><p>Returns taxons associated to a GO term</p>
@@ -189,6 +195,33 @@ mapped behind the scenes for querying.</p>
 <dd><p>Returns the ancestor ontology terms shared by two ontology terms</p>
 <p>subject: ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0006259">GO:0006259</a>’
 object: ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0046483">GO:0046483</a>’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_go_hierarchy_go_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_go_hierarchy_go_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_go_hierarchy_go_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns parent and children relationships for a given GO ID
+e.g. <a class="reference external" href="GO:0005885">GO:0005885</a>
+please note, this endpoint was migrated from the GO-CAM service api and may not be
+supported in its current form in the future.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_go_term_detail_by_go_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_go_term_detail_by_go_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_go_term_detail_by_go_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns models for a given GO term ID
+e.g. <a class="reference external" href="GO:0008150">GO:0008150</a>
+please note, this endpoint was migrated from the GO-CAM service api and may not be
+supported in its current form in the future.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_gocam_models_by_go_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_gocam_models_by_go_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_gocam_models_by_go_id" title="Permalink to this definition"></a></dt>
+<dd><p>Returns parent and children relationships for a given GO ID
+e.g. <a class="reference external" href="GO:0005885">GO:0005885</a>
+please note, this endpoint was migrated from the GO-CAM service api and may not be
+supported in its current form in the future.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -268,11 +301,6 @@ id is the name of a slim subset, e.g., goslim_agr, goslim_generic</p>
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">autocomplete_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.autocomplete_term" title="Permalink to this definition"></a></dt>
 <dd><p>Returns list of matching concepts or entities using lexical search</p>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.search.search">
-<span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.search" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-app.routers.slimmer">
