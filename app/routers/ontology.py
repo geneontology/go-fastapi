@@ -49,7 +49,7 @@ async def get_term_metadata_by_id(id: str):
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(
-    id: str, graph_type: GraphType = Query(GraphType.topology_graph)
+        id: str, graph_type: GraphType = Query(GraphType.topology_graph)
 ):
     """
     Returns graph of an ontology term
@@ -67,12 +67,12 @@ async def get_term_graph_by_id(
 
 @router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(
-    id: str,
-    cnode: str = Query(None, include_in_schema=False),
-    include_ancestors: bool = Query(True, include_in_schema=False),
-    include_descendants: bool = Query(True, include_in_schema=False),
-    relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
-    include_meta: bool = Query(False, include_in_schema=False),
+        id: str,
+        cnode: str = Query(None, include_in_schema=False),
+        include_ancestors: bool = Query(True, include_in_schema=False),
+        include_descendants: bool = Query(True, include_in_schema=False),
+        relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
+        include_meta: bool = Query(False, include_in_schema=False),
 ):
     """
     Extract a subgraph from an ontology term
@@ -220,7 +220,7 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
 
 @router.get("/api/go/{id}", tags=["ontology"])
 async def get_go_term_detail_by_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
     Returns models for a given GO term ID
@@ -232,7 +232,7 @@ async def get_go_term_detail_by_go_id(
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
-        """
+            """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
 		PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator="@|@") as ?synonyms)
@@ -254,9 +254,10 @@ async def get_go_term_detail_by_go_id(
     	}
 		GROUP BY ?goid ?label ?definition ?comment ?creation_date
     """
-        % id
+            % id
     )
     results = si._query(query)
+    print("query results:", results)
     results = transformArray(
         results, ["synonyms", "relatedSynonyms", "xrefs", "subsets", "alternativeIds"]
     )
@@ -265,7 +266,7 @@ async def get_go_term_detail_by_go_id(
 
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
 async def get_go_hierarchy_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
     Returns parent and children relationships for a given GO ID
@@ -276,7 +277,7 @@ async def get_go_hierarchy_go_id(
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
-        """
+            """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         SELECT ?hierarchy ?GO ?label WHERE {
     		BIND(%s as ?goquery)
@@ -297,7 +298,7 @@ async def get_go_hierarchy_go_id(
   	        }
     	}
     """
-        % id
+            % id
     )
     results = si._query(query)
     collated_results = []
@@ -312,7 +313,7 @@ async def get_go_hierarchy_go_id(
 
 @router.get("/api/go/{id}/models", tags=["ontology"])
 async def get_gocam_models_by_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
     Returns parent and children relationships for a given GO ID
@@ -323,7 +324,7 @@ async def get_gocam_models_by_go_id(
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
-        """
+            """
         PREFIX metago: <http://model.geneontology.org/>
 		SELECT distinct ?gocam
         WHERE 
@@ -336,7 +337,7 @@ async def get_gocam_models_by_go_id(
             }
         }
     """
-        % id
+            % id
     )
     results = si._query(query)
     collated_results = []

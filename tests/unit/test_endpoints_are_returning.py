@@ -296,6 +296,7 @@ def test_get_gocams_by_geneproduct_id():
 
 def test_get_go_term_detail_by_go_id():
     response = test_client.get("/api/go/GO_0008150")
+    pprint(response.json())
     assert len(response.json()) == 1
     assert response.status_code == 200
 
