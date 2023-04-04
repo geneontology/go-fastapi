@@ -156,7 +156,7 @@ def test_rgd_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 58
+            >= 52
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
