@@ -223,7 +223,8 @@ async def get_go_term_detail_by_go_id(
     id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
-    Returns models for a given PMID
+    Returns models for a given GO term ID
+    e.g. GO:0008150
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
