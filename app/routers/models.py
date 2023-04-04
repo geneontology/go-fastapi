@@ -155,7 +155,6 @@ async def get_goterms_by_model_id(
             collated["definitions"] = [result["definitions"].get("value")]
             collated["gocam"] = result["gocam"].get("value")
     collated_results.append(collated)
-    pprint(collated_results)
     return collated_results
 
 
