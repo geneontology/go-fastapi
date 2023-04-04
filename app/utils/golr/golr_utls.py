@@ -44,7 +44,7 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + optionals
     )
     logger.info("QUERY: ", query)
-
+    print(query)
     response = requests.get(query)
     logger.info(response.json()["response"]["docs"])
     return response.json()["response"]["docs"]

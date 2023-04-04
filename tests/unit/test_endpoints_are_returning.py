@@ -35,6 +35,7 @@ def test_bioenty_id_endpoints(id):
 def test_bioenty_function_id_endpoints(id):
     response = test_client.get(f"/api/bioentity/function/{id}")
     assert response.status_code == 200
+    pprint(response.json())
     assert len(response.json()) > 99
 
 
@@ -214,7 +215,8 @@ def test_autocomplete():
 
 
 def test_autocomplete_go():
-    response = test_client.get(f"/api/search/entity/autocomplete/go")
+    response = test_client.get("/api/search/entity/autocomplete/go")
+    print(response.json())
     assert response.status_code == 200
 
 
