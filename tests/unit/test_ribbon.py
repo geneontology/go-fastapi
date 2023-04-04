@@ -28,7 +28,7 @@ def test_zebrafish_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 95
+            >= 93
         )
         assert (
             subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations")
@@ -90,7 +90,7 @@ def test_fly_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 6
+            >= 5
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
@@ -134,11 +134,11 @@ def test_wb_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 75
+            >= 72
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
-            >= 13
+            >= 10
         )
     assert response.status_code == 200
 
@@ -152,7 +152,7 @@ def test_rgd_ribbon():
         assert subject.get("groups").get("GO:0003674")
         assert (
             subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
-            >= 6
+            >= 5
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")

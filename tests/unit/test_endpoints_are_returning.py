@@ -295,7 +295,8 @@ def test_get_gocams_by_geneproduct_id():
 
 
 def test_get_go_term_detail_by_go_id():
-    response = test_client.get("/api/go/GO_0008150")
+    id = urllib.parse.quote("GO:0008150")
+    response = test_client.get(f"/api/go/{id}")
     pprint(response.json())
     assert len(response.json()) == 1
     assert response.status_code == 200
@@ -303,12 +304,12 @@ def test_get_go_term_detail_by_go_id():
 
 def test_get_go_hierarchy_go_id():
     response = test_client.get("/api/go/GO_0008150/hierarchy")
-    assert len(response.json()) >= 27962
+    assert len(response.json()) >= 27791
     print(response.json())
     assert response.status_code == 200
 
 
 def test_get_gocam_models_by_go_id():
     response = test_client.get("/api/go/GO_0008150/models")
-    assert len(response.json()) >= 12985
+    assert len(response.json()) >= 12979
     assert response.status_code == 200

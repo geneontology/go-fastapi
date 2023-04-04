@@ -36,7 +36,6 @@ async def get_term_metadata_by_id(id: str):
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -230,38 +229,12 @@ async def get_go_term_detail_by_go_id(
     ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
-    id = "<http://purl.obolibrary.org/obo/" + id + ">"
-    query = (
-            """
-        PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
-		PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator="@|@") as ?synonyms)
-																	(GROUP_CONCAT(distinct ?relatedSynonym;separator="@|@") as ?relatedSynonyms)
-																	(GROUP_CONCAT(distinct ?alternativeId;separator="@|@") as ?alternativeIds)
-																	(GROUP_CONCAT(distinct ?xref;separator="@|@") as ?xrefs)
-																	(GROUP_CONCAT(distinct ?subset;separator="@|@") as ?subsets)
-		WHERE {
-			BIND(%s as ?goid) .
-			optional { ?goid rdfs:label ?label } .
-			optional { ?goid definition: ?definition } .
-			optional { ?goid rdfs:comment ?comment } .
-			optional { ?goid obo:creation_date ?creation_date } .
-			optional { ?goid obo:hasAlternativeId ?alternativeId } .
-			optional { ?goid obo:hasRelatedSynonym ?relatedSynonym } .
-			optional { ?goid obo:hasExactSynonym ?synonym } .
-			optional { ?goid obo:hasDbXref ?xref } .
-			optional { ?goid obo:inSubset ?subset } .
-    	}
-		GROUP BY ?goid ?label ?definition ?comment ?creation_date
-    """
-            % id
-    )
+    query = ontology_utils.create_go_summary_sparql(id)
     results = si._query(query)
-    print("query results:", results)
-    results = transformArray(
-        results, ["synonyms", "relatedSynonyms", "xrefs", "subsets", "alternativeIds"]
+    return transform(
+        results[0],
+        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
     )
-    return results
 
 
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
