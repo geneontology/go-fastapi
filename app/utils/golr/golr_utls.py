@@ -28,10 +28,12 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     """
     Return the result of a solr query on the given solrInstance (Enum ESOLR), for a certain document_category (ESOLRDoc) and id
     """
+    solr_url = solr_instance.value
+    print(solr_url)
     if optionals is None:
         optionals = ""
     query = (
-        solr_instance.value
+        solr_url
         + "select?q="
         + q
         + "&qf="

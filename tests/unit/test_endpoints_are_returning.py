@@ -190,33 +190,34 @@ def test_ontology_term_subsets(id):
     assert response.status_code == 200
 
 
-@pytest.mark.skip(
-    reason="currently this endpoint is disabled because we "
-    "have no 'facet_pivot' attribute in GOlr"
-)
+# @pytest.mark.skip(
+#     reason="currently this endpoint is disabled because we "
+#     "have no 'facet_pivot' attribute in GOlr"
+# )
 def test_search_entity():
     data = {
-        "term": "ssh",
-        "category": "gene",
-        "boost_fix": "0",
-        "boost_q": "0",
-        "taxon": "NCBITaxon:7955",
-        "highlight_class": "gene",
-        "id": "ssh",
+        "category": "gene"
     }
-    response = test_client.get(f"/api/search/entity/ssh", params=data)
+    response = test_client.get("/api/search/entity/autocomplete/ssh", params=data)
+    pprint(response.json())
     assert response.status_code == 200
 
 
-def test_autocomplete():
-    response = test_client.get(f"/api/search/entity/autocomplete/biological")
-    print(response.json())
+def test_autocomplete_shha():
+    response = test_client.get("/api/search/entity/autocomplete/shha")
+    assert 'id' in response.json().get("docs")[0]
+    assert response.status_code == 200
+
+
+def test_autocomplete_biological():
+    response = test_client.get("/api/search/entity/autocomplete/biological")
+    assert 'id' in response.json().get("docs")[0]
     assert response.status_code == 200
 
 
 def test_autocomplete_go():
     response = test_client.get("/api/search/entity/autocomplete/go")
-    print(response.json())
+    assert 'id' in response.json().get("docs")[0]
     assert response.status_code == 200
 
 
