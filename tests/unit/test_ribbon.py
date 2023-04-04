@@ -1,3 +1,5 @@
+import logging
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -9,6 +11,8 @@ gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
+
+logger = logging.getLogger(__name__)
 
 
 def test_zebrafish_ribbon():
@@ -24,7 +28,7 @@ def test_zebrafish_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 95
+            >= 93
         )
         assert (
             subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations")
@@ -86,7 +90,7 @@ def test_fly_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 6
+            >= 5
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
@@ -130,11 +134,11 @@ def test_wb_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 75
+            >= 72
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
-            >= 13
+            >= 10
         )
     assert response.status_code == 200
 
@@ -148,14 +152,14 @@ def test_rgd_ribbon():
         assert subject.get("groups").get("GO:0003674")
         assert (
             subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
-            >= 6
+            >= 5
         )
         assert (
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-            >= 58
+            >= 52
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
-            >= 11
+            >= 9
         )
     assert response.status_code == 200

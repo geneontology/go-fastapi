@@ -10,6 +10,7 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
+  # TODO: check if this is still needed, or can use 1.2
   POETRY_VERSION=1.3.2 \
   DEBIAN_FRONTEND=noninteractive
 
@@ -20,14 +21,12 @@ ENV PYTHONFAULTHANDLER=1 \
 # PIP_DISABLE_PIP_VERSION_CHECK - avoid warning that pip is out of date
 
 # Install Poetry
-RUN apt-get update && apt-get install -y curl git python3-pip python3 python3.10-venv nano make
+RUN apt-get update && apt-get install -y curl git python3-pip python3 nano make
 RUN python3 -m pip install "poetry==$POETRY_VERSION"
 RUN poetry self add "poetry-dynamic-versioning[plugin]"
 WORKDIR /code
 COPY Makefile pyproject.toml poetry.lock README.md .
 COPY . .
-# remove local .venv so we can respect the version of python installed via ubuntu:20.04 package manager
-# but still have all the necessary code to run tests locally to docker container if necessary. (python 3.8.10)
 # with the smallest number of layers possible (each COPY command creates a new layer)
 RUN rm -rf .venv
 EXPOSE 8081 8080

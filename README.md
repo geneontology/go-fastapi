@@ -29,6 +29,9 @@ will run the image and start the API server but give the control of the terminal
 `-p` tells docker to map the container port 8080 to the host port 8080.  This way the user can access the API docker
 version of the running API from their local browser via: http://127.0.0.1:8080/docs
 
+# TODO: ensure that the entrypoint is used so that we can tell dockerswarm etc. to bring back up the container, instead
+# of touching the background file, if the python server fails, the entire image is gone and we can detect that. 
+
 ```bash
 docker run -d -p 8080:8080 geneontology/go-fastapi
 ```
@@ -68,7 +71,7 @@ make start
 make test
 ```
 
-
+# add an endpoint to the API to kill the service and then test that the docker container restarts the service
 ### Pushing to Dockerhub
 
 GitHub Actions will automatically build and push the docker image to Dockerhub when a new versioned tag is created.

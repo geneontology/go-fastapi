@@ -1,10 +1,13 @@
-from os import path
+import logging
 from enum import Enum
+from os import path
+
 import yaml
 
 CONFIG = path.join(path.dirname(path.abspath(__file__)), "../conf/config.yaml")
 golr_config = None
 route_mapping = None
+logger = logging.getLogger(__name__)
 
 
 def get_golr_config():
@@ -23,4 +26,3 @@ class ESOLRDoc(Enum):
     ONTOLOGY = "ontology_class"
     ANNOTATION = "annotation"
     BIOENTITY = "bioentity"
-

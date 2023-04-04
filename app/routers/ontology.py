@@ -1,26 +1,27 @@
 import json
 import logging
 from enum import Enum
+from pprint import pprint
 from typing import List
 
 from fastapi import APIRouter, Query
+from linkml_runtime.utils.namespaces import Namespaces
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
+from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import (transform, transformArray)
-
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLRDoc, ESOLR
+from app.utils.settings import ESOLR, ESOLRDoc
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.0")
+USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
 
 
@@ -34,28 +35,27 @@ async def get_term_metadata_by_id(id: str):
     Returns meta data of an ontology term, e.g. GO:0003677
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
-    iri = ns.uri_for(id)
+    ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._query(query)
     return transform(
-         results[0],
-         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
-     )
+        results[0],
+        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
+    )
 
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(
-    id: str, graph_type: GraphType = Query(GraphType.topology_graph)
+        id: str, graph_type: GraphType = Query(GraphType.topology_graph)
 ):
     """
     Returns graph of an ontology term
     """
 
     graph_type = graph_type + "_json"  # GOLR field names
-    print(graph_type)
+    log.info(graph_type)
 
     data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are stringified in the json
@@ -66,12 +66,12 @@ async def get_term_graph_by_id(
 
 @router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(
-    id: str,
-    cnode: str = Query(None, include_in_schema=False),
-    include_ancestors: bool = Query(True, include_in_schema=False),
-    include_descendants: bool = Query(True, include_in_schema=False),
-    relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
-    include_meta: bool = Query(False, include_in_schema=False),
+        id: str,
+        cnode: str = Query(None, include_in_schema=False),
+        include_ancestors: bool = Query(True, include_in_schema=False),
+        include_descendants: bool = Query(True, include_in_schema=False),
+        relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
+        include_meta: bool = Query(False, include_in_schema=False),
 ):
     """
     Extract a subgraph from an ontology term
@@ -83,7 +83,7 @@ async def get_subgraph_by_term_id(
     # COMMENT: based on the CURIE of the id, we should be able to find out the ontology automatically
     ont = ontology_utils.get_ontology("go")
     relations = relation
-    print("Traversing: {} using {}".format(qnodes, relations))
+    log.info("Traversing: {} using {}".format(qnodes, relations))
     nodes = ont.traverse_nodes(
         qnodes, up=include_ancestors, down=include_descendants, relations=relations
     )
@@ -101,7 +101,7 @@ async def get_subsets_by_term(id: str):
     Returns subsets (slims) associated to an ontology term
     """
     ns = Namespaces()
-    ns.add_prefixmap('go')
+    ns.add_prefixmap("go")
     iri = ns.uri_for(id)
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
@@ -194,15 +194,15 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
     object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
 
-    print(subject)
-    print(object)
+    log.info(subject)
+    log.info(object)
     fields = "isa_partof_closure,isa_partof_closure_label"
 
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
     objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
 
-    print("SUBJECT: ", subres)
-    print("OBJECT: ", objres)
+    log.info("SUBJECT: ", subres)
+    log.info("OBJECT: ", objres)
 
     shared = []
     shared_labels = []
@@ -215,3 +215,115 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
             shared.append(sub)
             shared_labels.append(subres["isa_partof_closure_label"][i])
     return {"goids": shared, "gonames: ": shared_labels}
+
+
+@router.get("/api/go/{id}", tags=["ontology"])
+async def get_go_term_detail_by_go_id(
+        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+):
+    """
+    Returns models for a given GO term ID
+    e.g. GO:0008150
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
+    """
+    ns = Namespaces()
+    ns.add_prefixmap("go")
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    query = ontology_utils.create_go_summary_sparql(id)
+    results = si._query(query)
+    return transform(
+        results[0],
+        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
+    )
+
+
+@router.get("/api/go/{id}/hierarchy", tags=["ontology"])
+async def get_go_hierarchy_go_id(
+        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+):
+    """
+    Returns parent and children relationships for a given GO ID
+    e.g. GO:0005885
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
+    """
+    ns = Namespaces()
+    ns.add_prefixmap("go")
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    query = (
+            """
+        PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
+        SELECT ?hierarchy ?GO ?label WHERE {
+    		BIND(%s as ?goquery)
+  	    	{
+  		        {
+                  ?goquery rdfs:subClassOf+ ?GO .
+  	        	  ?GO rdfs:label ?label .
+	              FILTER (LANG(?label) != "en")    
+        	      BIND("parent" as ?hierarchy)
+            	}
+	        	UNION
+        		{
+                  ?GO rdfs:subClassOf* ?goquery .
+  		          ?GO rdfs:label ?label .    		
+        	      FILTER (LANG(?label) != "en")    
+ 	              BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
+        		}
+  	        }
+    	}
+    """
+            % id
+    )
+    results = si._query(query)
+    collated_results = []
+    collated = {}
+    for result in results:
+        collated["GO"] = result["GO"].get("value")
+        collated["label"] = result["label"].get("value")
+        collated["hierarchy"] = result["hierarchy"].get("value")
+        collated_results.append(collated)
+    return collated_results
+
+
+@router.get("/api/go/{id}/models", tags=["ontology"])
+async def get_gocam_models_by_go_id(
+        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+):
+    """
+    Returns parent and children relationships for a given GO ID
+    e.g. GO:0005885
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
+    """
+    ns = Namespaces()
+    ns.add_prefixmap("go")
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    query = (
+            """
+        PREFIX metago: <http://model.geneontology.org/>
+		SELECT distinct ?gocam
+        WHERE 
+        {
+	        GRAPH ?gocam {
+    	        ?gocam metago:graphType metago:noctuaCam .    
+                ?entity rdf:type owl:NamedIndividual .
+    			?entity rdf:type ?goid .
+                FILTER(?goid = %s)
+            }
+        }
+    """
+            % id
+    )
+    results = si._query(query)
+    collated_results = []
+    collated = {}
+    for result in results:
+        collated["gocam"] = result["gocam"].get("value")
+        collated_results.append(collated)
+    return collated_results

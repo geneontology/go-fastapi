@@ -26,5 +26,5 @@ async def get_expand_curie(
 async def get_contract_uri(
     uri: str = Query(None, description="full URI of the identified resource")
 ):
-    print(uri)
+    log.info(uri)
     return contract_uri(uri)

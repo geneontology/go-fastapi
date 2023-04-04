@@ -1,4 +1,8 @@
+import logging
+
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 # Respect the method name for run_sparql_on with enums
@@ -39,7 +43,8 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + "&wt=json&indent=on"
         + optionals
     )
-    # print("QUERY: ", query)
+    logger.info("QUERY: ", query)
 
     response = requests.get(query)
+    logger.info(response.json()["response"]["docs"])
     return response.json()["response"]["docs"]
