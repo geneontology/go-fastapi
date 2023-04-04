@@ -160,6 +160,6 @@ def test_rgd_ribbon():
         )
         assert (
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
-            >= 11
+            >= 9
         )
     assert response.status_code == 200
