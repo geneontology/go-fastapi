@@ -29,6 +29,8 @@ router = APIRouter()
 async def get_users():
     """
     Returns meta data of all GO users
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
@@ -72,6 +74,8 @@ async def get_users():
 async def get_groups():
     """
     Returns meta data of a GO group
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
@@ -102,37 +106,39 @@ async def get_groups():
 
 @router.get("/api/groups/{name}", tags=["users and groups"])
 async def get_group_metadata_by_name(
-    name: str = Query(
-        None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)"
-    )
+        name: str = Query(
+            None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)"
+        )
 ):
     """
-    Returns meta data of all GO users
+    Returns meta data of a GO group
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = (
-        """
-     PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
-        PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066> 
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
-        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-        PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-            
-		SELECT ?url ?orcid ?name   (COUNT(distinct ?gocam) AS ?gocams) 
-									        (COUNT(distinct ?goid) AS ?bps)
-		WHERE {
-  
-            BIND(\""""
-        + name
-        + """\""""
-        + """as ?groupName) .
+            """
+         PREFIX metago: <http://model.geneontology.org/>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+            PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066> 
+            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+            PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+            PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
+            PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
+            PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
+                
+            SELECT ?url ?orcid ?name   (COUNT(distinct ?gocam) AS ?gocams) 
+                                                (COUNT(distinct ?goid) AS ?bps)
+            WHERE {
+      
+                BIND(\""""
+            + name
+            + """\""""
+            + """as ?groupName) .
             ?url rdfs:label ?groupName .  
         	?orcidIRI has_affiliation: ?url .
   			?orcidIRI rdfs:label ?name

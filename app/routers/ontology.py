@@ -224,6 +224,8 @@ async def get_go_term_detail_by_go_id(
     """
     Returns models for a given GO term ID
     e.g. GO:0008150
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
@@ -243,6 +245,9 @@ async def get_go_hierarchy_go_id(
 ):
     """
     Returns parent and children relationships for a given GO ID
+    e.g. GO:0005885
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
@@ -290,6 +295,9 @@ async def get_gocam_models_by_go_id(
 ):
     """
     Returns parent and children relationships for a given GO ID
+    e.g. GO:0005885
+    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    supported in its current form in the future.
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
