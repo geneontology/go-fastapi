@@ -42,11 +42,14 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + category.value
         + '"&fl='
         + fields
-        + '&hl=on&hl.snippets=1000&hl.fl=*&hl.requireFieldMatch=true'
+        + '&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,'
+        + 'annotation_class_label_searchable,&hl.requireFieldMatch=true'
         + "&wt=json&indent=on"
         + optionals
     )
     print("QUERY: ", query)
     response = requests.get(query)
+    highlighted_results = {}
+    # for result in response.json()["highlighting"]:
     print(response.json()["highlighting"])
     return response.json()["response"]["docs"]
