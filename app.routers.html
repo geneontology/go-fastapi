@@ -296,10 +296,28 @@ id is the name of a slim subset, e.g., goslim_agr, goslim_generic</p>
 </section>
 <section id="module-app.routers.search">
 <span id="app-routers-search-module"></span><h2>app.routers.search module<a class="headerlink" href="#module-app.routers.search" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.routers.search.AutocompleteCategory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">AutocompleteCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.AutocompleteCategory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.search.AutocompleteCategory.gene">
+<span class="sig-name descname"><span class="pre">gene</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gene'</span></em><a class="headerlink" href="#app.routers.search.AutocompleteCategory.gene" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.routers.search.AutocompleteCategory.term">
+<span class="sig-name descname"><span class="pre">term</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'term'</span></em><a class="headerlink" href="#app.routers.search.AutocompleteCategory.term" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.search.autocomplete_term">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">autocomplete_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.autocomplete_term" title="Permalink to this definition"></a></dt>
-<dd><p>Returns list of matching concepts or entities using lexical search</p>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.search.</span></span><span class="sig-name descname"><span class="pre">autocomplete_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#app.routers.search.AutocompleteCategory" title="app.routers.search.AutocompleteCategory"><span class="pre">AutocompleteCategory</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.search.autocomplete_term" title="Permalink to this definition"></a></dt>
+<dd><p>Returns list of matching concepts or entities over annotation classes (e.g. GO terms) and
+bioentities (e.g. gene names and symbols)</p>
 </dd></dl>
 
 </section>
