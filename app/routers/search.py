@@ -22,40 +22,51 @@ async def autocomplete_term(
     Returns list of matching concepts or entities using lexical search
     """
 
-    # dictates the fields to return, annotation_class,aspect
+    # dictates the fields to return
     fields = (
-        "id,bioentity_label,bioentity_name,taxon,taxon_label,category,highlight"
+        "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
     )
 
     # TODO: figure out category
+    # In Solr, the qf (Query Fields) parameter is used to specify which fields in the
+    # index should be searched when executing a query.
+    # annotation_class == term, annotation_class_label == term label
     # boost fields %5E2 -> ^2, %5E1 -> ^1
-    query_filters = (
-        "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf="
+    query_fields = (
         "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf="
-        "annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf="
-        "reference_searchable%5E1&qf=panther_family_searchable%5E1&qf="
-        "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+        "annotation_class_label_searchable%5E1&qf="
+        "annotation_extension_class_label_searchable%5E1&qf="
+        "panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
     )
 
-    # if category != 'gene' and category != 'term':
-    #     raise NotImplementedError("category must be 'gene' or 'term'")
+    if category == 'gene':
+        category = ESOLRDoc.BIOENTITY
+    else:
+        category = ESOLRDoc.ANNOTATION
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     data = run_solr_text_on(
-        ESOLR.GOLR, ESOLRDoc.BIOENTITY, term+"*", query_filters, fields, optionals
+        ESOLR.GOLR, category, term+"*", query_fields, fields, optionals
     )
     docs = []
 
     for item in data:
+        if category == 'term':
+            label = item.get('annotation_class_label')
+            name = item.get('annotation_class')
+        else:
+            label = item.get('bioentity_label')
+            name = item.get('bioentity_name')
         auto_result = {
             "id": item.get('id'),
-            "label": item.get('bioentity_label'),
+            "label": label,
             "category": item.get('category'),
             "taxon": item.get('taxon'),
             "taxon_label": item.get('taxon_label'),
-            "highlight": item.get('highlight'),
+            "name": name
         }
         docs.append(auto_result)
+
     result = {"docs": docs}
     pprint(result)
     return result
