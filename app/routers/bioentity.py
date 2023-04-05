@@ -54,6 +54,11 @@ async def get_bioentity_by_id(
     """
     Get bioentities by their ids (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
+
+    # special case MGI, sigh
+    if id.startswith("MGI:"):
+        id = id.replace("MGI:", "MGI:MGI:")
+
     # fields is translated to fl in solr, which determines which stored fields should be returned with
     # the query
     fields = "id,bioentity_name,synonym,taxon,taxon_label"
