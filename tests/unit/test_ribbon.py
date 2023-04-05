@@ -1,11 +1,9 @@
 import logging
-
+import pytest
 from fastapi.testclient import TestClient
-
 from app.main import app
 
 test_client = TestClient(app)
-
 
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
 go_ids = ["GO:0008150"]
@@ -13,6 +11,20 @@ subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 logger = logging.getLogger(__name__)
+
+uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "/api/ontology/ribbon/",
+    ],
+)
+def test_ribbon_endpoint(endpoint):
+    data = {"subset": "goslim_agr", "subject": ["RGD:620474"]}
+    response = test_client.get(endpoint, params=data)
+    assert response.status_code == 200
 
 
 def test_zebrafish_ribbon():
@@ -163,3 +175,4 @@ def test_rgd_ribbon():
             >= 9
         )
     assert response.status_code == 200
+

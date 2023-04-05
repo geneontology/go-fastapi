@@ -1,23 +1,13 @@
-import json
 import logging
-from enum import Enum
-from pprint import pprint
 from typing import List
-
+from pprint import pprint
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import replace
-from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +68,7 @@ async def get_model_by_start_size(
         query += "\nLIMIT " + str(size)
     if start:
         query += "\nOFFSET " + str(start)
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, ["orcids", "names", "groupids", "groupnames"])
     return results
 
@@ -128,7 +118,7 @@ async def get_goterms_by_model_id(
     """
         % gocam
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     summary_gocam = ""
     collated = {}
     collated_results = []
@@ -204,7 +194,7 @@ async def get_geneproducts_by_model_id(
     """
         % gocam
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, ["gpids", "gpnames"])
     return results
 
@@ -249,8 +239,9 @@ async def get_geneproducts_by_model_id(
     """
         % gocam
     )
-    results = si._query(query)
-    results = transformArray(results, ["sources"])
+    results = si._sparql_query(query)
+    pprint(results)
+    # results = transformArray(results, ["sources"])
     return results
 
 
@@ -282,7 +273,7 @@ async def get_geneproducts_by_model_id(
     """
         % id
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     collated_results = []
     collated = {}
     for result in results:
@@ -293,3 +284,59 @@ async def get_geneproducts_by_model_id(
         }
         collated_results.append(collated)
     return collated_results
+
+
+@router.get("/api/gp/{id}/models", tags=["bioentity"])
+async def get_gocams_by_geneproduct_id(
+        id: str = Query(
+            None,
+            description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
+        )
+):
+    """
+    Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
+    """
+
+    ns = Namespaces()
+    ns.add_prefixmap("go")
+    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    si = SparqlImplementation(ont_r)
+    # reformat curie into an identifiers.org URI
+    id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id
+    logger.info(
+        "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
+        id,
+    )
+    query = (
+            """
+            PREFIX metago: <http://model.geneontology.org/>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+    
+            SELECT distinct ?gocam ?title
+    
+            WHERE 
+            {
+    
+              GRAPH ?gocam {
+                ?gocam metago:graphType metago:noctuaCam .    
+                ?s enabled_by: ?gpnode .    
+                ?gpnode rdf:type ?identifier .
+                ?gocam dc:title ?title .   
+                FILTER(?identifier = <%s>) .            
+              }
+    
+            }
+            ORDER BY ?gocam
+    
+        """
+            % id
+    )
+    results = si._sparql_query(query)
+    collated_results = []
+    collated = {}
+    for row in results:
+        collated["gocam"] = row["gocam"].get("value")
+        collated["title"] = row["title"].get("value")
+        collated_results.append(collated)
+    return results

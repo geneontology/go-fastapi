@@ -41,7 +41,7 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + category.value
         + '"&fl='
         + fields
-        + '&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,'
+        + '&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class'
         + 'annotation_class_label_searchable,&hl.requireFieldMatch=true'
         + "&wt=json&indent=on"
         + optionals
@@ -55,6 +55,8 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     for doc in response.json()["response"]["docs"]:
         if doc.get("id") is not None and doc.get("id") in response.json()["highlighting"]:
             doc["highlighting"] = response.json()["highlighting"][doc["id"]]
+            if doc.get("id").startswith("MGI:"):
+                doc["id"] = doc["id"].replace("MGI:MGI:", "MGI:")
         else:
             doc["highlighting"] = {}
         highlight_added.append(doc)

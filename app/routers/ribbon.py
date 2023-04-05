@@ -3,8 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
@@ -45,7 +44,7 @@ async def get_ontology_subsets_by_go_term_id(
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, [])
     results = replace(results, "subset", "OBO:go#", "")
     return results

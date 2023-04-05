@@ -1,8 +1,7 @@
 import logging
 
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
@@ -41,7 +40,8 @@ def goont_fetch_label(id):
     si = SparqlImplementation(ont_r)
     query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
     logger.info(query.query_str())
-    bindings = si._query(query.query_str())
+    bindings = si._sparql_query(query.query_str())
+    print(bindings)
     rows = [r["label"]["value"] for r in bindings]
     return rows[0]
 
