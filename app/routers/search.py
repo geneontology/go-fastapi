@@ -24,7 +24,7 @@ async def autocomplete_term(
 
     # dictates the fields to return, annotation_class,aspect
     fields = (
-        "id,bioentity_label,bioentity_name,taxon,taxon_label,category"
+        "id,bioentity_label,bioentity_name,taxon,taxon_label,category,highlight"
     )
 
     # TODO: figure out category
@@ -42,7 +42,7 @@ async def autocomplete_term(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     data = run_solr_text_on(
-        ESOLR.GOLR, ESOLRDoc.BIOENTITY, term, query_filters, fields, optionals
+        ESOLR.GOLR, ESOLRDoc.BIOENTITY, term+"*", query_filters, fields, optionals
     )
     docs = []
 
@@ -53,6 +53,7 @@ async def autocomplete_term(
             "category": item.get('category'),
             "taxon": item.get('taxon'),
             "taxon_label": item.get('taxon_label'),
+            "highlight": item.get('highlight'),
         }
         docs.append(auto_result)
     result = {"docs": docs}

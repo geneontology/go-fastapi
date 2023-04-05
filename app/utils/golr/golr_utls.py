@@ -42,6 +42,8 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + category.value
         + '"&fl='
         + fields
+        + '&hl=true&hl.fl='
+        + fields
         + "&wt=json&indent=on"
         + optionals
     )
