@@ -337,6 +337,10 @@ async def get_gocams_by_geneproduct_id(
     """
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
+    # special case MGI, sigh
+    if id.startswith("MGI:"):
+        id = id.replace("MGI:", "MGI:MGI:")
+
     ns = Namespaces()
     ns.add_prefixmap("go")
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
