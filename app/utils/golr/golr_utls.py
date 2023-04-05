@@ -58,5 +58,4 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         else:
             doc["highlighting"] = {}
         highlight_added.append(doc)
-    pprint(highlight_added)
     return highlight_added
