@@ -59,7 +59,7 @@ async def get_users():
         }
         GROUP BY ?orcid ?name 
         """
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, ["organizations", "affiliations"])
     return results
 
@@ -100,7 +100,7 @@ async def get_groups():
         }
         GROUP BY ?url ?name
         """
-    results = si._query(query)
+    results = si._sparql_query(query)
     return results
 
 
@@ -161,7 +161,7 @@ async def get_group_metadata_by_name(
         
         """
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     collated_results = []
     collated = {}
     for result in results:

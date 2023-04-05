@@ -1,23 +1,13 @@
-import json
 import logging
-from enum import Enum
-from pprint import pprint
 from typing import List
-
+from pprint import pprint
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import replace
-from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +68,7 @@ async def get_model_by_start_size(
         query += "\nLIMIT " + str(size)
     if start:
         query += "\nOFFSET " + str(start)
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, ["orcids", "names", "groupids", "groupnames"])
     return results
 
@@ -128,7 +118,7 @@ async def get_goterms_by_model_id(
     """
         % gocam
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     summary_gocam = ""
     collated = {}
     collated_results = []
@@ -204,7 +194,7 @@ async def get_geneproducts_by_model_id(
     """
         % gocam
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, ["gpids", "gpnames"])
     return results
 
@@ -249,8 +239,9 @@ async def get_geneproducts_by_model_id(
     """
         % gocam
     )
-    results = si._query(query)
-    results = transformArray(results, ["sources"])
+    results = si._sparql_query(query)
+    pprint(results)
+    # results = transformArray(results, ["sources"])
     return results
 
 
@@ -282,7 +273,7 @@ async def get_geneproducts_by_model_id(
     """
         % id
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     collated_results = []
     collated = {}
     for result in results:
@@ -341,11 +332,11 @@ async def get_gocams_by_geneproduct_id(
         """
             % id
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     collated_results = []
     collated = {}
     for row in results:
         collated["gocam"] = row["gocam"].get("value")
         collated["title"] = row["title"].get("value")
         collated_results.append(collated)
-    return collated_results
+    return results

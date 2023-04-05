@@ -39,7 +39,7 @@ async def get_term_metadata_by_id(id: str):
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
-    results = si._query(query)
+    results = si._sparql_query(query)
     return transform(
         results[0],
         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
@@ -106,7 +106,7 @@ async def get_subsets_by_term(id: str):
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
-    results = si._query(query)
+    results = si._sparql_query(query)
     results = transformArray(results, [])
     results = (results, "subset", "OBO:go#", "")
     return results
@@ -232,7 +232,7 @@ async def get_go_term_detail_by_go_id(
     ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
-    results = si._query(query)
+    results = si._sparql_query(query)
     return transform(
         results[0],
         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
@@ -278,7 +278,7 @@ async def get_go_hierarchy_go_id(
     """
             % id
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     collated_results = []
     collated = {}
     for result in results:
@@ -320,7 +320,7 @@ async def get_gocam_models_by_go_id(
     """
             % id
     )
-    results = si._query(query)
+    results = si._sparql_query(query)
     collated_results = []
     collated = {}
     for result in results:
