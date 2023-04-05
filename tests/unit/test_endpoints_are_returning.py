@@ -9,7 +9,7 @@ from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
 
 test_client = TestClient(app)
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
+gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
@@ -26,6 +26,13 @@ def test_golr_solr():
 @pytest.mark.parametrize("id", gene_ids)
 def test_bioenty_id_endpoints(id):
     response = test_client.get(f"/api/bioentity/{id}")
+    assert response.status_code == 200
+
+
+def test_bioenty_id_endpoints_MGI():
+    response = test_client.get("/api/bioentity/MGI:3588192")
+    for item in response.json():
+        assert item.get("id") == "MGI:3588192"
     assert response.status_code == 200
 
 
