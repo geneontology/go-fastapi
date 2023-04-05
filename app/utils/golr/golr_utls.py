@@ -42,13 +42,11 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + category.value
         + '"&fl='
         + fields
-        + '&hl=on&hl.snippets=1000&hl.fl='
-        + fields
+        + '&hl=on&hl.snippets=1000&hl.fl=*&hl.requireFieldMatch=true'
         + "&wt=json&indent=on"
         + optionals
     )
-    logger.info("QUERY: ", query)
+    print("QUERY: ", query)
     response = requests.get(query)
-    logger.info(response.json()["response"]["docs"])
     print(response.json()["highlighting"])
     return response.json()["response"]["docs"]

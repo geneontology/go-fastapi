@@ -204,7 +204,10 @@ def test_search_entity_ssh():
 
 
 def test_autocomplete_shh():
-    response = test_client.get("/api/search/entity/autocomplete/shh")
+    data = {
+        "category": "gene"
+    }
+    response = test_client.get("/api/search/entity/autocomplete/shh", params=data)
     assert 'id' in response.json().get("docs")[0]
     assert response.status_code == 200
 
