@@ -52,7 +52,7 @@ async def get_bioentity_by_id(
     rows: int = 100,
 ):
     """
-        Get bioentity by id (e.g. ZFIN:ZDB-GENE-990415-1)
+    Get bioentities by their ids (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
     # fields is translated to fl in solr, which determines which stored fields should be returned with
     # the query
@@ -83,7 +83,7 @@ async def get_annotations_by_goterm_id(
     rows: int = 100,
 ):
     """
-    Returns annotations associated to a GO term, (e.g. GO:0044598)
+    Returns annotations using the provided GO term, (e.g. GO:0044598)
     """
 
     # dictates the fields to return, annotation_class,aspect
@@ -144,7 +144,7 @@ async def get_genes_by_goterm_id(
     rows: int = 100,
 ):
     """
-    Returns genes associated to a GO term, (e.g. GO:0044598)
+    Returns genes annotated to the provided GO Term, (e.g. GO:0044598)
     """
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         return search_associations(
@@ -210,7 +210,7 @@ async def get_taxon_by_goterm_id(
     rows: int = 100,
 ):
     """
-    Returns taxons associated to a GO term (e.g. GO:0044598)
+    Returns taxon information for genes annotated to the provided GO term (e.g. GO:0044598)
     """
 
     fields = "taxon,taxon_label"
@@ -263,7 +263,7 @@ async def get_annotations_by_gene_id(
     rows: int = 100,
 ):
     """
-    Returns GO terms associated to a gene. (e.g. ZFIN:ZDB-GENE-050417-357)
+    Returns GO terms associated to a gene. (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
 
     IMPLEMENTATION DETAILS
     ----------------------
@@ -330,7 +330,7 @@ async def get_gocams_by_geneproduct_id(
     )
 ):
     """
-    Returns models for a given GO Term (e.g. GO:0044598)
+    Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
