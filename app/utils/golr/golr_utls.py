@@ -53,7 +53,7 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document
     highlight_added = []
     for doc in response.json()["response"]["docs"]:
-        if doc["id"] in response.json()["highlighting"]:
+        if doc.get("id") is not None and doc.get("id") in response.json()["highlighting"]:
             doc["highlighting"] = response.json()["highlighting"][doc["id"]]
         else:
             doc["highlighting"] = {}
