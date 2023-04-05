@@ -21,10 +21,12 @@ async def autocomplete_term(
     term: str = Query(..., description="example: `biological`"),
     start: int = 0,
     rows: int = 100,
-    category: AutocompleteCategory = Query(None, description="The category of items to retrieve.",)
+    category: AutocompleteCategory = Query(None, description="The category of items to retrieve, can "
+                                                             "be 'gene' or 'term'",)
 ):
     """
-    Returns list of matching concepts or entities using lexical search
+    Returns list of matching concepts or entities over annotation classes (e.g. GO terms) and
+    bioentities (e.g. gene names and symbols)
     """
 
     # dictates the fields to return
@@ -32,7 +34,6 @@ async def autocomplete_term(
         "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
     )
 
-    # TODO: figure out category
     # In Solr, the qf (Query Fields) parameter is used to specify which fields in the
     # index should be searched when executing a query.
     # annotation_class == term, annotation_class_label == term label
