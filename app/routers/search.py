@@ -70,6 +70,7 @@ async def autocomplete_term(
             "taxon_label": item.get('taxon_label'),
             "name": name,
             "highlight": item.get('highlighting'),
+            "match": item.get('highlighting'),
             "has_highlight": True if item.get('highlighting') else False
         }
         docs.append(auto_result)
