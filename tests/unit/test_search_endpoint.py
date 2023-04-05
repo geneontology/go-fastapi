@@ -50,3 +50,4 @@ def test_autocomplete_go():
     assert 'id' in response.json().get("docs")[0]
     assert response.status_code == 200
 
+

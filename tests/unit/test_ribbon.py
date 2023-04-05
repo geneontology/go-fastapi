@@ -175,3 +175,4 @@ def test_rgd_ribbon():
             >= 9
         )
     assert response.status_code == 200
+
