@@ -4,11 +4,16 @@ from ontobio.util.user_agent import get_user_agent
 from pprint import pprint
 from app.utils.golr.golr_utls import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
-
+from enum import Enum
 log = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
 router = APIRouter()
+
+
+class AutocompleteCategory(str, Enum):
+    gene = "gene"
+    term = "term"
 
 
 @router.get("/api/search/entity/autocomplete/{term}", tags=["search"])
@@ -16,7 +21,7 @@ async def autocomplete_term(
     term: str = Query(..., description="example: `biological`"),
     start: int = 0,
     rows: int = 100,
-    category: str = Query(None, description="example: `gene`"),
+    category: AutocompleteCategory = Query(None, description="The category of items to retrieve.",)
 ):
     """
     Returns list of matching concepts or entities using lexical search
