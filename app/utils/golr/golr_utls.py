@@ -1,7 +1,6 @@
 import logging
-
 import requests
-
+from pprint import pprint
 logger = logging.getLogger(__name__)
 
 
@@ -47,9 +46,17 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + "&wt=json&indent=on"
         + optionals
     )
-    print("QUERY: ", query)
+    # print("QUERY: ", query)
     response = requests.get(query)
-    highlighted_results = {}
-    # for result in response.json()["highlighting"]:
-    print(response.json()["highlighting"])
-    return response.json()["response"]["docs"]
+
+    # solr returns matching text in the field "highlighting", but it is not included in the response.
+    # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document
+    highlight_added = []
+    for doc in response.json()["response"]["docs"]:
+        if doc["id"] in response.json()["highlighting"]:
+            doc["highlighting"] = response.json()["highlighting"][doc["id"]]
+        else:
+            doc["highlighting"] = {}
+        highlight_added.append(doc)
+    pprint(highlight_added)
+    return highlight_added

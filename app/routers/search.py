@@ -1,7 +1,6 @@
 import logging
 from fastapi import APIRouter, Query
 from ontobio.util.user_agent import get_user_agent
-from pprint import pprint
 from app.utils.golr.golr_utls import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
 from enum import Enum
@@ -69,10 +68,11 @@ async def autocomplete_term(
             "category": item.get('category'),
             "taxon": item.get('taxon'),
             "taxon_label": item.get('taxon_label'),
-            "name": name
+            "name": name,
+            "highlight": item.get('highlighting'),
+            "has_highlight": True if item.get('highlighting') else False
         }
         docs.append(auto_result)
 
     result = {"docs": docs}
-    pprint(result)
     return result
