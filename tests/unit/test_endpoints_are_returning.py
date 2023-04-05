@@ -194,7 +194,7 @@ def test_ontology_term_subsets(id):
 #     reason="currently this endpoint is disabled because we "
 #     "have no 'facet_pivot' attribute in GOlr"
 # )
-def test_search_entity():
+def test_search_entity_ssh():
     data = {
         "category": "gene"
     }
@@ -203,8 +203,8 @@ def test_search_entity():
     assert response.status_code == 200
 
 
-def test_autocomplete_shha():
-    response = test_client.get("/api/search/entity/autocomplete/shha")
+def test_autocomplete_shh():
+    response = test_client.get("/api/search/entity/autocomplete/shh")
     assert 'id' in response.json().get("docs")[0]
     assert response.status_code == 200
 

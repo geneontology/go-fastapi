@@ -29,7 +29,7 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     Return the result of a solr query on the given solrInstance (Enum ESOLR), for a certain document_category (ESOLRDoc) and id
     """
     solr_url = solr_instance.value
-    print(solr_url)
+    logger.info(solr_url)
     if optionals is None:
         optionals = ""
     query = (
@@ -46,7 +46,6 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + optionals
     )
     logger.info("QUERY: ", query)
-    print(query)
     response = requests.get(query)
     logger.info(response.json()["response"]["docs"])
     return response.json()["response"]["docs"]
