@@ -1,5 +1,6 @@
 import logging
 from pprint import pprint
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -22,32 +23,26 @@ def test_golr_solr():
 
 
 def test_search_entity_ssh():
-    data = {
-        "category": "gene"
-    }
+    data = {"category": "gene"}
     response = test_client.get("/api/search/entity/autocomplete/ssh", params=data)
     assert response.status_code == 200
 
 
 def test_autocomplete_shh():
-    data = {
-        "category": "gene"
-    }
+    data = {"category": "gene"}
     response = test_client.get("/api/search/entity/autocomplete/shh", params=data)
-    assert 'id' in response.json().get("docs")[0]
+    assert "id" in response.json().get("docs")[0]
     assert response.status_code == 200
 
 
 def test_autocomplete_biological():
     response = test_client.get("/api/search/entity/autocomplete/biological")
-    assert 'id' in response.json().get("docs")[0]
+    assert "id" in response.json().get("docs")[0]
     pprint(response.json())
     assert response.status_code == 200
 
 
 def test_autocomplete_go():
     response = test_client.get("/api/search/entity/autocomplete/go")
-    assert 'id' in response.json().get("docs")[0]
+    assert "id" in response.json().get("docs")[0]
     assert response.status_code == 200
-
-

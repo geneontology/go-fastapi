@@ -5,14 +5,14 @@ from typing import List
 
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
-from app.utils.settings import get_user_agent
 
 from app.utils.golr.golr_utils import run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
 
@@ -219,7 +219,14 @@ async def get_taxon_by_goterm_id(
     """
 
     fields = "taxon,taxon_label"
-    query_filters = "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf=bioentity%5E2&qf=bioentity_label_searchable%5E1&qf=bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf=annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf=panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
+    query_filters = (
+        "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf="
+        "bioentity%5E2&qf=bioentity_label_searchable%5E1&qf="
+        "bioentity_name_searchable%5E1&qf=annotation_extension_class%5E2&qf="
+        "annotation_extension_class_label_searchable%5E1&qf=reference_searchable%5E1&qf="
+        "panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf="
+        "bioentity_isoform%5E1"
+    )
 
     evidences = evidence
     evidence = ""
@@ -325,4 +332,3 @@ async def get_annotations_by_gene_id(
                 log.info(asc)
                 assocs["associations"].append(asc)
     return assocs
-

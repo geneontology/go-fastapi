@@ -1,9 +1,11 @@
 import logging
-from fastapi import APIRouter, Query
-from app.utils.golr.golr_utils import run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
-from app.utils.settings import get_user_agent
 from enum import Enum
+
+from fastapi import APIRouter, Query
+
+from app.utils.golr.golr_utils import run_solr_text_on
+from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
+
 log = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
@@ -20,8 +22,10 @@ async def autocomplete_term(
     term: str = Query(..., description="example: `biological`"),
     start: int = 0,
     rows: int = 100,
-    category: AutocompleteCategory = Query(None, description="The category of items to retrieve, can "
-                                                             "be 'gene' or 'term'",)
+    category: AutocompleteCategory = Query(
+        None,
+        description="The category of items to retrieve, can " "be 'gene' or 'term'",
+    ),
 ):
     """
     Returns list of matching concepts or entities over annotation classes (e.g. GO terms) and
@@ -29,9 +33,7 @@ async def autocomplete_term(
     """
 
     # dictates the fields to return
-    fields = (
-        "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
-    )
+    fields = "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
 
     # In Solr, the qf (Query Fields) parameter is used to specify which fields in the
     # index should be searched when executing a query.
@@ -44,34 +46,34 @@ async def autocomplete_term(
         "panther_family_searchable%5E1&qf=panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
     )
 
-    if category == 'gene':
+    if category == "gene":
         category = ESOLRDoc.BIOENTITY
     else:
         category = ESOLRDoc.ANNOTATION
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     data = run_solr_text_on(
-        ESOLR.GOLR, category, term+"*", query_fields, fields, optionals
+        ESOLR.GOLR, category, term + "*", query_fields, fields, optionals
     )
     docs = []
 
     for item in data:
-        if category == 'term':
-            label = item.get('annotation_class_label')
-            name = item.get('annotation_class')
+        if category == "term":
+            label = item.get("annotation_class_label")
+            name = item.get("annotation_class")
         else:
-            label = item.get('bioentity_label')
-            name = item.get('bioentity_name')
+            label = item.get("bioentity_label")
+            name = item.get("bioentity_name")
         auto_result = {
-            "id": item.get('id'),
+            "id": item.get("id"),
             "label": label,
-            "category": item.get('category'),
-            "taxon": item.get('taxon'),
-            "taxon_label": item.get('taxon_label'),
+            "category": item.get("category"),
+            "taxon": item.get("taxon"),
+            "taxon_label": item.get("taxon_label"),
             "name": name,
-            "highlight": item.get('highlighting'),
-            "match": item.get('highlighting'),
-            "has_highlight": True if item.get('highlighting') else False
+            "highlight": item.get("highlighting"),
+            "match": item.get("highlighting"),
+            "has_highlight": True if item.get("highlighting") else False,
         }
         docs.append(auto_result)
 

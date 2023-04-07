@@ -1,6 +1,7 @@
 import logging
 import urllib.parse
 from pprint import pprint
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -79,4 +80,3 @@ def test_bioenty_gene_function_taxon_endpoint(id):
 def test_bioenty_gene_function_endpoints(id):
     response = test_client.get(f"/api/bioentity/function/{id}/taxons")
     assert response.status_code == 200
-

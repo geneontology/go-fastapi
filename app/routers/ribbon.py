@@ -3,15 +3,16 @@ from typing import List
 
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
-from app.utils.settings import get_user_agent
 
-from app.utils.sparql.sparql_utils import transform_array
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint
+from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
+                                get_user_agent)
+from app.utils.sparql.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
 
@@ -35,7 +36,7 @@ async def get_ontology_subsets_by_go_term_id(
     query = ontology_utils.get_go_subsets_sparql_query(id)
     # replace with OntologyFactory with ontobio - but config on startup
     # or use OAK  here and rewrite - still need to config on startup (SQLLite - up front to make
-    # the latest version, etc)
+    # the latest version, etc.)
 
     ns = Namespaces()
     ns.add_prefixmap("go")

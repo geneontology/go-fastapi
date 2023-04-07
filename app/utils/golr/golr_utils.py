@@ -1,13 +1,16 @@
 import logging
-import requests
 from pprint import pprint
+
+import requests
+
 logger = logging.getLogger(__name__)
 
 
 # Respect the method name for run_sparql_on with enums
 def run_solr_on(solr_instance, category, id, fields):
     """
-    Return the result of a solr query on the given solrInstance (Enum ESOLR), for a certain document_category (ESOLRDoc) and id
+    Return the result of a solr query on the given solrInstance (Enum ESOLR),
+    for a certain document_category (ESOLRDoc) and id
     """
     query = (
         solr_instance.value
@@ -25,7 +28,8 @@ def run_solr_on(solr_instance, category, id, fields):
 
 def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     """
-    Return the result of a solr query on the given solrInstance (Enum ESOLR), for a certain document_category (ESOLRDoc) and id
+    Return the result of a solr query on the given solrInstance (Enum ESOLR),
+    for a certain document_category (ESOLRDoc) and id
     """
     solr_url = solr_instance.value
     logger.info(solr_url)
@@ -41,8 +45,8 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + category.value
         + '"&fl='
         + fields
-        + '&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class'
-        + 'annotation_class_label_searchable,&hl.requireFieldMatch=true'
+        + "&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class"
+        + "annotation_class_label_searchable,&hl.requireFieldMatch=true"
         + "&wt=json&indent=on"
         + optionals
     )
@@ -53,7 +57,10 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document
     highlight_added = []
     for doc in response.json()["response"]["docs"]:
-        if doc.get("id") is not None and doc.get("id") in response.json()["highlighting"]:
+        if (
+            doc.get("id") is not None
+            and doc.get("id") in response.json()["highlighting"]
+        ):
             doc["highlighting"] = response.json()["highlighting"][doc["id"]]
             if doc.get("id").startswith("MGI:"):
                 doc["id"] = doc["id"].replace("MGI:MGI:", "MGI:")

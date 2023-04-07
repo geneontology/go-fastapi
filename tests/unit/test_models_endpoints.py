@@ -1,6 +1,7 @@
 import logging
 import urllib.parse
 from pprint import pprint
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -88,10 +89,10 @@ def test_get_modelid_by_pmid():
 
 def test_get_go_term_detail_by_go_id():
     response = test_client.get("/api/go/GO_0008150")
-    assert 'goid' in response.json()
-    assert 'label' in response.json()
-    assert response.json().get('goid') == 'http://purl.obolibrary.org/obo/GO_0008150'
-    assert response.json().get('label') == 'biological_process'
+    assert "goid" in response.json()
+    assert "label" in response.json()
+    assert response.json().get("goid") == "http://purl.obolibrary.org/obo/GO_0008150"
+    assert response.json().get("label") == "biological_process"
     assert type(response.json()) == dict
     assert response.status_code == 200
 
@@ -106,4 +107,3 @@ def test_get_gocam_models_by_go_id():
     response = test_client.get("/api/go/GO_0008150/models")
     assert len(response.json()) >= 12979
     assert response.status_code == 200
-

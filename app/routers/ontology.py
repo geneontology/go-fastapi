@@ -3,17 +3,19 @@ import logging
 from enum import Enum
 from pprint import pprint
 from typing import List
+
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from app.utils.settings import get_user_agent
 
-from app.utils.sparql.sparql_utils import transform_array, transform
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint
+from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
+                                get_user_agent)
+from app.utils.sparql.sparql_utils import transform, transform_array
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +30,7 @@ class GraphType(str, Enum):
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str):
     """
-    Returns meta data of an ontology term, e.g. GO:0003677
+    Returns metadata of an ontology term, e.g. GO:0003677
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
@@ -44,7 +46,7 @@ async def get_term_metadata_by_id(id: str):
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(
-        id: str, graph_type: GraphType = Query(GraphType.topology_graph)
+    id: str, graph_type: GraphType = Query(GraphType.topology_graph)
 ):
     """
     Returns graph of an ontology term
@@ -62,12 +64,12 @@ async def get_term_graph_by_id(
 
 @router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(
-        id: str,
-        cnode: str = Query(None, include_in_schema=False),
-        include_ancestors: bool = Query(True, include_in_schema=False),
-        include_descendants: bool = Query(True, include_in_schema=False),
-        relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
-        include_meta: bool = Query(False, include_in_schema=False),
+    id: str,
+    cnode: str = Query(None, include_in_schema=False),
+    include_ancestors: bool = Query(True, include_in_schema=False),
+    include_descendants: bool = Query(True, include_in_schema=False),
+    relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
+    include_meta: bool = Query(False, include_in_schema=False),
 ):
     """
     Extract a subgraph from an ontology term
@@ -111,7 +113,7 @@ async def get_subsets_by_term(id: str):
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
     """
-    Returns meta data of an ontology subset (slim)
+    Returns metadata of an ontology subset (slim)
     id is the name of a slim subset, e.g., goslim_agr, goslim_generic
     """
 
@@ -215,7 +217,7 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
 
 @router.get("/api/go/{id}", tags=["ontology"])
 async def get_go_term_detail_by_go_id(
-        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
     Returns models for a given GO term ID
@@ -237,7 +239,7 @@ async def get_go_term_detail_by_go_id(
 
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
 async def get_go_hierarchy_go_id(
-        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
     Returns parent and children relationships for a given GO ID
@@ -251,7 +253,7 @@ async def get_go_hierarchy_go_id(
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
-            """
+        """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         SELECT ?hierarchy ?GO ?label WHERE {
             BIND(%s as ?goquery)
@@ -272,7 +274,7 @@ async def get_go_hierarchy_go_id(
             }
         }
     """
-            % id
+        % id
     )
     results = si._sparql_query(query)
     collated_results = []
@@ -287,7 +289,7 @@ async def get_go_hierarchy_go_id(
 
 @router.get("/api/go/{id}/models", tags=["ontology"])
 async def get_gocam_models_by_go_id(
-        id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
 ):
     """
     Returns parent and children relationships for a given GO ID
@@ -301,7 +303,7 @@ async def get_gocam_models_by_go_id(
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
-            """
+        """
         PREFIX metago: <http://model.geneontology.org/>
 		SELECT distinct ?gocam
         WHERE 
@@ -314,7 +316,7 @@ async def get_gocam_models_by_go_id(
             }
         }
     """
-            % id
+        % id
     )
     results = si._sparql_query(query)
     collated_results = []
