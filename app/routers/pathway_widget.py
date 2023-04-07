@@ -7,7 +7,7 @@ from oaklib.implementations.sparql.sparql_implementation import \
 from oaklib.resource import OntologyResource
 from prefixcommons.curie_util import contract_uri, expand_uri
 from app.utils.settings import get_sparql_endpoint, get_user_agent
-
+from app.utils.prefixes.prefix_utils import get_identifierorg_uri
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
@@ -37,10 +37,9 @@ async def get_gocams_by_geneproduct_id(
     si = SparqlImplementation(ont_r)
     # reformat curie into an identifiers.org URI
     if not id.startswith("http"):
-        id = expand_uri(id)
+        id = get_identifierorg_uri(id)
         print(id)
 
-    print(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,
