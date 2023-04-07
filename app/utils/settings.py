@@ -1,10 +1,10 @@
 import logging
 from enum import Enum
 from os import path
-
 import yaml
 
 CONFIG = path.join(path.dirname(path.abspath(__file__)), "../conf/config.yaml")
+
 golr_config = None
 sparql_config = None
 route_mapping = None
@@ -16,7 +16,7 @@ def get_sparql_endpoint():
     if sparql_config is None:
         with open(CONFIG, "r") as f:
             sparql_config = yaml.load(f, Loader=yaml.FullLoader)
-    return sparql_config["sparql_endpoint"]["url"]
+    return sparql_config["sparql_url"]["url"]
 
 
 def get_user_agent():
