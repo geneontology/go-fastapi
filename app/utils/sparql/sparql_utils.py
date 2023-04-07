@@ -1,7 +1,7 @@
 SEPARATOR = "|"
 
 
-def transform(data, keys_to_split: List = None):
+def transform(data, keys_to_split=None):
     """
     Transform a SPARQL json result by:
     1) outputing only { key : value }, removing datatype

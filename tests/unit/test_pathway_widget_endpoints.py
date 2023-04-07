@@ -24,7 +24,7 @@ def test_get_gocams_by_geneproduct_id():
 
 
 def test_get_gocams_by_geneproduct_id_causal2():
-    id = urllib.parse.quote("fb:FBgn0003731")
+    id = urllib.parse.quote("FB:FBgn0003731")
     data = {
         "causalmf": 2,
     }

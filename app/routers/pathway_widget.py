@@ -5,7 +5,7 @@ from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
-
+from prefixcommons.curie_util import contract_uri, expand_uri
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 
 logger = logging.getLogger(__name__)
@@ -36,10 +36,9 @@ async def get_gocams_by_geneproduct_id(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     # reformat curie into an identifiers.org URI
-    if id.startswith("FB") or id.startswith("fb"):
-        id = "http://identifiers.org/flybase/" + id.split(":")[1]
-    else:
-        id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id
+    if not id.startswith("http"):
+        id = expand_uri(id)
+        print(id)
 
     print(id)
     logger.info(
