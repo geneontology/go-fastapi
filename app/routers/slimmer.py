@@ -5,7 +5,7 @@ from typing import List
 from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
-from app.utils.settings import get_user_agent
+from app.utils.settings import get_user_agent, ESOLR
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -67,7 +67,7 @@ async def slimmer_function(
         slim=slim,
         object_category="function",
         user_agent=USER_AGENT,
-        url="http://golr-aux.geneontology.io/solr",
+        url=ESOLR.GOLR,
     )
 
     # To the fullest extent possible return HGNC ids
