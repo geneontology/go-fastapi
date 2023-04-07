@@ -11,7 +11,7 @@ from app.utils.settings import get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint
 
 from .slimmer import gene_to_uniprot_from_mygene
 
@@ -40,7 +40,7 @@ async def get_ontology_subsets_by_go_term_id(
     ns = Namespaces()
     ns.add_prefixmap("go")
     iri = ns.uri_for(id)
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
@@ -70,7 +70,7 @@ async def get_ribbon_results(
     ),
     exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
     exclude_PB: bool = Query(
-        False, description="If true, excludes direct annotations " "to protein binding"
+        False, description="If true, excludes direct annotations to protein binding"
     ),
     cross_aspect: bool = Query(
         False,

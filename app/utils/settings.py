@@ -10,6 +10,10 @@ route_mapping = None
 logger = logging.getLogger(__name__)
 
 
+def get_sparql_endpoint():
+    return "http://rdf.geneontology.org/sparql"
+
+
 def get_user_agent():
     name = "go-fastapi"
     version = "0.1.1"

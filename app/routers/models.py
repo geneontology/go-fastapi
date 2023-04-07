@@ -5,11 +5,13 @@ from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from app.utils.settings import get_user_agent
+from app.utils.settings import get_user_agent, get_sparql_endpoint
+from app.utils.sparql.sparql_utils import transform_array
 
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
+SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 
@@ -22,40 +24,37 @@ async def get_model_by_start_size(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-    	PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
   
         SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids) 
                                     (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
-							        (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids) 
-							        (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames) 
-        
+                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids) 
+                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames) 
         WHERE 
         {
-  	    	{
-              	GRAPH ?gocam {            
-	                ?gocam metago:graphType metago:noctuaCam .
-              
-            	    ?gocam dc:title ?title ;
-        	             dc:date ?date ;
-            	         dc:contributor ?orcid ;
-    		    		 providedBy: ?providedBy .
+            {
+                GRAPH ?gocam {
+                    ?gocam metago:graphType metago:noctuaCam .
+                    ?gocam dc:title ?title ;
+                        dc:date ?date ;
+                        dc:contributor ?orcid ;
+                        providedBy: ?providedBy .
     
-    	            BIND( IRI(?orcid) AS ?orcidIRI ).
-	                BIND( IRI(?providedBy) AS ?providedByIRI ).
+                    BIND( IRI(?orcid) AS ?orcidIRI ).
+                    BIND( IRI(?providedBy) AS ?providedByIRI ).
                 }
          
-          		optional {
-        		  	?providedByIRI rdfs:label ?providedByLabel .
-  		        }
-  
+                optional {
+                    ?providedByIRI rdfs:label ?providedByLabel .
+                }
                 optional { ?orcidIRI rdfs:label ?name }
-        	  	BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
+                BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
             }   
   
         }
@@ -84,7 +83,7 @@ async def get_goterms_by_model_id(
     gocam = ""
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     for model in gocams:
         if gocam == "":
@@ -159,7 +158,7 @@ async def get_geneproducts_by_model_id(
     gocam = ""
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     for model in gocams:
         if gocam == "":
@@ -210,7 +209,7 @@ async def get_geneproducts_by_model_id(
     gocam = ""
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     for model in gocams:
         if gocam == "":
@@ -254,7 +253,7 @@ async def get_geneproducts_by_model_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
         """
@@ -296,7 +295,7 @@ async def get_gocams_by_geneproduct_id(
 
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     # reformat curie into an identifiers.org URI
     id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id

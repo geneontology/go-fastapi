@@ -13,7 +13,7 @@ from app.utils.settings import get_user_agent
 from app.utils.sparql.sparql_utils import transform_array, transform
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ async def get_term_metadata_by_id(id: str):
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
@@ -99,7 +99,7 @@ async def get_subsets_by_term(id: str):
     ns = Namespaces()
     ns.add_prefixmap("go")
     iri = ns.uri_for(id)
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
@@ -225,7 +225,7 @@ async def get_go_term_detail_by_go_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
@@ -247,7 +247,7 @@ async def get_go_hierarchy_go_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
@@ -297,7 +297,7 @@ async def get_gocam_models_by_go_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
