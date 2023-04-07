@@ -3,25 +3,21 @@ import logging
 from enum import Enum
 from pprint import pprint
 from typing import List
-
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import transform, transformArray
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
+from app.utils.sparql.sparql_utils import transform_array, transform
 import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
+from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
+USER_AGENT = get_user_agent()
 router = APIRouter()
 
 
@@ -36,7 +32,7 @@ async def get_term_metadata_by_id(id: str):
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
@@ -103,11 +99,11 @@ async def get_subsets_by_term(id: str):
     ns = Namespaces()
     ns.add_prefixmap("go")
     iri = ns.uri_for(id)
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
-    results = transformArray(results, [])
+    results = transform_array(results, [])
     results = (results, "subset", "OBO:go#", "")
     return results
 
@@ -229,7 +225,7 @@ async def get_go_term_detail_by_go_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
@@ -251,30 +247,30 @@ async def get_go_hierarchy_go_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (
             """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         SELECT ?hierarchy ?GO ?label WHERE {
-    		BIND(%s as ?goquery)
-  	    	{
-  		        {
-                  ?goquery rdfs:subClassOf+ ?GO .
-  	        	  ?GO rdfs:label ?label .
-	              FILTER (LANG(?label) != "en")    
-        	      BIND("parent" as ?hierarchy)
-            	}
-	        	UNION
-        		{
-                  ?GO rdfs:subClassOf* ?goquery .
-  		          ?GO rdfs:label ?label .    		
-        	      FILTER (LANG(?label) != "en")    
- 	              BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
-        		}
-  	        }
-    	}
+            BIND(%s as ?goquery)
+            {
+                {
+                    ?goquery rdfs:subClassOf+ ?GO .
+                    ?GO rdfs:label ?label .
+                    FILTER (LANG(?label) != "en")    
+                    BIND("parent" as ?hierarchy)
+                    }
+                UNION
+                {
+                    ?GO rdfs:subClassOf* ?goquery .
+                    ?GO rdfs:label ?label .    		
+                    FILTER (LANG(?label) != "en")    
+                    BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
+                }
+            }
+        }
     """
             % id
     )
@@ -301,7 +297,7 @@ async def get_gocam_models_by_go_id(
     """
     ns = Namespaces()
     ns.add_prefixmap("go")
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = "<http://purl.obolibrary.org/obo/" + id + ">"
     query = (

@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import (bioentity, labeler, models, ontology, prefixes,
                          publications, ribbon, search, slimmer,
-                         users_and_groups)
+                         users_and_groups, pathway_widget)
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ app.include_router(search.router)
 app.include_router(models.router)
 app.include_router(users_and_groups.router)
 app.include_router(publications.router)
+app.include_router(pathway_widget.router)
 
 # CORS
 app.add_middleware(

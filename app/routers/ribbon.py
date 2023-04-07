@@ -4,21 +4,20 @@ from typing import List
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
-from ontobio.sparql.sparql_ontol_utils import transform, transformArray
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
+from app.utils.sparql.sparql_utils import transform_array
 import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.golr.golr_utils import run_solr_text_on
+from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint
 
 from .slimmer import gene_to_uniprot_from_mygene
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
+USER_AGENT = get_user_agent()
 router = APIRouter()
 
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
@@ -41,11 +40,11 @@ async def get_ontology_subsets_by_go_term_id(
     ns = Namespaces()
     ns.add_prefixmap("go")
     iri = ns.uri_for(id)
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
-    results = transformArray(results, [])
+    results = transform_array(results, [])
     results = replace(results, "subset", "OBO:go#", "")
     return results
 
@@ -71,7 +70,7 @@ async def get_ribbon_results(
     ),
     exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
     exclude_PB: bool = Query(
-        False, description="If true, excludes direct annotations " "to protein binding"
+        False, description="If true, excludes direct annotations to protein binding"
     ),
     cross_aspect: bool = Query(
         False,

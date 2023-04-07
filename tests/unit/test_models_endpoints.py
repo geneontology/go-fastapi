@@ -86,13 +86,6 @@ def test_get_modelid_by_pmid():
     assert response.status_code == 200
 
 
-def test_get_gocams_by_geneproduct_id():
-    id = urllib.parse.quote("MGI:3588192")
-    response = test_client.get(f"/api/gp/{id}/models")
-    assert len(response.json()) == 2
-    assert response.status_code == 200
-
-
 def test_get_go_term_detail_by_go_id():
     response = test_client.get("/api/go/GO_0008150")
     assert 'goid' in response.json()

@@ -7,8 +7,7 @@ from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
-
-from app.utils.settings import get_golr_config
+from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()
 omap = {}
@@ -36,7 +35,7 @@ def goont_fetch_label(id):
     ns = Namespaces()
     ns.add_prefixmap("go")
     iri = ns.uri_for(id)
-    ont_r = OntologyResource(url="http://rdf.geneontology.org/sparql")
+    ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
     logger.info(query.query_str())

@@ -9,9 +9,9 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
-from app.utils.golr.golr_utls import run_solr_text_on
+from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -29,7 +29,7 @@ TYPE_PATHWAY = "pathway"
 TYPE_PUBLICATION = "publication"
 
 categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
+USER_AGENT = get_user_agent()
 
 
 class RelationshipType(str, Enum):

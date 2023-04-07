@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
+from app.utils.settings import ESOLR, ESOLRDoc
 
 test_client = TestClient(app)
 
