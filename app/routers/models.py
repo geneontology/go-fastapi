@@ -271,7 +271,6 @@ async def get_geneproducts_by_model_id(
     )
     results = si._sparql_query(query)
     collated_results = []
-    collated = {}
     for result in results:
         collated = {
             "subject": result["subject"].get("value"),
@@ -280,59 +279,3 @@ async def get_geneproducts_by_model_id(
         }
         collated_results.append(collated)
     return collated_results
-
-
-@router.get("/api/gp/{id}/models", tags=["bioentity"])
-async def get_gocams_by_geneproduct_id(
-        id: str = Query(
-            None,
-            description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
-        )
-):
-    """
-    Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
-    """
-
-    ns = Namespaces()
-    ns.add_prefixmap("go")
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    # reformat curie into an identifiers.org URI
-    id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id
-    logger.info(
-        "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
-        id,
-    )
-    query = (
-            """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-    
-            SELECT distinct ?gocam ?title
-    
-            WHERE 
-            {
-    
-              GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .    
-                ?s enabled_by: ?gpnode .    
-                ?gpnode rdf:type ?identifier .
-                ?gocam dc:title ?title .   
-                FILTER(?identifier = <%s>) .            
-              }
-    
-            }
-            ORDER BY ?gocam
-    
-        """
-            % id
-    )
-    results = si._sparql_query(query)
-    collated_results = []
-    collated = {}
-    for row in results:
-        collated["gocam"] = row["gocam"].get("value")
-        collated["title"] = row["title"].get("value")
-        collated_results.append(collated)
-    return results
