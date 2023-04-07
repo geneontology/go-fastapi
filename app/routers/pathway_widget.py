@@ -19,7 +19,7 @@ async def get_gocams_by_geneproduct_id(
             description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
         ),
         causalmf: int = Query(
-            2,
+            None,
             description="Used by the pathway widget to get GP models with 2 causal MFs",
             include_in_schema=False
         ),
@@ -65,13 +65,9 @@ async def get_gocams_by_geneproduct_id(
     )
     if causalmf == 2:
         query = """
-              PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
       PREFIX pr: <http://purl.org/ontology/prv/core#>
       PREFIX metago: <http://model.geneontology.org/>
       PREFIX dc: <http://purl.org/dc/elements/1.1/>
-      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-      PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-      PREFIX owl: <http://www.w3.org/2002/07/owl#>
       PREFIX providedBy: <http://purl.org/pav/providedBy>
       PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
       PREFIX causally_upstream_of_or_within: <http://purl.obolibrary.org/obo/RO_0002418>
