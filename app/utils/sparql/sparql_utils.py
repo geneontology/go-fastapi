@@ -1,8 +1,7 @@
-
 SEPARATOR = "|"
 
 
-def transform(data, keys_to_split=[]):
+def transform(data, keys_to_split=None):
     """
     Transform a SPARQL json result by:
     1) outputing only { key : value }, removing datatype
@@ -11,9 +10,9 @@ def transform(data, keys_to_split=[]):
     transformed = {}
     for key in data:
         if key in keys_to_split:
-            transformed[key] = data[key]['value'].split(SEPARATOR)
+            transformed[key] = data[key]["value"].split(SEPARATOR)
         else:
-            transformed[key] = data[key]['value']
+            transformed[key] = data[key]["value"]
     return transformed
 
 

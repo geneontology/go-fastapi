@@ -1,6 +1,7 @@
 import logging
 from enum import Enum
 from os import path
+
 import yaml
 
 CONFIG = path.join(path.dirname(path.abspath(__file__)), "../conf/config.yaml")
@@ -23,7 +24,7 @@ def get_user_agent():
     name = "go-fastapi"
     version = "0.1.1"
     user_agent_array = ["{}/{}".format(name, version)]
-    return ' '.join(user_agent_array)
+    return " ".join(user_agent_array)
 
 
 def get_golr_config():

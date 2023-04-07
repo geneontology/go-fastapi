@@ -1,12 +1,14 @@
 import logging
 
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
+
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()

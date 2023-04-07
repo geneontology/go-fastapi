@@ -4,11 +4,9 @@ description = ""
 authors = ["Sierra Taylor Moxon <sierra.taylor@gmail.com>"]
 name = "app"
 
-
 packages = [
     { include = "app" }
 ]
-
 
 [tool.poetry-dynamic-versioning]
 enable = false

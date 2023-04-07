@@ -1,10 +1,13 @@
 import logging
+
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.resource import OntologyResource
-from app.utils.settings import get_user_agent, get_sparql_endpoint
-
+from prefixcommons.curie_util import contract_uri, expand_uri
+from app.utils.settings import get_sparql_endpoint, get_user_agent
+from app.utils.prefixes.prefix_utils import get_identifierorg_uri
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
@@ -14,15 +17,15 @@ router = APIRouter()
 
 @router.get("/api/gp/{id}/models", tags=["bioentity"])
 async def get_gocams_by_geneproduct_id(
-        id: str = Query(
-            None,
-            description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
-        ),
-        causalmf: int = Query(
-            None,
-            description="Used by the pathway widget to get GP models with 2 causal MFs",
-            include_in_schema=False
-        ),
+    id: str = Query(
+        None,
+        description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
+    ),
+    causalmf: int = Query(
+        None,
+        description="Used by the pathway widget to get GP models with 2 causal MFs",
+        include_in_schema=False,
+    ),
 ):
     """
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
@@ -33,18 +36,16 @@ async def get_gocams_by_geneproduct_id(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     # reformat curie into an identifiers.org URI
-    if id.startswith("FB") or id.startswith('fb'):
-        id = "http://identifiers.org/flybase/" + id.split(":")[1]
-    else:
-        id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id
+    if not id.startswith("http"):
+        id = get_identifierorg_uri(id)
+        print(id)
 
-    print(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,
     )
     query = (
-            """
+        """
             PREFIX metago: <http://model.geneontology.org/>
             PREFIX dc: <http://purl.org/dc/elements/1.1/>
             PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
@@ -66,10 +67,11 @@ async def get_gocams_by_geneproduct_id(
             ORDER BY ?gocam
 
         """
-            % id
+        % id
     )
     if causalmf == 2:
-        query = """
+        query = (
+            """
       PREFIX pr: <http://purl.org/ontology/prv/core#>
       PREFIX metago: <http://model.geneontology.org/>
       PREFIX dc: <http://purl.org/dc/elements/1.1/>
@@ -152,7 +154,9 @@ async def get_gocams_by_geneproduct_id(
         )
       }
       ORDER BY ?gocam
-    """ % id
+    """
+            % id
+        )
     results = si._sparql_query(query)
     collated_results = []
     collated = {}

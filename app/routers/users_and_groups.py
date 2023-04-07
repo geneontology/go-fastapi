@@ -1,10 +1,13 @@
 import logging
+
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import \
+    SparqlImplementation
 from oaklib.resource import OntologyResource
+
+from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
-from app.utils.settings import get_user_agent, get_sparql_endpoint
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +19,7 @@ router = APIRouter()
 async def get_users():
     """
     DEPRECATED
-    Returns meta data of all GO users
+    Returns metadata of all GO users
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
@@ -56,7 +59,7 @@ async def get_users():
 async def get_groups():
     """
     DEPRECATED
-    Returns meta data of a GO group
+    Returns metadata of a GO group
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
@@ -87,13 +90,13 @@ async def get_groups():
 
 @router.get("/api/groups/{name}", tags=["users and groups"])
 async def get_group_metadata_by_name(
-        name: str = Query(
-            None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)"
-        )
+    name: str = Query(
+        None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)"
+    )
 ):
     """
     DEPRECATED
-    Returns meta data of a GO group
+    Returns metadata of a GO group
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
@@ -102,7 +105,7 @@ async def get_group_metadata_by_name(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
-            """
+        """
          PREFIX metago: <http://model.geneontology.org/>
             PREFIX dc: <http://purl.org/dc/elements/1.1/>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
@@ -118,9 +121,9 @@ async def get_group_metadata_by_name(
             WHERE {
       
             BIND(\""""
-            + name
-            + """\""""
-            + """as ?groupName) .
+        + name
+        + """\""""
+        + """as ?groupName) .
                     ?url rdfs:label ?groupName .  
                     ?orcidIRI has_affiliation: ?url .
                     ?orcidIRI rdfs:label ?name
