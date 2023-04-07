@@ -26,11 +26,10 @@ async def get_expand_curie(
 
 @router.get("/api/identifier/prefixes/contract/", tags=["identifier/prefixes"])
 async def get_contract_uri(
-    url: str = Query(..., description="full URI of the identified resource")
-):
+    uri: str):
     """
     Enter a full URI of the identified resource to contract to CURIE format
     e.g. http://purl.obolibrary.org/obo/GO_0008150
     """
     cmaps = [read_biocontext('go_context')]
-    return contract_uri(url)
+    return contract_uri(uri)
