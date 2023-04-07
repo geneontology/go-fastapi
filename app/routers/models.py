@@ -97,21 +97,21 @@ async def get_goterms_by_model_id(
             PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
             PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
             PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-    		SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
+            SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
             WHERE 
             {
-    		    VALUES ?gocam { %s }
-      		    GRAPH ?gocam {
+                VALUES ?gocam { %s }
+                GRAPH ?gocam {
                     ?entity rdf:type owl:NamedIndividual .
-        			?entity rdf:type ?goids
+                    ?entity rdf:type ?goids
                 }
 
                 VALUES ?goclasses { BP: MF: CC:  } . 
-      			?goids rdfs:subClassOf+ ?goclasses .
-        		?goids rdfs:label ?gonames .
-      		    ?goids definition: ?definitions .
+                ?goids rdfs:subClassOf+ ?goclasses .
+                ?goids rdfs:label ?gonames .
+                ?goids definition: ?definitions .
             }
-    		ORDER BY DESC(?gocam)
+            ORDER BY DESC(?gocam)
     """
         % gocam
     )
@@ -171,7 +171,7 @@ async def get_geneproducts_by_model_id(
             PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
             PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
             SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier;separator="@|@") as ?gpids)
-            				(GROUP_CONCAT(distinct ?name;separator="@|@") as ?gpnames)
+                            (GROUP_CONCAT(distinct ?name;separator="@|@") as ?gpnames)
             WHERE 
             {
                 VALUES ?gocam { %s }
@@ -183,7 +183,7 @@ async def get_geneproducts_by_model_id(
                 }
                 optional {
                     GRAPH <http://purl.obolibrary.org/obo/go/extensions/go-graphstore.owl> {
-                	    ?identifier rdfs:label ?name
+                        ?identifier rdfs:label ?name
                     }
                 }
             }

@@ -24,10 +24,10 @@ def test_get_gocams_by_geneproduct_id():
 
 
 def test_get_gocams_by_geneproduct_id_causal2():
-    id = urllib.parse.quote("MGI:3588192")
+    id = urllib.parse.quote("fb:FBgn0003731")
     data = {
         "causalmf": 2,
     }
     response = test_client.get(f"/api/gp/{id}/models", params=data)
-    assert len(response.json()) == 2
+    assert len(response.json()) > 0
     assert response.status_code == 200

@@ -254,23 +254,23 @@ async def get_go_hierarchy_go_id(
             """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         SELECT ?hierarchy ?GO ?label WHERE {
-    		BIND(%s as ?goquery)
-  	    	{
-  		        {
-                  ?goquery rdfs:subClassOf+ ?GO .
-  	        	  ?GO rdfs:label ?label .
-	              FILTER (LANG(?label) != "en")    
-        	      BIND("parent" as ?hierarchy)
-            	}
-	        	UNION
-        		{
-                  ?GO rdfs:subClassOf* ?goquery .
-  		          ?GO rdfs:label ?label .    		
-        	      FILTER (LANG(?label) != "en")    
- 	              BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
-        		}
-  	        }
-    	}
+            BIND(%s as ?goquery)
+            {
+                {
+                    ?goquery rdfs:subClassOf+ ?GO .
+                    ?GO rdfs:label ?label .
+                    FILTER (LANG(?label) != "en")    
+                    BIND("parent" as ?hierarchy)
+                    }
+                UNION
+                {
+                    ?GO rdfs:subClassOf* ?goquery .
+                    ?GO rdfs:label ?label .    		
+                    FILTER (LANG(?label) != "en")    
+                    BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
+                }
+            }
+        }
     """
             % id
     )

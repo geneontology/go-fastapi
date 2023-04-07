@@ -33,7 +33,12 @@ async def get_gocams_by_geneproduct_id(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     # reformat curie into an identifiers.org URI
-    id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id
+    if id.startswith("FB") or id.startswith('fb'):
+        id = "http://identifiers.org/flybase/" + id.split(":")[1]
+    else:
+        id = "http://identifiers.org/" + id.split(":")[0].lower() + "/" + id
+
+    print(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,
@@ -95,7 +100,7 @@ async def get_gocams_by_geneproduct_id(
       WHERE {
         GRAPH ?gocam  {  
           # Inject gene product ID here
-          ?gene rdf:type <` + id + `> .
+          ?gene rdf:type <%s> .
         }
         FILTER EXISTS {
           ?gocam metago:graphType metago:noctuaCam .
@@ -147,7 +152,7 @@ async def get_gocams_by_geneproduct_id(
         )
       }
       ORDER BY ?gocam
-    """
+    """ % id
     results = si._sparql_query(query)
     collated_results = []
     collated = {}
