@@ -8,7 +8,7 @@ from app.utils.settings import get_user_agent
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
+USER_AGENT = get_user_agent()
 router = APIRouter()
 
 

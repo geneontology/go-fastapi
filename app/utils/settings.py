@@ -10,7 +10,9 @@ route_mapping = None
 logger = logging.getLogger(__name__)
 
 
-def get_user_agent(name: str, version: str):
+def get_user_agent():
+    name = "go-fastapi"
+    version = "0.1.1"
     user_agent_array = ["{}/{}".format(name, version)]
     return ' '.join(user_agent_array)
 

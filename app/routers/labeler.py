@@ -8,7 +8,7 @@ from app.utils.ontology.ontology_utils import batch_fetch_labels
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
+USER_AGENT = get_user_agent()
 router = APIRouter()
 
 

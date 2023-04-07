@@ -17,7 +17,7 @@ from .slimmer import gene_to_uniprot_from_mygene
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = get_user_agent(name="go-fastapi", version="0.1.1")
+USER_AGENT = get_user_agent()
 router = APIRouter()
 
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
