@@ -22,7 +22,7 @@ def test_expander_endpoint(id):
     assert response.status_code == 200
 
 @pytest.mark.parametrize("id", uris)
-def test_contract_endpoint(id):
+def test_contract_endpoint():
     data = {
         "uri": id
     }
