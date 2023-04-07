@@ -1,23 +1,10 @@
-import json
 import logging
-from enum import Enum
-from pprint import pprint
-from typing import List
-
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import replace
-from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from app.utils.sparql.sparql_utils import transform, transform_array
-from ontobio.util.user_agent import get_user_agent
-
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.sparql.sparql_utils import transform_array
+from app.utils.settings import get_user_agent
 
 logger = logging.getLogger(__name__)
 

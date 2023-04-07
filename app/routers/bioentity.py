@@ -9,7 +9,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
 from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc

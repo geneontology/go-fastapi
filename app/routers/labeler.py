@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Query
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
 from app.utils.ontology.ontology_utils import batch_fetch_labels
 

@@ -5,7 +5,7 @@ from typing import List
 from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"

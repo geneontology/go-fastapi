@@ -4,10 +4,9 @@ from typing import List
 from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
-from ontobio.util.user_agent import get_user_agent
+from app.utils.settings import get_user_agent
 
 from app.utils.sparql.sparql_utils import transform_array
 import app.utils.ontology.ontology_utils as ontology_utils

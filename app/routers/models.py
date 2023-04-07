@@ -5,8 +5,7 @@ from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.util.user_agent import get_user_agent
-from app.utils.sparql.sparql_utils import transform_array
+from app.utils.settings import get_user_agent
 
 logger = logging.getLogger(__name__)
 

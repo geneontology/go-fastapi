@@ -10,6 +10,11 @@ route_mapping = None
 logger = logging.getLogger(__name__)
 
 
+def get_user_agent(name: str, version: str):
+    user_agent_array = ["{}/{}".format(name, version)]
+    return ' '.join(user_agent_array)
+
+
 def get_golr_config():
     global golr_config
     if golr_config is None:
