@@ -7,11 +7,11 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
-from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
+from app.utils.sparql.sparql_utils import transform_array
 import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_text_on
+from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -45,7 +45,7 @@ async def get_ontology_subsets_by_go_term_id(
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
-    results = transformArray(results, [])
+    results = transform_array(results, [])
     results = replace(results, "subset", "OBO:go#", "")
     return results
 

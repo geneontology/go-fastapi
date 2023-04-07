@@ -5,9 +5,8 @@ from fastapi import APIRouter, Query
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
-
+from app.utils.sparql.sparql_utils import transform_array
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +68,7 @@ async def get_model_by_start_size(
     if start:
         query += "\nOFFSET " + str(start)
     results = si._sparql_query(query)
-    results = transformArray(results, ["orcids", "names", "groupids", "groupnames"])
+    results = transform_array(results, ["orcids", "names", "groupids", "groupnames"])
     return results
 
 
@@ -195,7 +194,7 @@ async def get_geneproducts_by_model_id(
         % gocam
     )
     results = si._sparql_query(query)
-    results = transformArray(results, ["gpids", "gpnames"])
+    results = transform_array(results, ["gpids", "gpnames"])
     return results
 
 
@@ -241,7 +240,6 @@ async def get_geneproducts_by_model_id(
     )
     results = si._sparql_query(query)
     pprint(results)
-    # results = transformArray(results, ["sources"])
     return results
 
 

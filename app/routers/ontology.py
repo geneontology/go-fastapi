@@ -12,11 +12,11 @@ from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import replace
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from ontobio.sparql.sparql_ontol_utils import transform, transformArray
 from ontobio.util.user_agent import get_user_agent
 
+from app.utils.sparql.sparql_utils import transform_array, transform
 import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utls import run_solr_on, run_solr_text_on
+from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
 
 log = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ async def get_subsets_by_term(id: str):
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
-    results = transformArray(results, [])
+    results = transform_array(results, [])
     results = (results, "subset", "OBO:go#", "")
     return results
 

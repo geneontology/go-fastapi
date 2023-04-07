@@ -11,7 +11,7 @@ from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 from ontobio.util.user_agent import get_user_agent
 
-from app.utils.golr.golr_utls import run_solr_text_on
+from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
 
 from .slimmer import gene_to_uniprot_from_mygene

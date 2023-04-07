@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, Query
 from ontobio.util.user_agent import get_user_agent
-from app.utils.golr.golr_utls import run_solr_text_on
+from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc
 from enum import Enum
 log = logging.getLogger(__name__)
