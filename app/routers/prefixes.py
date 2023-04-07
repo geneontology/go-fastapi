@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
     cmaps = [read_biocontext('go_context')]
-    return get_prefixes()
+    return get_prefixes(cmaps)
 
 
 @router.get("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])

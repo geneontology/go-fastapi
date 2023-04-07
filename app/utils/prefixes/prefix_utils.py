@@ -19,6 +19,8 @@ def get_identifierorg_uri(identifier):
     """
     if identifier.startswith("FB:"):
         uri = "http://identifiers.org/" + "flybase/" + identifier.split(":")[1]
+    elif identifier.startswith("WB:"):
+        uri = "http://identifiers.org/" + "wormbase/" + identifier.split(":")[1]
     else:
         uri = "http://identifiers.org/" + identifier.split(":")[0].lower() +"/" + identifier
     return uri

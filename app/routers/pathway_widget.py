@@ -38,7 +38,6 @@ async def get_gocams_by_geneproduct_id(
     # reformat curie into an identifiers.org URI
     if not id.startswith("http"):
         id = get_identifierorg_uri(id)
-        print(id)
 
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
