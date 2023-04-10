@@ -50,7 +50,6 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + "&wt=json&indent=on"
         + optionals
     )
-    # print("QUERY: ", query)
     response = requests.get(query)
 
     # solr returns matching text in the field "highlighting", but it is not included in the response.

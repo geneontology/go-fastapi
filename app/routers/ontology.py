@@ -1,16 +1,12 @@
 import json
 import logging
 from enum import Enum
-from pprint import pprint
 from typing import List
-
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-
+from prefixcommons.curie_util import expand_uri, read_biocontext
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
 from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
@@ -32,8 +28,6 @@ async def get_term_metadata_by_id(id: str):
     """
     Returns metadata of an ontology term, e.g. GO:0003677
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -98,9 +92,6 @@ async def get_subsets_by_term(id: str):
     """
     Returns subsets (slims) associated to an ontology term
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
-    iri = ns.uri_for(id)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
@@ -217,7 +208,7 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
 
 @router.get("/api/go/{id}", tags=["ontology"])
 async def get_go_term_detail_by_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+    id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
 ):
     """
     Returns models for a given GO term ID
@@ -225,8 +216,7 @@ async def get_go_term_detail_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -239,7 +229,7 @@ async def get_go_term_detail_by_go_id(
 
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
 async def get_go_hierarchy_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+    id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
 ):
     """
     Returns parent and children relationships for a given GO ID
@@ -247,16 +237,18 @@ async def get_go_hierarchy_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
+    cmaps = [read_biocontext("go_context")]
+    for d in cmaps:
+        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    id = expand_uri(id, cmaps)
+
     query = (
         """
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         SELECT ?hierarchy ?GO ?label WHERE {
-            BIND(%s as ?goquery)
+            BIND(<%s> as ?goquery)
             {
                 {
                     ?goquery rdfs:subClassOf+ ?GO .
@@ -289,7 +281,7 @@ async def get_go_hierarchy_go_id(
 
 @router.get("/api/go/{id}/models", tags=["ontology"])
 async def get_gocam_models_by_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO_0005885, GO_0097136 ...)")
+    id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
 ):
     """
     Returns parent and children relationships for a given GO ID
@@ -297,22 +289,26 @@ async def get_gocam_models_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
+    # TODO - this is a hack to get around the fact that the go_context file does not
+    # have the MGI prefix defined the same way minerva expects it.
+    # This should be fixed in the biocontext file, in prefixmaps, or in minerva
+    cmaps = [read_biocontext("go_context")]
+    for d in cmaps:
+        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    id = "<http://purl.obolibrary.org/obo/" + id + ">"
+    id = expand_uri(id, cmaps)
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
-		SELECT distinct ?gocam
+        SELECT distinct ?gocam
         WHERE 
         {
-	        GRAPH ?gocam {
-    	        ?gocam metago:graphType metago:noctuaCam .    
+            GRAPH ?gocam {
+                ?gocam metago:graphType metago:noctuaCam .    
                 ?entity rdf:type owl:NamedIndividual .
-    			?entity rdf:type ?goid .
-                FILTER(?goid = %s)
+                ?entity rdf:type ?goid .
+                FILTER(?goid = <%s>)
             }
         }
     """

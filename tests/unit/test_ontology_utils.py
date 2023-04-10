@@ -2,13 +2,14 @@ import logging
 
 from fastapi.testclient import TestClient
 from ontobio.sparql.sparql_ontology import EagerRemoteSparqlOntology
-
+import pytest
 import app.utils.ontology.ontology_utils as ou
 from app.main import app
 from app.utils.settings import get_golr_config
 
 test_client = TestClient(app)
 logger = logging.getLogger(__name__)
+go_ids = ["GO:0008150"]
 
 
 def test_get_ontology_config():
@@ -232,3 +233,10 @@ def test_create_go_summary_sparql():
     go_summary_sparql = ou.create_go_summary_sparql(goid="GO:0003674")
     assert go_summary_sparql is not None
     assert "GO_0003674" in go_summary_sparql
+
+
+@pytest.mark.parametrize("id", go_ids)
+def test_get_go_hierarchy_go_id(id):
+    response = test_client.get(f"/api/go/{id}/hierarchy")
+    assert len(response.json()) >= 0
+    assert response.status_code == 200

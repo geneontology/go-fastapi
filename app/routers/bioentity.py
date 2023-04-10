@@ -1,13 +1,7 @@
 import logging
 from enum import Enum
-from pprint import pprint
 from typing import List
-
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
-from oaklib.resource import OntologyResource
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 

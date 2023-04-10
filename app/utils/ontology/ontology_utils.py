@@ -42,7 +42,6 @@ def goont_fetch_label(id):
     query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
     logger.info(query.query_str())
     bindings = si._sparql_query(query.query_str())
-    print(bindings)
     rows = [r["label"]["value"] for r in bindings]
     return rows[0]
 

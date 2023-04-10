@@ -1,11 +1,9 @@
 import logging
 from enum import Enum
 from typing import List
-
 from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
-
 from app.utils.settings import ESOLR, get_user_agent
 
 INVOLVED_IN = "involved_in"

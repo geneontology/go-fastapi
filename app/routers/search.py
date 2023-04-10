@@ -1,8 +1,6 @@
 import logging
 from enum import Enum
-
 from fastapi import APIRouter, Query
-
 from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
