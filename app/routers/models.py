@@ -18,7 +18,7 @@ SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 
-@router.get("/api/models", tags=["models"])
+@router.get("/api/models", tags=["models"], deprecated=True)
 async def get_model_by_start_size(
     start: int = None, size: int = None, last: int = None
 ):
