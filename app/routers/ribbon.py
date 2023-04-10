@@ -1,11 +1,9 @@
 import logging
 from typing import List
-
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
-
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,

@@ -1,5 +1,4 @@
 import logging
-from pprint import pprint
 
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import \
@@ -43,12 +42,9 @@ async def get_model_details_by_pmid(
     """
     )
     results = si._sparql_query(query)
-
-    pprint(results)
     collated_results = []
     collated = {}
     for result in results:
-        print(result)
         collated["gocam"] = result["gocam"].get("value")
         collated_results.append(collated)
     return results

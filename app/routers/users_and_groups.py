@@ -1,10 +1,7 @@
 import logging
-
 from fastapi import APIRouter, Query
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
 

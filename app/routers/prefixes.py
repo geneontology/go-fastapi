@@ -1,5 +1,4 @@
 import logging
-
 from fastapi import APIRouter, Query
 from prefixcommons.curie_util import contract_uri, expand_uri, get_prefixes, read_biocontext
 

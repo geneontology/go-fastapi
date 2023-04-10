@@ -1,12 +1,9 @@
 import json
 import logging
 from enum import Enum
-from pprint import pprint
 from typing import List
-
 from fastapi import APIRouter, Query
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 from prefixcommons.curie_util import expand_uri, read_biocontext

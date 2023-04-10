@@ -4,9 +4,8 @@ from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
-from prefixcommons.curie_util import contract_uri, expand_uri, read_biocontext
+from prefixcommons.curie_util import expand_uri, read_biocontext
 from app.utils.settings import get_sparql_endpoint, get_user_agent
-from app.utils.prefixes.prefix_utils import get_identifierorg_uri
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
