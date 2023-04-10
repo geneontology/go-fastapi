@@ -2,7 +2,6 @@ import logging
 from pprint import pprint
 
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
@@ -22,8 +21,6 @@ async def get_model_details_by_pmid(
     """
     Returns models for a given PMID
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
 

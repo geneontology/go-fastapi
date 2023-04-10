@@ -3,7 +3,6 @@ from pprint import pprint
 from typing import List
 
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
@@ -25,8 +24,6 @@ async def get_model_by_start_size(
     """
     Returns metadata of an ontology term, e.g. GO:0003677
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """
@@ -84,8 +81,6 @@ async def get_goterms_by_model_id(
     Returns go term details based on a GO-CAM model ID
     """
     gocam = ""
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     for model in gocams:
@@ -159,8 +154,6 @@ async def get_geneproducts_by_model_id(
     Returns gene product details based on a GO-CAM model ID
     """
     gocam = ""
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     for model in gocams:
@@ -210,8 +203,6 @@ async def get_geneproducts_by_model_id(
     Returns pubmed details based on a GO-CAM model ID
     """
     gocam = ""
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     for model in gocams:
@@ -240,7 +231,6 @@ async def get_geneproducts_by_model_id(
         % gocam
     )
     results = si._sparql_query(query)
-    pprint(results)
     return results
 
 
@@ -254,8 +244,6 @@ async def get_geneproducts_by_model_id(
     """
     Returns term details based on a GO-CAM model ID
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (

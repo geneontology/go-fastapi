@@ -1,11 +1,10 @@
 import logging
 
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
-from prefixcommons.curie_util import contract_uri, expand_uri
+from prefixcommons.curie_util import contract_uri, expand_uri, read_biocontext
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.prefixes.prefix_utils import get_identifierorg_uri
 logger = logging.getLogger(__name__)
@@ -31,14 +30,11 @@ async def get_gocams_by_geneproduct_id(
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
 
-    ns = Namespaces()
-    ns.add_prefixmap("go")
+    cmaps = [read_biocontext('go_context')]
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    # reformat curie into an identifiers.org URI
-    if not id.startswith("http"):
-        id = get_identifierorg_uri(id)
-
+    id = expand_uri(id=id, cmaps=cmaps)
+    print("id", id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,

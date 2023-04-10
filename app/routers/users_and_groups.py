@@ -1,7 +1,6 @@
 import logging
 
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
@@ -23,8 +22,6 @@ async def get_users():
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """
@@ -63,8 +60,6 @@ async def get_groups():
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """
@@ -100,8 +95,6 @@ async def get_group_metadata_by_name(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (

@@ -4,7 +4,6 @@ from pprint import pprint
 from typing import List
 
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource

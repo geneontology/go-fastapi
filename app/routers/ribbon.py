@@ -2,9 +2,7 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Query
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
 
@@ -38,9 +36,6 @@ async def get_ontology_subsets_by_go_term_id(
     # or use OAK  here and rewrite - still need to config on startup (SQLLite - up front to make
     # the latest version, etc.)
 
-    ns = Namespaces()
-    ns.add_prefixmap("go")
-    iri = ns.uri_for(id)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
