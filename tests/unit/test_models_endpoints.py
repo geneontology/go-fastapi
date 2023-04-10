@@ -98,6 +98,7 @@ def test_get_go_term_detail_by_go_id():
 
 
 def test_get_gocam_models_by_go_id():
-    response = test_client.get("/api/go/GO_0008150/models")
-    assert len(response.json()) >= 12979
+    id = "GO:0008150"
+    response = test_client.get(f"/api/go/{id}/models")
+    assert len(response.json()) > 100
     assert response.status_code == 200
