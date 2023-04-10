@@ -10,10 +10,9 @@ router = APIRouter()
 
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
-    cmap = read_biocontext("go_context")
-    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
-    cmap.update(mgi)
-    cmaps = [cmap]
+    cmaps = [read_biocontext("go_context")]
+    for d in cmaps:
+        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
     return get_prefixes(cmaps)
 
 
@@ -23,10 +22,9 @@ async def get_expand_curie(
         None, description="identifier in CURIE format of the resource to expand"
     )
 ):
-    cmap = read_biocontext("go_context")
-    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
-    cmap.update(mgi)
-    cmaps = [cmap]
+    cmaps = [read_biocontext("go_context")]
+    for d in cmaps:
+        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
     return expand_uri(id=id, cmaps=cmaps)
 
 

@@ -25,7 +25,6 @@ def test_get_gocams_by_geneproduct_id_MGI():
     assert response.status_code == 200
 
 
-
 def test_get_gocams_by_geneproduct_id_causal2():
     id = urllib.parse.quote("FB:FBgn0003731")
     data = {
