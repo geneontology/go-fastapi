@@ -30,11 +30,13 @@ async def get_gocams_by_geneproduct_id(
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
 
-    cmaps = [read_biocontext('go_context')]
+    cmap = read_biocontext("go_context")
+    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
+    cmap.update(mgi)
+    cmaps = [cmap]
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id=id, cmaps=cmaps)
-    print("id", id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,

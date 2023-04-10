@@ -10,7 +10,10 @@ router = APIRouter()
 
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
-    cmaps = [read_biocontext('go_context')]
+    cmap = read_biocontext("go_context")
+    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
+    cmap.update(mgi)
+    cmaps = [cmap]
     return get_prefixes(cmaps)
 
 
@@ -20,7 +23,10 @@ async def get_expand_curie(
         None, description="identifier in CURIE format of the resource to expand"
     )
 ):
-    cmaps = [read_biocontext('go_context')]
+    cmap = read_biocontext("go_context")
+    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
+    cmap.update(mgi)
+    cmaps = [cmap]
     return expand_uri(id=id, cmaps=cmaps)
 
 
@@ -31,5 +37,4 @@ async def get_contract_uri(
     Enter a full URI of the identified resource to contract to CURIE format
     e.g. http://purl.obolibrary.org/obo/GO_0008150
     """
-    cmaps = [read_biocontext('go_context')]
     return contract_uri(uri)

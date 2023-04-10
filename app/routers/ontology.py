@@ -240,7 +240,10 @@ async def get_go_hierarchy_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    cmaps = [read_biocontext('go_context')]
+    cmap = read_biocontext("go_context")
+    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
+    cmap.update(mgi)
+    cmaps = [cmap]
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id, cmaps)
@@ -290,7 +293,13 @@ async def get_gocam_models_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    cmaps = [read_biocontext('go_context')]
+    cmap = read_biocontext("go_context")
+    # TODO - this is a hack to get around the fact that the go_context file does not
+    # have the MGI prefix defined the same way minerva expects it.
+    # This should be fixed in the biocontext file, in prefixmaps, or in minerva.
+    mgi = {"MGI:": "http://identifiers.org/mgi/MGI:"}
+    cmap.update(mgi)
+    cmaps = [cmap]
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id, cmaps)
