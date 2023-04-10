@@ -232,3 +232,9 @@ def test_create_go_summary_sparql():
     go_summary_sparql = ou.create_go_summary_sparql(goid="GO:0003674")
     assert go_summary_sparql is not None
     assert "GO_0003674" in go_summary_sparql
+
+
+def test_get_go_hierarchy_go_id():
+    response = test_client.get("/api/go/GO:0008150/hierarchy")
+    assert len(response.json()) >= 27791
+    assert response.status_code == 200
