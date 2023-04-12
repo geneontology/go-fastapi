@@ -295,6 +295,7 @@ async def get_gocam_models_by_go_id(
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps)
     id = converter.expand(id)
+    print(id)
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
