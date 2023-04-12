@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 def remap_prefixes(cmap):
     response = urllib.request.urlopen("https://raw.githubusercontent.com/ExposuresProvider/cam-pipeline/kg-tsv/supplemental-namespaces.json")
     data = json.loads(response.read().decode())
-    print(data)
     for k, v in data.items():
         cmap[k] = v
     cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
+    cmap["WB"] = "http://identifiers.org/wormbase/"
     return cmap
 
