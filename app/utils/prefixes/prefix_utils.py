@@ -6,10 +6,13 @@ import urllib.request
 logger = logging.getLogger(__name__)
 
 
-# Respect the method name for run_sparql_on with enums
+# have to remap prefixes from prefixmaps in order to match the prefixes in Minerva
 def remap_prefixes(cmap):
-    data = json.loads(urllib.request.urlopen("https://github.com/ExposuresProvider/cam-pipeline/blob/kg-tsv/supplemental-namespaces.json").read().decode())
+    response = urllib.request.urlopen("https://raw.githubusercontent.com/ExposuresProvider/cam-pipeline/kg-tsv/supplemental-namespaces.json")
+    data = json.loads(response.read().decode())
+    print(data)
     for k, v in data.items():
         cmap[k] = v
+    cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
     return cmap
 
