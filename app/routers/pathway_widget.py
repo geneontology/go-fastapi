@@ -5,6 +5,8 @@ from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
 from prefixcommons.curie_util import expand_uri, read_biocontext
+from prefixmaps import load_context
+from curies import Converter
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 logger = logging.getLogger(__name__)
 
@@ -13,7 +15,7 @@ SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 
-@router.get("/api/gp/{id}/models", tags=["bioentity"])
+@router.get("/api/gp/{id}/models", tags=["pathways"])
 async def get_gocams_by_geneproduct_id(
     id: str = Query(
         None,
@@ -29,7 +31,10 @@ async def get_gocams_by_geneproduct_id(
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
 
-    cmaps = [read_biocontext("go_context")]
+    context = load_context("go")
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
     for d in cmaps:
         d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
     ont_r = OntologyResource(url=get_sparql_endpoint())
