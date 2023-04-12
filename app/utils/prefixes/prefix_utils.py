@@ -24,5 +24,6 @@ def get_prefixes(context: str = "go"):
     cmaps = converter.prefix_map
     # hacky solution to: https://github.com/geneontology/go-site/issues/2000
     cmaps = remap_prefixes(cmaps)
+
     return cmaps
 

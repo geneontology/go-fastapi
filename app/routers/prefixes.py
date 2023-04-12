@@ -1,7 +1,5 @@
 import logging
 from fastapi import APIRouter, Query
-from prefixmaps import load_context
-from curies import Converter
 from app.utils.prefixes.prefix_utils import get_prefixes
 from prefixcommons.curie_util import contract_uri, expand_uri
 log = logging.getLogger(__name__)
