@@ -23,7 +23,6 @@ async def get_expand_curie(
     )
 ):
     cmaps = get_prefixes("go")
-    pprint(cmaps)
     # have to set strict to "False" to allow for WB and WormBase as prefixes that
     # map to the same expanded URI prefix
     converter = Converter.from_prefix_map(cmaps, strict=False)

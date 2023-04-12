@@ -12,8 +12,6 @@ def remap_prefixes(cmap):
     response = urllib.request.urlopen("https://raw.githubusercontent.com/ExposuresProvider/cam-pipeline/kg-tsv/supplemental-namespaces.json")
     data = json.loads(response.read().decode())
     for k, v in data.items():
-        print("k: ", k)
-        print("v: ", v)
         cmap[v] = k
     cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
     cmap["WB"] = "http://identifiers.org/wormbase/"
