@@ -6,6 +6,7 @@ from oaklib.implementations.sparql.sparql_implementation import \
 from oaklib.resource import OntologyResource
 from prefixcommons.curie_util import expand_uri, read_biocontext
 from app.utils.settings import get_sparql_endpoint, get_user_agent
+from app.utils.sparql.sparql_utils import transform_array
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
@@ -153,10 +154,4 @@ async def get_gocams_by_geneproduct_id(
             % id
         )
     results = si._sparql_query(query)
-    collated_results = []
-    collated = {}
-    for row in results:
-        collated["gocam"] = row["gocam"].get("value")
-        collated["title"] = row["title"].get("value")
-        collated_results.append(collated)
-    return results
+    return transform_array(results)
