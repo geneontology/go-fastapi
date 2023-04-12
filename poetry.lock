@@ -2706,7 +2706,7 @@ docs = ["Sphinx", "sphinx-rtd-theme"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5413a450918b47611f388ec67f71f47c58e60f7d9c8b49364d17d747d5d92d7a"
+content-hash = "d2fff5544e6ac1177c67ad2d9607cdf917c4362cdfb074bbe5bde3df5a98f9e0"
 
 [metadata.files]
 aiohttp = [
