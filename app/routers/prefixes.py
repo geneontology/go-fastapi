@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
-    return get_prefixes("go")
+    return [get_prefixes("go")]
 
 
 @router.get("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
@@ -18,7 +18,7 @@ async def get_expand_curie(
         None, description="identifier in CURIE format of the resource to expand"
     )
 ):
-    cmaps = get_prefixes("go")
+    cmaps = [get_prefixes("go")]
     return expand_uri(id=id, cmaps=cmaps)
 
 
