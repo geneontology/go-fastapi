@@ -71,22 +71,27 @@ make test
 ### Deploying a change in the API code to docker image on AWS:
 
 1) ssh into the AWS instance running the docker container, invade the image and git pull the changes
-
+total downtime for this process is about 2 minutes! 
 ```bash
-ssh -i [path to pem key] ubuntu@[public ip address]
-docker exec -it [container id] /bin/bash
+ssh -i [path/to/pem/key/locally] ubuntu@[aws.instance.public.ip.address]
+sudo docker stop geneontology/go-fastapi
+sudo docker rm geneontology/go-fastapi
+sudo docker image rm geneontology/go-fastapi
 cd go-fastapi
 git pull 
+sudo docker build -t geneontology/go-fastapi .
+sudo docker run -d -p 8080:8080 geneontology/go-fastapi
 ```
 
-2) stop the running api
+### Restarting the API server on AWS manually:
+2) stop the running api from inside the docker container
 ```bash
 sudo pkill gunicorn
 ```
-this will stop the running docker container and push you back into the AWS instance itself
+this will stop the running docker container and push you back into the AWS instance itself.
 
 3) restart the image 
-
+This automatically restarts the API server by running `make start` in the docker container.
 ```bash
 docker run -d -p 8080:8080 geneontology/go-fastapi
 ```
