@@ -242,7 +242,7 @@ async def get_go_hierarchy_go_id(
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    converter = Converter.from_prefix_map(cmaps)
+    converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
 
     query = (
@@ -293,7 +293,7 @@ async def get_gocam_models_by_go_id(
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    converter = Converter.from_prefix_map(cmaps)
+    converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
     print(id)
     query = (
