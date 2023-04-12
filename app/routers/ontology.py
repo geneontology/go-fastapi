@@ -7,7 +7,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 from app.utils.prefixes.prefix_utils import get_prefixes
-from prefixcommons.curie_util import expand_uri
+from curies import Converter
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
@@ -242,7 +242,8 @@ async def get_go_hierarchy_go_id(
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    id = expand_uri(id, cmaps)
+    converter = Converter.from_prefix_map(cmaps)
+    id = converter.expand(id)
 
     query = (
         """
@@ -292,7 +293,8 @@ async def get_gocam_models_by_go_id(
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    id = expand_uri(id, cmaps)
+    converter = Converter.from_prefix_map(cmaps)
+    id = converter.expand(id)
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
