@@ -1,26 +1,15 @@
 import logging
 from pprint import pprint
-
-import requests
+import json
+import urllib.request
 
 logger = logging.getLogger(__name__)
 
 
 # Respect the method name for run_sparql_on with enums
-def get_identifierorg_uri(identifier):
-    """
-    return the identifier.org uri for the given identifier
-    such that it matches what GO has stored for the URI.  This
-    means using http vs. https and using the stored prefix (for
-    flybase this is 'flybase' vs. 'fb' in identifiers.org)
+def remap_prefixes(cmap):
+    data = json.loads(urllib.request.urlopen("https://github.com/ExposuresProvider/cam-pipeline/blob/kg-tsv/supplemental-namespaces.json").read().decode())
+    for k, v in data.items():
+        cmap[k] = v
+    return cmap
 
-    :param identifier: the identifier to convert to an identifier.org uri
-    :return: the identifier.org uri as specified in Noctua
-    """
-    if identifier.startswith("FB:"):
-        uri = "http://identifiers.org/" + "flybase/" + identifier.split(":")[1]
-    elif identifier.startswith("WB:"):
-        uri = "http://identifiers.org/" + "wormbase/" + identifier.split(":")[1]
-    else:
-        uri = "http://identifiers.org/" + identifier.split(":")[0].lower() +"/" + identifier
-    return uri

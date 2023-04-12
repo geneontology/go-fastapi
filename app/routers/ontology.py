@@ -6,7 +6,11 @@ from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from prefixcommons.curie_util import expand_uri, read_biocontext
+from prefixmaps import load_context
+from curies import Converter
+from app.utils.prefixes.prefix_utils import remap_prefixes
+from prefixcommons.curie_util import expand_uri
+
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
 from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
@@ -237,9 +241,12 @@ async def get_go_hierarchy_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    cmaps = [read_biocontext("go_context")]
-    for d in cmaps:
-        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
+    context = load_context("go")
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmaps = remap_prefixes(cmaps)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id, cmaps)
@@ -292,9 +299,12 @@ async def get_gocam_models_by_go_id(
     # TODO - this is a hack to get around the fact that the go_context file does not
     # have the MGI prefix defined the same way minerva expects it.
     # This should be fixed in the biocontext file, in prefixmaps, or in minerva
-    cmaps = [read_biocontext("go_context")]
-    for d in cmaps:
-        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
+    context = load_context("go")
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmaps = remap_prefixes(cmaps)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id, cmaps)

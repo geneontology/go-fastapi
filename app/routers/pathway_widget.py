@@ -1,5 +1,5 @@
 import logging
-
+from app.utils.prefixes.prefix_utils import remap_prefixes
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
@@ -36,13 +36,11 @@ async def get_gocams_by_geneproduct_id(
     extended_prefix_map = context.as_extended_prefix_map()
     converter = Converter.from_extended_prefix_map(extended_prefix_map)
     cmaps = converter.prefix_map
-
-    cmaps["MGI"] = "http://identifiers.org/mgi/MGI:"
-    cmaps["WB"] = "http://identifiers.org/wormbase/"
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmaps = remap_prefixes(cmaps)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id=id, cmaps=[cmaps])
-    print(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,

@@ -1,7 +1,9 @@
 import logging
 from fastapi import APIRouter, Query
-from prefixcommons.curie_util import contract_uri, expand_uri, get_prefixes, read_biocontext
-
+from prefixmaps import load_context
+from curies import Converter
+from app.utils.prefixes.prefix_utils import remap_prefixes
+from prefixcommons.curie_util import contract_uri, expand_uri, get_prefixes
 log = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -9,9 +11,12 @@ router = APIRouter()
 
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
-    cmaps = [read_biocontext("go_context")]
-    for d in cmaps:
-        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
+    context = load_context("go")
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmaps = remap_prefixes(cmaps)
     return get_prefixes(cmaps)
 
 
@@ -21,9 +26,12 @@ async def get_expand_curie(
         None, description="identifier in CURIE format of the resource to expand"
     )
 ):
-    cmaps = [read_biocontext("go_context")]
-    for d in cmaps:
-        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
+    context = load_context("go")
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmaps = remap_prefixes(cmaps)
     return expand_uri(id=id, cmaps=cmaps)
 
 
