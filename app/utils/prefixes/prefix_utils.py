@@ -1,8 +1,8 @@
 import logging
-from pprint import pprint
 import json
 import urllib.request
-
+from prefixmaps import load_context
+from curies import Converter
 logger = logging.getLogger(__name__)
 
 
@@ -15,4 +15,14 @@ def remap_prefixes(cmap):
     cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
     cmap["WB"] = "http://identifiers.org/wormbase/"
     return cmap
+
+
+def get_prefixes(context: str = "go"):
+    context = load_context(context)
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmaps = remap_prefixes(cmaps)
+    return cmaps
 

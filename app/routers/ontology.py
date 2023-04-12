@@ -6,9 +6,7 @@ from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from prefixmaps import load_context
-from curies import Converter
-from app.utils.prefixes.prefix_utils import remap_prefixes
+from app.utils.prefixes.prefix_utils import get_prefixes
 from prefixcommons.curie_util import expand_uri
 
 import app.utils.ontology.ontology_utils as ontology_utils
@@ -241,12 +239,7 @@ async def get_go_hierarchy_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    context = load_context("go")
-    extended_prefix_map = context.as_extended_prefix_map()
-    converter = Converter.from_extended_prefix_map(extended_prefix_map)
-    cmaps = converter.prefix_map
-    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-    cmaps = remap_prefixes(cmaps)
+    cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id, cmaps)
@@ -296,15 +289,7 @@ async def get_gocam_models_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-    # TODO - this is a hack to get around the fact that the go_context file does not
-    # have the MGI prefix defined the same way minerva expects it.
-    # This should be fixed in the biocontext file, in prefixmaps, or in minerva
-    context = load_context("go")
-    extended_prefix_map = context.as_extended_prefix_map()
-    converter = Converter.from_extended_prefix_map(extended_prefix_map)
-    cmaps = converter.prefix_map
-    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-    cmaps = remap_prefixes(cmaps)
+    cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id, cmaps)

@@ -2,8 +2,8 @@ import logging
 from fastapi import APIRouter, Query
 from prefixmaps import load_context
 from curies import Converter
-from app.utils.prefixes.prefix_utils import remap_prefixes
-from prefixcommons.curie_util import contract_uri, expand_uri, get_prefixes
+from app.utils.prefixes.prefix_utils import get_prefixes
+from prefixcommons.curie_util import contract_uri, expand_uri
 log = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -11,13 +11,7 @@ router = APIRouter()
 
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
-    context = load_context("go")
-    extended_prefix_map = context.as_extended_prefix_map()
-    converter = Converter.from_extended_prefix_map(extended_prefix_map)
-    cmaps = converter.prefix_map
-    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-    cmaps = remap_prefixes(cmaps)
-    return get_prefixes(cmaps)
+    return get_prefixes("go")
 
 
 @router.get("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
@@ -26,12 +20,7 @@ async def get_expand_curie(
         None, description="identifier in CURIE format of the resource to expand"
     )
 ):
-    context = load_context("go")
-    extended_prefix_map = context.as_extended_prefix_map()
-    converter = Converter.from_extended_prefix_map(extended_prefix_map)
-    cmaps = converter.prefix_map
-    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-    cmaps = remap_prefixes(cmaps)
+    cmaps = get_prefixes("go")
     return expand_uri(id=id, cmaps=cmaps)
 
 

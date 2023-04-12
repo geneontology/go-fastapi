@@ -1,12 +1,10 @@
 import logging
-from app.utils.prefixes.prefix_utils import remap_prefixes
+from app.utils.prefixes.prefix_utils import get_prefixes
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
-from prefixcommons.curie_util import expand_uri, read_biocontext
-from prefixmaps import load_context
-from curies import Converter
+from prefixcommons.curie_util import expand_uri
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
 logger = logging.getLogger(__name__)
@@ -32,12 +30,7 @@ async def get_gocams_by_geneproduct_id(
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
 
-    context = load_context("go")
-    extended_prefix_map = context.as_extended_prefix_map()
-    converter = Converter.from_extended_prefix_map(extended_prefix_map)
-    cmaps = converter.prefix_map
-    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-    cmaps = remap_prefixes(cmaps)
+    cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     id = expand_uri(id=id, cmaps=[cmaps])
