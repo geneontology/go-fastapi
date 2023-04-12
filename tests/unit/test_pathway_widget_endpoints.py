@@ -25,6 +25,12 @@ def test_get_gocams_by_geneproduct_id_MGI():
     assert response.status_code == 200
 
 
+def test_get_gocams_by_geneproduct_id_WB():
+    response = test_client.get(f"/api/gp/WB:WBGene00002147/models")
+    assert len(response.json()) > 0
+    assert response.status_code == 200
+
+
 def test_get_gocams_by_geneproduct_id_causal2():
     id = urllib.parse.quote("FB:FBgn0003731")
     data = {

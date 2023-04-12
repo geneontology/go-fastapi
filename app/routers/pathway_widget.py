@@ -36,11 +36,13 @@ async def get_gocams_by_geneproduct_id(
     extended_prefix_map = context.as_extended_prefix_map()
     converter = Converter.from_extended_prefix_map(extended_prefix_map)
     cmaps = converter.prefix_map
-    for d in cmaps:
-        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
+
+    cmaps["MGI"] = "http://identifiers.org/mgi/MGI:"
+    cmaps["WB"] = "http://identifiers.org/wormbase/"
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    id = expand_uri(id=id, cmaps=cmaps)
+    id = expand_uri(id=id, cmaps=[cmaps])
+    print(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,
