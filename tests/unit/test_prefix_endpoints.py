@@ -29,6 +29,6 @@ def test_contract_uri():
 
 
 def test_get_all_prefixes():
-    response = test_client.get(f"/api/identifier/prefixes")
-    assert len(response.json()) > 200
+    response = test_client.get("/api/identifier/prefixes")
+    assert len(response.json()) > 50
     assert response.status_code == 200

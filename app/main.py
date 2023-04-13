@@ -23,17 +23,17 @@ app = FastAPI(
     },
     license_info={"name": "BSD3"},
 )
+app.include_router(ontology.router)
 app.include_router(bioentity.router)
+app.include_router(ribbon.router)
+app.include_router(pathway_widget.router)
 app.include_router(slimmer.router)
+app.include_router(models.router)
 app.include_router(prefixes.router)
 app.include_router(labeler.router)
-app.include_router(ontology.router)
-app.include_router(ribbon.router)
 app.include_router(search.router)
-app.include_router(models.router)
-app.include_router(users_and_groups.router)
 app.include_router(publications.router)
-app.include_router(pathway_widget.router)
+app.include_router(users_and_groups.router)
 
 # CORS
 app.add_middleware(

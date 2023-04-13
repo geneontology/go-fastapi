@@ -1,12 +1,12 @@
 import logging
-
+from app.utils.prefixes.prefix_utils import get_prefixes
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.resource import OntologyResource
-from prefixcommons.curie_util import expand_uri, read_biocontext
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
+from curies import Converter
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
@@ -14,7 +14,7 @@ SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 
-@router.get("/api/gp/{id}/models", tags=["bioentity"])
+@router.get("/api/gp/{id}/models", tags=["pathways"])
 async def get_gocams_by_geneproduct_id(
     id: str = Query(
         None,
@@ -30,12 +30,11 @@ async def get_gocams_by_geneproduct_id(
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
 
-    cmaps = [read_biocontext("go_context")]
-    for d in cmaps:
-        d.update((k, "http://identifiers.org/mgi/MGI:") for k, v in d.items() if v == "http://identifiers.org/mgi/")
+    cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    id = expand_uri(id=id, cmaps=cmaps)
+    converter = Converter.from_prefix_map(cmaps, strict=False)
+    id = converter.expand(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,
