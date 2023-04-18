@@ -71,7 +71,7 @@ make test
 ### Deploying a change in the API code to docker image on AWS:
 
 1) ssh into the AWS instance running the docker container, invade the image and git pull the changes
-total downtime for this process is about 2 minutes! 
+total downtime for this process is about 5 minutes! 
 ```bash
 ssh -i [path/to/pem/key/locally] ubuntu@[aws.instance.public.ip.address]
 sudo docker stop geneontology/go-fastapi
@@ -106,4 +106,17 @@ docker login
 docker build -t geneontology/go-fastapi .
 docker tag geneontology/go-fastapi:latest geneontology/go-fastapi:[tag_name]
 docker push geneontology/go-fastapi:[tag_name]
+```
+
+### Deploying to AWS/production
+
+1) create a go-fastapi release using the GitHub UI and semantic versioning.
+2) wait for the GitHub action to build and push the docker image to Dockerhub.
+3) ssh into the AWS instance running the docker container, pull the new image and restart the container.
+```bash
+ssh -i [path/to/pem/key/locally] ubuntu@[aws.instance.public.ip.address]
+sudo docker pull geneontology/go-fastapi:latest
+sudo docker stop geneontology/go-fastapi
+sudo docker rm geneontology/go-fastapi
+sudo docker run -d -p 8080:8080 geneontology/go-fastapi
 ```

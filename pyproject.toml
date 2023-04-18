@@ -1,5 +1,5 @@
 [tool.poetry]
-version = "0.1.1.post62.dev0+6d4df5d"
+version = "0.0.0"
 description = ""
 authors = ["Sierra Taylor Moxon <sierra.taylor@gmail.com>"]
 name = "app"
