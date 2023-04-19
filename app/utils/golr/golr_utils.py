@@ -25,14 +25,20 @@ def run_solr_on(solr_instance, category, id, fields):
     response = requests.get(query)
     return response.json()["response"]["docs"][0]
 
-
+# (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
 def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     """
     Return the result of a solr query on the given solrInstance (Enum ESOLR),
     for a certain document_category (ESOLRDoc) and id
     """
     solr_url = solr_instance.value
-    logger.info(solr_url)
+    print("solr_url", solr_url)
+    print("category", category.value)
+    print("q", q)
+    print("qf", qf)
+    print("fields", fields)
+    print("optionals", optionals)
+
     if optionals is None:
         optionals = ""
     query = (
@@ -45,11 +51,12 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + category.value
         + '"&fl='
         + fields
-        + "&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class"
+        + "&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class,"
         + "annotation_class_label_searchable,&hl.requireFieldMatch=true"
         + "&wt=json&indent=on"
         + optionals
     )
+    print("here's the query", query)
     response = requests.get(query)
 
     # solr returns matching text in the field "highlighting", but it is not included in the response.

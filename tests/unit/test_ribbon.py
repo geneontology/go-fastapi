@@ -1,5 +1,5 @@
 import logging
-
+from pprint import pprint
 import pytest
 from fastapi.testclient import TestClient
 
@@ -7,7 +7,7 @@ from app.main import app
 
 test_client = TestClient(app)
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8"]
+gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", 'ZFIN:ZDB-GENE-990415-72']
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
@@ -36,19 +36,23 @@ def test_zebrafish_ribbon():
         assert subject.get("label") == "shha"
         assert subject.get("taxon_label") == "Danio rerio"
         assert subject.get("groups").get("GO:0003674")
-        assert (
+        assert(
+            subject.get("groups").get("GO:0038023").get("ALL").get("nb_annotations")
+            >= 1
+        )
+        assert (  # molecular function
             subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
             >= 5
         )
-        assert (
+        assert (  # biological process
             subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
             >= 93
         )
-        assert (
+        assert (  # cell differentiation
             subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations")
             >= 22
         )
-        assert (
+        assert (  # cellular component
             subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
             >= 4
         )

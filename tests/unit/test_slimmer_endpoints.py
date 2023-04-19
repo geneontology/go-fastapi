@@ -2,7 +2,7 @@ import logging
 
 import pytest
 from fastapi.testclient import TestClient
-
+from pprint import pprint
 from app.main import app
 
 test_client = TestClient(app)
@@ -25,3 +25,14 @@ def test_slimmer_endpoint(endpoint):
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
     assert len(response.json()) > 2
+
+
+@pytest.mark.parametrize("endpoint", ["/api/bioentityset/slimmer/function"])
+def test_slimmer_endpoint(endpoint):
+    data = {
+        "subject": "ZFIN:ZDB-GENE-980526-166",
+        "slim": ["GO:0005102"],
+    }
+    response = test_client.get(endpoint, params=data)
+    assert response.status_code == 200
+    assert len(response.json()) > 0

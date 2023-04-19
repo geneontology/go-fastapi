@@ -11,6 +11,7 @@ from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
 from app.utils.sparql.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
+from pprint import pprint
 
 log = logging.getLogger(__name__)
 
@@ -23,16 +24,13 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_ontology_subsets_by_go_term_id(
     id: str = Query(
-        None, description="'CURIE identifier of a GO term," " e.g. GO:0006259"
+        None, description="'CURIE identifier of a GO term, e.g. GO:0006259"
     )
 ):
     """
     Returns subsets (slims) associated to an ontology term
     """
     query = ontology_utils.get_go_subsets_sparql_query(id)
-    # replace with OntologyFactory with ontobio - but config on startup
-    # or use OAK  here and rewrite - still need to config on startup (SQLLite - up front to make
-    # the latest version, etc.)
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -81,6 +79,7 @@ async def get_ribbon_results(
 
     # Step 1: create the categories
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
+    # in categories
     for category in categories:
         category["groups"] = category["terms"]
         del category["terms"]
@@ -165,7 +164,6 @@ async def get_ribbon_results(
             "nb_annotations": 0,
             "terms": set(),
         }
-
         if subject_id.startswith("MGI:"):
             subject_id = "MGI:" + subject_id
         mod_ids.append(subject_id)
@@ -180,10 +178,9 @@ async def get_ribbon_results(
             fq += "&fq=!evidence_type:IBA"
         if exclude_PB:
             fq += '&fq=!annotation_class:"GO:0005515"'
-        log.info(fq)
-
+        print("here is the first call")
         data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
-
+        pprint(data)
         # compute number of terms and annotations
         for annot in data:
             aspect = ontology_utils.aspect_map[annot["aspect"]]
@@ -304,6 +301,7 @@ async def get_ribbon_results(
     qf = ""
     fq = '&fq=bioentity:("' + '" or "'.join(mod_ids) + '")&rows=100000'
     fields = "bioentity,bioentity_label,taxon,taxon_label"
+    print("heres the second call???")
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, q, qf, fields, fq)
 
     for entity in subjects:

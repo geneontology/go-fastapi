@@ -5,7 +5,8 @@ from oaklib.implementations.sparql.sparql_implementation import \
     SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import ESOLR, ESOLRDoc, run_solr_text_on
+from ontobio.golr.golr_query import ESOLR, ESOLRDoc
+from app.utils.golr.golr_utils import run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
@@ -49,7 +50,7 @@ def goont_fetch_label(id):
 def get_ontology_subsets_by_id(id: str):
     q = "*:*"
     qf = ""
-    fq = "&fq=subset:" + id + "&rows=1000"
+    fq = "&fq=subset:" + id
     fields = "annotation_class,annotation_class_label,description,source"
 
     # This is a temporary fix while waiting for the PR of the AGR slim on go-ontology
@@ -61,8 +62,10 @@ def get_ontology_subsets_by_id(id: str):
                 terms_list.add(term)
 
         goslim_agr_ids = '" "'.join(terms_list)
-        fq = '&fq=annotation_class:("' + goslim_agr_ids + '")&rows=1000'
+        fq = '&fq=annotation_class:("' + goslim_agr_ids + '")'
 
+    fq = fq+"&rows=1000"
+    print("first get subset query")
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 
     tr = {}
@@ -79,6 +82,7 @@ def get_ontology_subsets_by_id(id: str):
         cats.append(category)
 
     fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
+    print("second get subset query")
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 
     for category in tr:
