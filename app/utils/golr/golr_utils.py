@@ -32,12 +32,6 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     for a certain document_category (ESOLRDoc) and id
     """
     solr_url = solr_instance.value
-    print("solr_url", solr_url)
-    print("category", category.value)
-    print("q", q)
-    print("qf", qf)
-    print("fields", fields)
-    print("optionals", optionals)
 
     if optionals is None:
         optionals = ""
@@ -56,7 +50,6 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + "&wt=json&indent=on"
         + optionals
     )
-    print("here's the query", query)
     response = requests.get(query)
 
     # solr returns matching text in the field "highlighting", but it is not included in the response.
