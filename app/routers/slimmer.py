@@ -36,8 +36,8 @@ async def slimmer_function(
         "example: GO:0005575",
     ),
     exclude_automatic_assertions: bool = False,
-    rows: int = 100,
-    start: int = 1,
+    rows: int = -1,
+    start: int = 0,
 ):
     """
     For a given gene(s), summarize its annotations over a defined set of slim
@@ -45,7 +45,6 @@ async def slimmer_function(
 
     # Note that GO currently uses UniProt as primary ID
     # for some sources: https://github.com/biolink/biolink-api/issues/66
-    # https://github.com/monarch-initiative/dipper/issues/461
 
     subjects = [
         x.replace("WormBase:", "WB:") if "WormBase:" in x else x for x in subject
@@ -68,8 +67,10 @@ async def slimmer_function(
         url=ESOLR.GOLR,
         relationship_type=relationship_type.value,
         exclude_automatic_assertions=exclude_automatic_assertions,
-        rows=-1,
-        start=None
+        # rows=-1 sets row limit to 100000 (max_rows set in GolrQuery) and also iterates
+        # through results via GolrQuery method.
+        rows=rows,
+        start=start
     )
 
     # To the fullest extent possible return HGNC ids
