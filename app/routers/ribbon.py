@@ -178,9 +178,7 @@ async def get_ribbon_results(
             fq += "&fq=!evidence_type:IBA"
         if exclude_PB:
             fq += '&fq=!annotation_class:"GO:0005515"'
-        print("here is the first call")
         data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
-        pprint(data)
         # compute number of terms and annotations
         for annot in data:
             aspect = ontology_utils.aspect_map[annot["aspect"]]
