@@ -5,7 +5,7 @@ from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
 from app.utils.settings import ESOLR, get_user_agent
-
+from pprint import pprint
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
 FUNCTION_CATEGORY = "function"
@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 class RelationshipType(str, Enum):
-    acts_upstream_of_or_within = (ACTS_UPSTREAM_OF_OR_WITHIN,)
+    acts_upstream_of_or_within = ACTS_UPSTREAM_OF_OR_WITHIN
     involved_in = INVOLVED_IN
 
 
@@ -36,8 +36,8 @@ async def slimmer_function(
         "example: GO:0005575",
     ),
     exclude_automatic_assertions: bool = False,
-    rows: int = 100,
-    start: int = 1,
+    rows: int = -1,
+    start: int = 0,
 ):
     """
     For a given gene(s), summarize its annotations over a defined set of slim
@@ -45,9 +45,7 @@ async def slimmer_function(
 
     # Note that GO currently uses UniProt as primary ID
     # for some sources: https://github.com/biolink/biolink-api/issues/66
-    # https://github.com/monarch-initiative/dipper/issues/461
 
-    # TODO - figure out if this is still needed. WormBase to WB
     subjects = [
         x.replace("WormBase:", "WB:") if "WormBase:" in x else x for x in subject
     ]
@@ -67,6 +65,12 @@ async def slimmer_function(
         object_category="function",
         user_agent=USER_AGENT,
         url=ESOLR.GOLR,
+        relationship_type=relationship_type.value,
+        exclude_automatic_assertions=exclude_automatic_assertions,
+        # rows=-1 sets row limit to 100000 (max_rows set in GolrQuery) and also iterates
+        # through results via GolrQuery method.
+        rows=rows,
+        start=start
     )
 
     # To the fullest extent possible return HGNC ids
