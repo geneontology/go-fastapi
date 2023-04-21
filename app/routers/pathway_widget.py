@@ -21,7 +21,7 @@ async def get_gocams_by_geneproduct_id(
         description="A Gene Product CURIE (e.g. MGI:3588192, MGI:MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
     ),
     causalmf: int = Query(
-        2,
+        None,
         description="Used by the pathway widget The model has a chain of at least three functions connected "
                     "by at least two consecutive causal relation edges.  One of these functions is enabled_by "
                     "this input gene"
@@ -38,6 +38,7 @@ async def get_gocams_by_geneproduct_id(
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
+    print(id)
     logger.info(
         "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
         id,
