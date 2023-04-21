@@ -22,6 +22,7 @@ async def get_gocams_by_geneproduct_id(
     ),
     causalmf: int = Query(
         None,
+        deprecated=True,
         description="Used by the pathway widget The model has a chain of at least three functions connected "
                     "by at least two consecutive causal relation edges.  One of these functions is enabled_by "
                     "this input gene"
