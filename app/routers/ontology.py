@@ -299,13 +299,14 @@ async def get_gocam_models_by_go_id(
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
-        SELECT distinct ?gocam
+        SELECT distinct ?gocam ?title 
         WHERE 
         {
             GRAPH ?gocam {
                 ?gocam metago:graphType metago:noctuaCam .    
                 ?entity rdf:type owl:NamedIndividual .
                 ?entity rdf:type ?goid .
+                ?gocam dc:title ?title . 
                 FILTER(?goid = <%s>)
             }
         }
@@ -313,9 +314,4 @@ async def get_gocam_models_by_go_id(
         % id
     )
     results = si._sparql_query(query)
-    collated_results = []
-    collated = {}
-    for result in results:
-        collated["gocam"] = result["gocam"].get("value")
-        collated_results.append(collated)
-    return collated_results
+    return transform_array(results)
