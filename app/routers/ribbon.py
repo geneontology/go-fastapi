@@ -169,8 +169,7 @@ async def get_ribbon_results(
             "nb_annotations": 0,
             "terms": set(),
         }
-        if subject_id.startswith("MGI:"):
-            subject_id = "MGI:" + subject_id
+
         mod_ids.append(subject_id)
 
         q = "*:*"

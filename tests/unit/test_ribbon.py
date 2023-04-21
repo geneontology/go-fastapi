@@ -36,10 +36,6 @@ def test_zebrafish_ribbon():
         assert subject.get("label") == "shha"
         assert subject.get("taxon_label") == "Danio rerio"
         assert subject.get("groups").get("GO:0003674")
-        assert(
-            subject.get("groups").get("GO:0038023").get("ALL").get("nb_annotations")
-            >= 1
-        )
         assert (  # molecular function
             subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
             >= 5

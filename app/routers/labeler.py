@@ -16,7 +16,9 @@ async def expand_curie(id: List[str] = Query(...)):
     Fetches a map from CURIEs/IDs to labels
     """
 
-    if id.startswith("MGI:MGI:"):
-        id = id.replace("MGI:MGI:", "MGI:")
+    for i in id:
+        if "MGI:MGI" in i:
+            id.remove(i)
+            id.append(i.replace("MGI:MGI", "MGI:"))
 
     return batch_fetch_labels(id)
