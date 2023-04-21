@@ -33,7 +33,7 @@ version of the running API from their local browser via: http://127.0.0.1:8080/d
 # of touching the background file, if the python server fails, the entire image is gone and we can detect that. 
 
 ```bash
-docker run -d -p 8080:8080 geneontology/go-fastapi
+docker run -d -p 8080:8080 --name go-fastapi geneontology/go-fastapi
 ```
 
 ### Deploying a change in the API code to docker image:

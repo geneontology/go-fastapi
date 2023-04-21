@@ -28,7 +28,7 @@ async def slimmer_function(
     relationship_type: RelationshipType = Query(
         default=RelationshipType.acts_upstream_of_or_within
     ),
-    subject: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388"),
+    subject: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388, MGI:3588192"),
     slim: List[str] = Query(
         ...,
         description="Map objects up (slim) to a higher level category. "
@@ -46,16 +46,17 @@ async def slimmer_function(
     # Note that GO currently uses UniProt as primary ID
     # for some sources: https://github.com/biolink/biolink-api/issues/66
 
-    subjects = [
-        x.replace("WormBase:", "WB:") if "WormBase:" in x else x for x in subject
-    ]
     slimmer_subjects = []
-    for s in subjects:
+    for s in subject:
         if "HGNC:" in s or "NCBIGene:" in s or "ENSEMBL:" in s:
             prots = gene_to_uniprot_from_mygene(s)
             if len(prots) == 0:
                 prots = [s]
             slimmer_subjects += prots
+        elif "MGI:MGI:" in s:
+            slimmer_subjects.append(s.replace("MGI:MGI:", "MGI:"))
+        elif "WormBase:" in s:
+            slimmer_subjects.append(s.replace("WormBase:", "WB:"))
         else:
             slimmer_subjects.append(s)
 

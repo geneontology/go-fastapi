@@ -40,7 +40,7 @@ async def get_bioentity_by_id(
     id: str = Query(
         ...,
         description="example: `CURIE identifier of a bioentity (e.g. a gene) "
-        "(e.g. ZFIN:ZDB-GENE-990415-1)`",
+        "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
     ),
     start: int = 0,
     rows: int = 100,
@@ -257,7 +257,7 @@ async def get_taxon_by_goterm_id(
 
 @router.get("/api/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_annotations_by_gene_id(
-    id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+    id: str = Query(..., description="CURIE identifier of a GO term, e.g. ZFIN:ZDB-GENE-050417-357"),
     # ... in query means "required" parameter.
     slim: List[str] = Query(
         default=None,
@@ -287,6 +287,9 @@ async def get_annotations_by_gene_id(
     Again, this should be transparently handled; e.g. you can use NCBIGene:6469, and this will be
     mapped behind the scenes for querying.
     """
+
+    if id.startswith("MGI:MGI:"):
+        id = id.replace("MGI:MGI:", "MGI:")
 
     assocs = search_associations(
         object_category="function",
