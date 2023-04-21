@@ -54,10 +54,20 @@ def test_slimmer_endpoint_shha(endpoint):
 @pytest.mark.parametrize("endpoint", ["/api/bioentityset/slimmer/function"])
 def test_slimmer_endpoint_mgimgi(endpoint):
     data = {
-        "subject": ["ZFIN:ZDB-GENE-980526-166", "MGI:3588192", "MGI:MGI:3588192"],
-        "slim": ["GO:0005102"],
+        "subject": ["MGI:MGI:3588192"],
+        "slim": ["GO:0005575"],
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
-    pprint(response.json())
+    assert len(response.json()) > 0
+
+
+@pytest.mark.parametrize("endpoint", ["/api/bioentityset/slimmer/function"])
+def test_slimmer_endpoint_mgi(endpoint):
+    data = {
+        "subject": ["MGI:3588192"],
+        "slim": ["GO:0005575"],
+    }
+    response = test_client.get(endpoint, params=data)
+    assert response.status_code == 200
     assert len(response.json()) > 0
