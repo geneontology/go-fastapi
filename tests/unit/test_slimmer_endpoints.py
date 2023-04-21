@@ -59,5 +59,5 @@ def test_slimmer_endpoint_mgimgi(endpoint):
     }
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 200
-    print (response.json())
+    pprint(response.json())
     assert len(response.json()) > 0
