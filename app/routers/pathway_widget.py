@@ -18,7 +18,7 @@ router = APIRouter()
 async def get_gocams_by_geneproduct_id(
     id: str = Query(
         None,
-        description="A Gene Product CURIE (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
+        description="A Gene Product CURIE (e.g. MGI:3588192, MGI:MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
     ),
     causalmf: int = Query(
         None,
@@ -29,6 +29,8 @@ async def get_gocams_by_geneproduct_id(
     """
     Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
     """
+    if id.startswith("MGI:MGI:"):
+        id = id.replace("MGI:MGI:", "MGI:")
 
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())

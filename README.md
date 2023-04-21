@@ -30,7 +30,7 @@ will run the image and start the API server but give the control of the terminal
 version of the running API from their local browser via: http://127.0.0.1:8080/docs
 
 ```bash
-docker run -d -p 8080:8080 geneontology/go-fastapi
+docker run -d -p 8080:8080 --name go-fastapi geneontology/go-fastapi
 ```
 
 ### Deploying a change in the API code to docker image:

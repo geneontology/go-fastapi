@@ -22,6 +22,9 @@ async def get_expand_curie(
         None, description="identifier in CURIE format of the resource to expand"
     )
 ):
+    if id.startswith("MGI:MGI:"):
+        id = id.replace("MGI:MGI:", "MGI:")
+
     cmaps = get_prefixes("go")
     # have to set strict to "False" to allow for WB and WormBase as prefixes that
     # map to the same expanded URI prefix
