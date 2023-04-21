@@ -29,9 +29,6 @@ will run the image and start the API server but give the control of the terminal
 `-p` tells docker to map the container port 8080 to the host port 8080.  This way the user can access the API docker
 version of the running API from their local browser via: http://127.0.0.1:8080/docs
 
-# TODO: ensure that the entrypoint is used so that we can tell dockerswarm etc. to bring back up the container, instead
-# of touching the background file, if the python server fails, the entire image is gone and we can detect that. 
-
 ```bash
 docker run -d -p 8080:8080 --name go-fastapi geneontology/go-fastapi
 ```
@@ -71,7 +68,34 @@ make start
 make test
 ```
 
-# add an endpoint to the API to kill the service and then test that the docker container restarts the service
+### Deploying a change in the API code to docker image on AWS:
+
+1) ssh into the AWS instance running the docker container, invade the image and git pull the changes
+total downtime for this process is about 5 minutes! 
+```bash
+ssh -i [path/to/pem/key/locally] ubuntu@[aws.instance.public.ip.address]
+sudo docker stop geneontology/go-fastapi
+sudo docker rm geneontology/go-fastapi
+sudo docker image rm geneontology/go-fastapi
+cd go-fastapi
+git pull 
+sudo docker build -t geneontology/go-fastapi .
+sudo docker run -d -p 8080:8080 geneontology/go-fastapi
+```
+
+### Restarting the API server on AWS manually:
+2) stop the running api from inside the docker container
+```bash
+sudo pkill gunicorn
+```
+this will stop the running docker container and push you back into the AWS instance itself.
+
+3) restart the image 
+This automatically restarts the API server by running `make start` in the docker container.
+```bash
+docker run -d -p 8080:8080 geneontology/go-fastapi
+```
+
 ### Pushing to Dockerhub
 
 GitHub Actions will automatically build and push the docker image to Dockerhub when a new versioned tag is created.
@@ -82,4 +106,17 @@ docker login
 docker build -t geneontology/go-fastapi .
 docker tag geneontology/go-fastapi:latest geneontology/go-fastapi:[tag_name]
 docker push geneontology/go-fastapi:[tag_name]
+```
+
+### Deploying to AWS/production
+
+1) create a go-fastapi release using the GitHub UI and semantic versioning.
+2) wait for the GitHub action to build and push the docker image to Dockerhub.
+3) ssh into the AWS instance running the docker container, pull the new image and restart the container.
+```bash
+ssh -i [path/to/pem/key/locally] ubuntu@[aws.instance.public.ip.address]
+sudo docker pull geneontology/go-fastapi:latest
+sudo docker stop geneontology/go-fastapi
+sudo docker rm geneontology/go-fastapi
+sudo docker run -d -p 8080:8080 geneontology/go-fastapi
 ```

@@ -1,26 +1,30 @@
 import logging
+import json
+import urllib.request
+from prefixmaps import load_context
+from curies import Converter
 from pprint import pprint
-
-import requests
-
 logger = logging.getLogger(__name__)
 
 
-# Respect the method name for run_sparql_on with enums
-def get_identifierorg_uri(identifier):
-    """
-    return the identifier.org uri for the given identifier
-    such that it matches what GO has stored for the URI.  This
-    means using http vs. https and using the stored prefix (for
-    flybase this is 'flybase' vs. 'fb' in identifiers.org)
+# have to remap prefixes from prefixmaps in order to match the prefixes in Minerva
+def remap_prefixes(cmap):
+    response = urllib.request.urlopen("https://raw.githubusercontent.com/ExposuresProvider/cam-pipeline/kg-tsv/supplemental-namespaces.json")
+    data = json.loads(response.read().decode())
+    for k, v in data.items():
+        cmap[v] = k
+    cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
+    cmap["WB"] = "http://identifiers.org/wormbase/"
+    return cmap
 
-    :param identifier: the identifier to convert to an identifier.org uri
-    :return: the identifier.org uri as specified in Noctua
-    """
-    if identifier.startswith("FB:"):
-        uri = "http://identifiers.org/" + "flybase/" + identifier.split(":")[1]
-    elif identifier.startswith("WB:"):
-        uri = "http://identifiers.org/" + "wormbase/" + identifier.split(":")[1]
-    else:
-        uri = "http://identifiers.org/" + identifier.split(":")[0].lower() +"/" + identifier
-    return uri
+
+def get_prefixes(context: str = "go"):
+    context = load_context(context)
+    extended_prefix_map = context.as_extended_prefix_map()
+    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    cmaps = converter.prefix_map
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    cmap_remapped = remap_prefixes(cmaps)
+
+    return cmap_remapped
+
