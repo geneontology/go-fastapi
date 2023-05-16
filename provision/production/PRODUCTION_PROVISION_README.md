@@ -209,5 +209,6 @@ Then, within the docker image:
 ```
 chown root /tmp/go-*
 chgrp root /tmp/go-*
+chmod 400 /tmp/go-ssh
 ```
 
