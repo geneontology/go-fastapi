@@ -86,9 +86,7 @@ go-deploy --working-directory aws -list-workspaces -verbose
 
 ## Provision Instance on AWS
 
-We only need to provision the AWS instance once. This is because we
-only want one instance to manage the wildcard certificates. Use the
-terraform commands shown above to figure out the name of an existing
+Use the terraform commands shown above to figure out the name of an existing
 workspace. If such workspace exists, then you can skip the
 provisionning of the aws instance. Or you can destroy the aws instance
 and re-provision if that is the intent.
