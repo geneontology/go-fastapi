@@ -1,0 +1,10 @@
+solr_url:
+  url: "{{ solr_url }}"
+  timeout: 30
+ontologies:
+  - id: go
+    handle: go
+    pre_load: false
+sparql_url:
+  url: "{{ sparql_url }}"
+  timeout: 60

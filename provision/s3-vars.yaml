@@ -1,0 +1,7 @@
+---
+###############
+# s3 bucket for apache logs
+################
+S3_PATH: go-fastapi 
+S3_CRED_FILE: REPLACE_ME
+S3_BUCKET: REPLACE_ME

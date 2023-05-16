@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+
+  fastapi:
+    hostname: fastapi 
+    container_name: fastapi  
+    volumes:
+      - {{ stage_dir }}/conf/config.yaml:/code/app/conf/config.yaml
+    image: 'geneontology/go-fastapi:{{ fastapi_tag }}'
+    init: true
+    restart: unless-stopped
+    healthcheck:
+       test: wget --no-verbose --timeout=5 --tries=5 --spider http://fastapi:8080 || kill 1
+       interval: 60s
+       retries: 1
+       start_period: 30s
+
+  apache_proxy:
+    hostname: apache_fastapi
+    container_name: apache_fastapi
+    image: {{ apache_proxy_image }}
+    volumes:
+      - {{ stage_dir }}/httpd-confs:/etc/apache2/sites-enabled
+      - {{ stage_dir }}/qos.conf:/etc/apache2/mods-enabled/qos.conf
+      - {{ stage_dir }}/robots.txt:/var/www/html/robots.txt
+      - {{ stage_dir }}/apache_logs:/var/log/apache2
+      - {{ stage_dir }}/credentials:/opt/credentials
+      - {{ stage_dir }}/credentials/s3cfg:/root/.aws/config
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - S3_PATH={{ S3_PATH }}/fastapi
+      - S3_BUCKET={{ S3_BUCKET }}
+      - USE_SSL={{ USE_SSL }}
+      - S3_SSL_CERTS_LOCATION={{ S3_SSL_CERTS_LOCATION }}
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - fastapi 
+

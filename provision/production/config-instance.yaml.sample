@@ -1,0 +1,13 @@
+ssh_keys:
+     public: /tmp/go-ssh.pub
+     private: /tmp/go-ssh
+
+instance:
+    tags:
+       Name: REPLACE_ME  # This will be the tag used in AWS 
+    instance_type: t2.large
+    disk_size: 200
+    open_ports:
+       - 80
+       - 22
+       - 443
