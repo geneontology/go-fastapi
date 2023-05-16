@@ -41,7 +41,7 @@ We use S3 terraform backend to store terraform's state. See production/backend.t
 
 ## DNS 
 
-DNS record is used for go-fastapi . Once the instance has been provisioned, you would need to point this record to elastic ip of the VM. For testing purposes you can use aes-test-go-fastapi.geneontology.io.
+DNS record is used for go-fastapi . Once the instance has been provisioned, you would need to point this record to elastic ip of the VM. For testing purposes you can use aes-test-go-fastapi.geneontology.org.
 
 ## SSH Keys
 For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
