@@ -48,7 +48,7 @@ For testing purposes you can you your own ssh keys. But for production please as
 
 ## Prepare The AWS Credentials
 
-The credentials are need by terraform to provision the AWS instance and are used by the provisioned instance to access the s3 bucket used as a certificate store and push aapache logs. One could also copy in from an existing credential set, see Appendix I at the end for more details.
+The credentials are used by terraform to provision the AWS instance and by the provisioned instance to access the certificate store and the apache logs s3 buckets. One could also copy in from an existing credential set, see Appendix I at the end for more details.
 
 - [ ] Copy and modify the aws credential file to the default location `/tmp/go-aws-credentials` <br/>`cp production/go-aws-credentials.sample /tmp/go-aws-credentials`
 - [ ] You will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME`.
