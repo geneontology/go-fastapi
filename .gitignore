@@ -142,3 +142,13 @@ Pipfile.lock
 
 # No Pycharm
 .idea/
+
+
+# AWS Provisioning 
+*.cfg
+*.tfvars.json
+config-instance.yaml
+config-stack.yaml
+.terraform.lock.hcl
+.terraform/
+backend.tf

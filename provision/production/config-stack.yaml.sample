@@ -1,0 +1,25 @@
+ssh_keys:
+     public: /tmp/go-ssh.pub
+     private: /tmp/go-ssh
+
+stack:
+   vars:
+      PROD_MODE: 1
+      stage_dir: /home/ubuntu/stage_dir
+      apache_proxy_image: geneontology/apache-proxy:v4
+      S3_CRED_FILE: /tmp/go-aws-credentials
+
+      S3_BUCKET: REPLACE_ME_APACHE_LOG_BUCKET
+
+      # APACHE PROXY WILL ALLOW FOR HTTPS. Recommended for PRODUCTION
+      USE_SSL: 0 
+      S3_SSL_CERTS_LOCATION: s3://REPLACE_ME/geneontology.org.tar.gz
+
+      # APACHE PROXY USE QOS module. Recommended for PRODUCTION
+      USE_QOS: 1
+      QS_ClientEventBlockCount: "350 300"
+      QS_ClientEventBlockExcludeIP: "9.9.9.9"
+
+      fastapi_host: REPLACE_ME # aes-test-go-fastapi
+      fastapi_tag: 0.1.3
+   scripts: [ "stage.yaml", "start_services.yaml" ]
