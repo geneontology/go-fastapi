@@ -155,14 +155,20 @@ Check list:
 - docker-compose -f stage_dir/docker-compose.yaml up -d
 - docker-compose -f stage_dir/docker-compose.yaml logs -f 
 
-Testing LogRotate. Use -f option to force log rotation.
+Testing LogRotate:
 
 ```sh
 docker exec -u 0 -it apache_fastapi bash # enter container
 cat /opt/credentials/s3cfg
 echo $S3_BUCKET
 aws s3 ls s3://$S3_BUCKET
-logrotate -v -f /etc/logrotate.d/apache2
+logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
+```
+
+Testing Health Check:
+
+```sh
+docker inspect --format "{{json .State.Health }}" fastapi
 ```
 
 ## Destroy Instance and Delete Workspace.
