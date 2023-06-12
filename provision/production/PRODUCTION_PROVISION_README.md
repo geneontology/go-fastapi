@@ -148,12 +148,28 @@ Check list:
 
 ## Debugging
 
+- Use -dry-run and copy and paste the command and execute it manually
 - ssh to machine. username is ubuntu. Try using dns names to make sure they are fine
 - docker-compose -f stage_dir/docker-compose.yaml ps
 - docker-compose -f stage_dir/docker-compose.yaml down # whenever you make any changes 
 - docker-compose -f stage_dir/docker-compose.yaml up -d
 - docker-compose -f stage_dir/docker-compose.yaml logs -f 
-- Use -dry-run and copy and paste the command and execute it manually
+
+Testing LogRotate:
+
+```sh
+docker exec -u 0 -it apache_fastapi bash # enter container
+cat /opt/credentials/s3cfg
+echo $S3_BUCKET
+aws s3 ls s3://$S3_BUCKET
+logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
+```
+
+Testing Health Check:
+
+```sh
+docker inspect --format "{{json .State.Health }}" fastapi
+```
 
 ## Destroy Instance and Delete Workspace.
 
