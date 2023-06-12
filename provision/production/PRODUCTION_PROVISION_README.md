@@ -158,7 +158,7 @@ Check list:
 Testing LogRotate. Use -f option to force log rotation.
 
 ```sh
-docker exec -u 0 -it apache_fastapi bash # enter container as root
+docker exec -u 0 -it apache_fastapi bash # enter container
 cat /opt/credentials/s3cfg
 echo $S3_BUCKET
 aws s3 ls s3://$S3_BUCKET
