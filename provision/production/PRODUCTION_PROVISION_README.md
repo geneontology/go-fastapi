@@ -159,10 +159,11 @@ Testing LogRotate:
 
 ```sh
 docker exec -u 0 -it apache_fastapi bash # enter container
-cat /opt/credentials/s3cfg
+cat ~/.aws/config 
 echo $S3_BUCKET
 aws s3 ls s3://$S3_BUCKET
 logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
+cat /tmp/logrotate-to-s3.log # make sure uploading to s3 was fine
 ```
 
 Testing Health Check:
