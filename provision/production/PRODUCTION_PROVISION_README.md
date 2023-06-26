@@ -177,7 +177,6 @@ docker inspect --format "{{json .State.Health }}" fastapi
 ```sh
 # Make sure you pointing to the correct workspace before destroying the stack.
 terraform -chdir=aws workspace list
-terraform -chdir=aws workspace select <name_of_workspace>
 terraform -chdir=aws workspace show # shows the name of current workspace
 terraform -chdir=aws show           # shows the state you are about to destroy
 terraform -chdir=aws destroy        # You would need to type Yes to approve.
