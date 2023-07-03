@@ -55,7 +55,7 @@ Note: you will need to supply an `aws_access_key_id` and `aws_secret_access_key`
 
 ```bash
 cp production/go-aws-credentials.sample /tmp/go-aws-credentials
-nano /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_access_key`
+emacs /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_access_key`
 ```
 
 3. Prepare and initialize the S3 Terraform backend:
