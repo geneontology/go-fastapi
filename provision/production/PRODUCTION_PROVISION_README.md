@@ -39,7 +39,7 @@ For testing purposes you can you your own ssh keys. But for production please as
 
 ## Deployment: 
 
-#### Spin up the provided dockerized development environment:
+1. Spin up the provided dockerized development environment:
 
 ```bash
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
@@ -47,7 +47,7 @@ git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
 ```
 
-#### Prepare AWS credentials:
+2. Prepare AWS credentials:
 
 The credentials are used by Terraform to provision the AWS instance and by the provisioned instance to access the certificate store and the s3 buckets used to store Apache logs.  Copy and modify the aws credential file to the default location `/tmp/go-aws-credentials` 
 
@@ -58,7 +58,7 @@ cp production/go-aws-credentials.sample /tmp/go-aws-credentials
 nano /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_access_key`
 ```
 
-#### Prepare and initialize the S3 Terraform backend:
+3. Prepare and initialize the S3 Terraform backend:
 
 ```bash
 
@@ -77,7 +77,7 @@ go-deploy -init --working-directory aws -verbose
 go-deploy --working-directory aws -list-workspaces -verbose 
 ```
 
-#### Provision instance on AWS:
+4. Provision instance on AWS:
 
 If a workspace exists above, then you can skip the provisioning of the AWS instance.  Else, create a workspace using the following namespace pattern `production-YYYY-MM-DD`.  e.g.: `production-2023-01-30`
 
@@ -100,14 +100,14 @@ go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --c
 
 Note: write down the IP address of the AWS instance that is created. This can be found in production-YYYY-MM-DD.cfg
 
-#### deploy stack to AWS:
+5. deploy stack to AWS:
 
-1. Make DNS names for go-fastapi point to the public IP address on AWS Route 53
-2. Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
-3. s3 credentials are placed in a file using the format described above
-4. s3 uri if SSL is enabled. Location of SSL certs/key
-5. QoS mitigation if QoS is enabled
-6. Use the same workspace name as in the previous step
+* Make DNS names for go-fastapi point to the public IP address on AWS Route 53
+* Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
+* s3 credentials are placed in a file using the format described above
+* s3 uri if SSL is enabled. Location of SSL certs/key
+* QoS mitigation if QoS is enabled
+* Use the same workspace name as in the previous step
 
 ```bash
 cp ./production/config-stack.yaml.sample ./config-stack.yaml
@@ -116,15 +116,16 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-stack.yaml
 ```
 
-#### Access go-fastapi from a browser:
+6. Access go-fastapi from a browser:
 
 We use health checks in the docker-compose file.  
 Use go-fastapi dns name. http://{go-fastapi_host}/docs
 
-#### Debugging:
+7. Debugging:
 
-- Use -dry-run and copy and paste the command and execute it manually
-- ssh to the machine; username is ubuntu. Try using DNS names to make sure they are fine.
+* Use -dry-run and copy and paste the command and execute it manually
+* ssh to the machine; username is ubuntu. Try using DNS names to make sure they are fine.
+
 ```bash
 docker-compose -f stage_dir/docker-compose.yaml ps
 docker-compose -f stage_dir/docker-compose.yaml down # whenever you make any changes 
@@ -132,7 +133,7 @@ docker-compose -f stage_dir/docker-compose.yaml up -d
 docker-compose -f stage_dir/docker-compose.yaml logs -f 
 ```
 
-#### Testing LogRotate:
+8. Testing LogRotate:
 
 ```bash
 docker exec -u 0 -it apache_fastapi bash # enter the container
@@ -142,13 +143,13 @@ aws s3 ls s3://$S3_BUCKET
 logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
 ```
 
-#### Testing Health Check:
+9. Testing Health Check:
 
 ```sh
 docker inspect --format "{{json .State.Health }}" fastapi
 ```
 
-#### Destroy Instance and Delete Workspace:
+10. Destroy Instance and Delete Workspace:
 
 ```bash
 # Make sure you point to the correct workspace before destroying the stack.
@@ -168,8 +169,7 @@ terraform -chdir=aws workspace delete <name_of_workspace>  # delete workspace.
 ## For Developers:
 Use the recipe below to create a local, development environment for this application. 
 
-```
-# start docker container `go-dev` in interactive mode.
+1. start docker container `go-dev` in interactive mode.
 
 ```bash
 docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
@@ -180,7 +180,7 @@ In the command above we used the `--rm` option which means the container will be
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
 ```
 
-#### Exit or stop the container:
+2. To exit or stop the container:
 
 ```bash
 docker stop go-dev                   # stop container with the intent of restarting it. This is equivalent to `exit` inside the container.
@@ -188,7 +188,7 @@ docker start -ia go-dev              # restart and attach to the container.
 docker rm -f go-dev                  # remove it for good.
 ```
 
-#### Use `docker cp` to copy these credentials to /tmp:
+3. Use `docker cp` to copy these credentials to /tmp:
 
 ```bash
 docker cp /tmp/go-aws-credentials go-dev:/tmp/
@@ -196,7 +196,7 @@ docker cp /tmp/go-ssh go-dev:/tmp
 docker cp /tmp/go-ssh.pub go-dev:/tmp
 ```
 
-#### Then, within the docker image:
+within the docker image:
 
 ```bash
 chown root /tmp/go-*
@@ -206,7 +206,8 @@ chmod 400 /tmp/go-ssh
 
 
  #### additional terraform commands? 
-```
+ 
+```bash 
 cat production-YYYY-MM-DD.tfvars.json
 
 # The previous command creates an ansible inventory file.
