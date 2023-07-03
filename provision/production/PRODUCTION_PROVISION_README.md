@@ -3,7 +3,7 @@
 This guide describes the deployment of the `go-fastapi` stack to AWS using Terraform, ansible, and the "go-deploy" Python library. 
 
 ## Prerequisites: 
-Note, we have a docker-based environment with all these tools installed. 
+Note: we have a docker-based environment with all these tools installed. 
 
 #### software:
 
