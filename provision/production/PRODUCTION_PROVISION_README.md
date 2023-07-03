@@ -30,7 +30,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 
 #### DNS: 
 
-DNS record is used for `go-fastapi`. Once the instance has been provisioned, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use aes-test-go-fastapi.geneontology.org.
+DNS record is used for `go-fastapi`. Once the instance has been provisioned, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org`
 
 #### SSH Keys:
 
