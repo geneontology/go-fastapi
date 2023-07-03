@@ -36,7 +36,7 @@ DNS record is used for `go-fastapi`. Once the instance has been provisioned, you
 
 For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
 
-## Recipe 
+## Deployment: 
 
 #### Spin up the provided dockerized development environment:
 
