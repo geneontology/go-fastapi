@@ -2,7 +2,7 @@
 
 This guide describes the deployment of the `go-fastapi` stack to AWS using Terraform, ansible, and the "go-deploy" Python library. 
 
-### Prerequisites: Note, we have a docker-based environment with all these tools installed. 
+## Prerequisites: Note, we have a docker-based environment with all these tools installed. 
 
 #### software:
 
@@ -36,7 +36,7 @@ DNS record is used for `go-fastapi`. Once the instance has been provisioned, you
 
 For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
 
-## STANDARD OPERATING PROCEDURE 
+## Recipe 
 
 #### Spin up the provided dockerized development environment:
 
@@ -164,7 +164,7 @@ terraform -chdir=aws workspace select default # change to default workspace
 terraform -chdir=aws workspace delete <name_of_workspace>  # delete workspace.
 ```
 
-### For Developers:
+## For Developers:
 Use the recipe below to create a local, development environment for this application. 
 
 ```
