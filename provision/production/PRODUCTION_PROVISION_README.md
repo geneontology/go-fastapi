@@ -79,7 +79,8 @@ go-deploy --working-directory aws -list-workspaces -verbose
 
 4. Provision instance on AWS:
 
-If a workspace exists above, then you can skip the provisioning of the AWS instance.  Else, create a workspace using the following namespace pattern `production-YYYY-MM-DD`.  e.g.: `production-2023-01-30`
+If a workspace exists above, then you can skip the provisioning of the AWS instance.  
+Else, create a workspace using the following namespace pattern `production-YYYY-MM-DD`.  e.g.: `production-2023-01-30`
 
 * Remember you can use the -dry-run and the -verbose options to test "go-deploy"
 
@@ -174,7 +175,8 @@ Use the recipe below to create a local, development environment for this applica
 ```bash
 docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
 
-In the command above we used the `--rm` option which means the container will be deleted when you exit. If that is not the intent and you want to delete it later at your own convenience. Use the following `docker run` command.
+In the command above we used the `--rm` option which means the container will be deleted when you exit.
+If that is not the intent and you want to delete it later at your own convenience. Use the following `docker run` command.
 
 ```bash
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
