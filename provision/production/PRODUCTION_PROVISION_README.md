@@ -188,8 +188,7 @@ terraform -chdir=aws workspace select default # change to default workspace
 terraform -chdir=aws workspace delete <name_of_workspace>  # delete workspace.
 ```
 
-## For Developers:
-Use the recipe below to create a local, development environment for this application. 
+## Using the shared docker container (go-dev):
 
 1. start the docker container `go-dev` in interactive mode.
 
