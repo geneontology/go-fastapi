@@ -160,9 +160,11 @@ docker-compose -f stage_dir/docker-compose.yaml logs -f
 ```bash
 docker exec -u 0 -it apache_fastapi bash # enter the container
 cat /opt/credentials/s3cfg
+
 echo $S3_BUCKET
 aws s3 ls s3://$S3_BUCKET
 logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
+cat /tmp/logrotate-to-s3.log # make sure uploading to s3 was fine
 ```
 
 9. Testing Health Check:
@@ -177,7 +179,6 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 # Make sure you point to the correct workspace before destroying the stack.
 
 terraform -chdir=aws workspace list
-terraform -chdir=aws workspace select <name_of_workspace>
 terraform -chdir=aws workspace show # shows the name of current workspace
 terraform -chdir=aws show           # shows the state you are about to destroy
 terraform -chdir=aws destroy        # You would need to type Yes to approve.

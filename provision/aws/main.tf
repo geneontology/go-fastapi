@@ -15,6 +15,12 @@ variable "public_key_path" {
   default = "/tmp/go-ssh.pub"
 }
 
+variable "use_elastic_ip" {
+  type = bool
+  description = "whether to use an elastic ip or not"
+  default = true
+}
+
 provider "aws" {
   region = "us-east-1"
   shared_credentials_files = [ "/tmp/go-aws-credentials" ]
@@ -32,9 +38,10 @@ variable "ami" {
 }
 
 module "base" {
-  source = "git::https://github.com/geneontology/devops-aws-go-instance.git?ref=V2.0"
+  source = "git::https://github.com/geneontology/devops-aws-go-instance.git?ref=V2.1"
   instance_type = var.instance_type
   ami = var.ami
+  use_elastic_ip = var.use_elastic_ip 
   public_key_path = var.public_key_path
   tags = var.tags
   open_ports = var.open_ports
