@@ -38,7 +38,7 @@ DNS record is used for `go-fastapi`. Once the instance has been provisioned, you
 
 For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
 
-## Deployment: 
+## Provisioning EC2 instances: 
 
 1. Spin up the provided dockerized development environment:
 
@@ -75,10 +75,7 @@ export AWS_SHARED_CREDENTIALS_FILE=/tmp/go-aws-credentials
 # S3 bucket
 aws s3 ls s3://REPLACE_ME_WITH_TERRAFORM_BACKEND_BUCKET
 
-# test deploy
-go-deploy -dry-run -verbose -init --working-directory aws -verbose
-
-# if everything looks good, run the command for real:
+# initialize (if it doesn't work, we fail):
 go-deploy -init --working-directory aws -verbose
 
 # Use these commands to figure out the name of an existing workspace if any. The name should have a pattern `production-YYYY-MM-DD`
@@ -100,7 +97,12 @@ emacs config-instance.yaml  # verify the location of the ssh keys for your AWS i
 cp ./production/config-instance.yaml.sample config-instance.yaml
 emacs  ./config-instance.yaml   # Verify contents and modify if needed.
 
+# test the deployment
+go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose -dry-run --conf config-instance.yaml
+
+# deploy if all looks good.
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-instance.yaml
+# will produce an IP address in the resulting inventory.json file.
 
 # The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
 ```
@@ -118,12 +120,12 @@ cat production-YYYY-MM-DD-inventory.cfg
 # Useful terraform commands to check what you have just done
 terraform -chdir=aws workspace show   # current terraform workspace
 terraform -chdir=aws show             # current state deployed ...
-terraform -chdir=aws output           # public ip of aws instance
+terraform -chdir=aws output           # shows public ip of aws instance 
 ```
 
-5. deploy stack to AWS:
+## Deploy go-fastapi stack via Ansible to AWS:
 
-* Make DNS names for go-fastapi point to the public IP address on AWS Route 53
+* Make DNS names for go-fastapi point to the public IP address on AWS Route 53 - put IP into DNS
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
 * s3 credentials are placed in a file using the format described above
 * s3 uri if SSL is enabled. Location of SSL certs/key
@@ -138,12 +140,14 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-stack.yaml
 ```
 
-6. Access go-fastapi from a browser:
+ssh -i /tmp/go-ssh ubuntu@IP_ADDRESS
+
+1. Access go-fastapi from a browser:
 
 We use health checks in the `docker-compose` file.  
 Use go-fastapi DNS name. http://{go-fastapi_host}/docs
 
-7. Debugging:
+2. Debugging:
 
 * Use -dry-run and copy and paste the command and execute it manually
 * ssh to the machine; the username is ubuntu. Try using DNS names to make sure they are fine.
@@ -155,7 +159,7 @@ docker-compose -f stage_dir/docker-compose.yaml up -d
 docker-compose -f stage_dir/docker-compose.yaml logs -f 
 ```
 
-8. Testing LogRotate:
+3. Testing LogRotate:
 
 ```bash
 docker exec -u 0 -it apache_fastapi bash # enter the container
@@ -167,19 +171,19 @@ logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
 cat /tmp/logrotate-to-s3.log # make sure uploading to s3 was fine
 ```
 
-9. Testing Health Check:
+4. Testing Health Check:
 
 ```sh
 docker inspect --format "{{json .State.Health }}" go-fastapi
 ```
 
-10. Destroy Instance and Delete Workspace:
+5. Destroy Instance and Delete Workspace:
 
 ```bash
 # Make sure you point to the correct workspace before destroying the stack.
 
 terraform -chdir=aws workspace list
-terraform -chdir=aws workspace show # shows the name of current workspace
+terraform -chdir=aws workspace show # shows the name of the current workspace
 terraform -chdir=aws show           # shows the state you are about to destroy
 terraform -chdir=aws destroy        # You would need to type Yes to approve.
 
