@@ -195,6 +195,7 @@ Use the recipe below to create a local, development environment for this applica
 
 ```bash
 docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
+```
 
 In the command above we used the `--rm` option which means the container will be deleted when you exit.
 If that is not the intent and you want to delete it later at your own convenience. Use the following `docker run` command.
