@@ -10,6 +10,7 @@ Note: we have a docker-based environment with all these tools installed.
 - go-fastapi checkout 
 - Terraform: v1.1.4
 - Ansible: 2.10.7
+- aws cli
 - go-deploy: `poetry install go-deploy==0.4.1` # requires python >=3.8
 
 #### configuration files:
