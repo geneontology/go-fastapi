@@ -106,6 +106,20 @@ go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --c
 
 Note: write down the IP address of the AWS instance that is created. This can be found in production-YYYY-MM-DD.cfg
 
+If you need to check what you have just done, here are some helpful Terraform commands:
+
+```bash
+cat production-YYYY-MM-DD.tfvars.json
+
+# The previous command creates an ansible inventory file.
+cat production-YYYY-MM-DD-inventory.cfg
+
+# Useful terraform commands to check what you have just done
+terraform -chdir=aws workspace show   # current terraform workspace
+terraform -chdir=aws show             # current state deployed ...
+terraform -chdir=aws output           # public ip of aws instance
+```
+
 5. deploy stack to AWS:
 
 * Make DNS names for go-fastapi point to the public IP address on AWS Route 53
@@ -212,17 +226,3 @@ chgrp root /tmp/go-*
 chmod 400 /tmp/go-ssh
 ```
 
-
- #### additional terraform commands? 
- 
-```bash 
-cat production-YYYY-MM-DD.tfvars.json
-
-# The previous command creates an ansible inventory file.
-cat production-YYYY-MM-DD-inventory.cfg
-
-# Useful terraform commands to check what you have just done
-terraform -chdir=aws workspace show   # current terraform workspace
-terraform -chdir=aws show             # current state deployed ...
-terraform -chdir=aws output           # public ip of aws instance
-```
