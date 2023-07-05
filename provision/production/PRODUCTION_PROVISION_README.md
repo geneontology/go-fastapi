@@ -64,13 +64,20 @@ emacs /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_
 
 # The S3 backend is used to store the terraform state.
 cp ./production/backend.tf.sample ./aws/backend.tf
-cat ./aws/backend.tf
+
+# replace the REPLACE_ME_GOAPI_S3_BACKEND with the appropriate backend
+emacs ./aws/backend.tf
 
 # Use the AWS cli to make sure you have access to the terraform s3 backend bucket
 export AWS_SHARED_CREDENTIALS_FILE=/tmp/go-aws-credentials
 
 # S3 bucket
-aws s3 ls s3://REPLACE_ME_WITH_TERRAFORM_BACKEND_BUCKET 
+aws s3 ls s3://REPLACE_ME_WITH_TERRAFORM_BACKEND_BUCKET
+
+# test deploy
+go-deploy -dry-run -verbose -init --working-directory aws -verbose
+
+# if everything looks good, run the command for real:
 go-deploy -init --working-directory aws -verbose
 
 # Use these commands to figure out the name of an existing workspace if any. The name should have a pattern `production-YYYY-MM-DD`
@@ -82,18 +89,16 @@ go-deploy --working-directory aws -list-workspaces -verbose
 If a workspace exists above, then you can skip the provisioning of the AWS instance.  
 Else, create a workspace using the following namespace pattern `production-YYYY-MM-DD`.  e.g.: `production-2023-01-30`
 
-* Remember you can use the -dry-run and the -verbose options to test "go-deploy"
-
 ```bash
-# copy `production/config-instance.yaml.sample` to another location and modify using vim or emacs.
+# copy `production/config-instance.yaml.sample` to another location and modify using emacs.
 
 cp ./production/config-instance.yaml.sample config-instance.yaml
-
-# verify the location of the ssh keys for your AWS instance in your copy of `config-instance.yaml` under `ssh_keys`.
-# verify location of the public ssh key in `aws/main.tf`
+emacs config-instance.yaml  # verify the location of the ssh keys for your AWS instance in your copy of `config-instance.yaml` under `ssh_keys`.
+                            # verify the location of the public ssh key in `aws/main.tf`
 
 cp ./production/config-instance.yaml.sample config-instance.yaml
-cat ./config-instance.yaml   # Verify contents and modify if needed.
+emacs  ./config-instance.yaml   # Verify contents and modify if needed.
+
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-instance.yaml
 
 # The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
@@ -112,20 +117,21 @@ Note: write down the IP address of the AWS instance that is created. This can be
 
 ```bash
 cp ./production/config-stack.yaml.sample ./config-stack.yaml
-cat ./config-stack.yaml    # Verify contents and modify if needed.
+emacs ./config-stack.yaml    # Verify contents and modify if needed.
+
 export ANSIBLE_HOST_KEY_CHECKING=False
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-stack.yaml
 ```
 
 6. Access go-fastapi from a browser:
 
-We use health checks in the docker-compose file.  
-Use go-fastapi dns name. http://{go-fastapi_host}/docs
+We use health checks in the `docker-compose` file.  
+Use go-fastapi DNS name. http://{go-fastapi_host}/docs
 
 7. Debugging:
 
 * Use -dry-run and copy and paste the command and execute it manually
-* ssh to the machine; username is ubuntu. Try using DNS names to make sure they are fine.
+* ssh to the machine; the username is ubuntu. Try using DNS names to make sure they are fine.
 
 ```bash
 docker-compose -f stage_dir/docker-compose.yaml ps
@@ -147,7 +153,7 @@ logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
 9. Testing Health Check:
 
 ```sh
-docker inspect --format "{{json .State.Health }}" fastapi
+docker inspect --format "{{json .State.Health }}" go-fastapi
 ```
 
 10. Destroy Instance and Delete Workspace:
@@ -170,7 +176,7 @@ terraform -chdir=aws workspace delete <name_of_workspace>  # delete workspace.
 ## For Developers:
 Use the recipe below to create a local, development environment for this application. 
 
-1. start docker container `go-dev` in interactive mode.
+1. start the docker container `go-dev` in interactive mode.
 
 ```bash
 docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
