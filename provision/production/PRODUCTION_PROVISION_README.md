@@ -96,9 +96,6 @@ cp ./production/config-instance.yaml.sample config-instance.yaml
 emacs config-instance.yaml  # verify the location of the ssh keys for your AWS instance in your copy of `config-instance.yaml` under `ssh_keys`.
                             # verify the location of the public ssh key in `aws/main.tf`
 
-cp ./production/config-instance.yaml.sample config-instance.yaml
-emacs  ./config-instance.yaml   # Verify contents and modify if needed.
-
 # test the deployment
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose -dry-run --conf config-instance.yaml
 
