@@ -22,4 +22,7 @@ stack:
 
       fastapi_host: REPLACE_ME # aes-test-go-fastapi
       fastapi_tag: 0.2.0
+
+      REDIRECT_HTTP: 1
+      redirect_to: REPLACE_ME # aes-test-go-fastapi.geneontology.org
    scripts: [ "stage.yaml", "start_services.yaml" ]

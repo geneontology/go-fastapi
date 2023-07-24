@@ -24,8 +24,19 @@
           dest: '{{ stage_dir }}/{{ item.dir }}'
         with_items:
           - { file: 'docker-compose-production.yaml', dir: 'docker-compose.yaml' }
-          - { file: 'httpd-vhosts-prod-fastapi.conf', dir: 'httpd-confs' }
           - { file: 'config.yaml', dir: 'conf' }
+
+      - name: install http conf file
+        template:
+          src: httpd-vhosts-prod-fastapi.conf 
+          dest: '{{ stage_dir }}/httpd-confs/httpd-vhosts-prod-fastapi.conf'
+        when: not REDIRECT_HTTP | bool
+
+      - name: install http redirect file
+        template:
+          src: httpd-vhosts-prod-fastapi-redirect.conf 
+          dest: '{{ stage_dir }}/httpd-confs/httpd-vhosts-prod-fastapi.conf'
+        when: REDIRECT_HTTP | bool
 
       - name: install ssl configs from templates directory
         template:
