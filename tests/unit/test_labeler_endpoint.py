@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class TestLabelerEndpoint(unittest.TestCase):
+
+    """Test the labeler endpoint."""
+
     def test_labeler_endpoint(self):
         """
         Test the labeler endpoint with "GO:0003677".

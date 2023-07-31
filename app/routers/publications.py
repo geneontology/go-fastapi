@@ -1,3 +1,5 @@
+"""Publication-related endpoints."""
+
 import logging
 
 from fastapi import APIRouter, Query

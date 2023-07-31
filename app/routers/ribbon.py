@@ -1,10 +1,12 @@
+"""Ribbon router."""
+
 import logging
 from typing import List
 
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import ESOLR, replace
+from ontobio.golr.golr_query import replace
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_text_on
@@ -39,6 +41,11 @@ async def get_ontology_subsets_by_go_term_id(
 
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_by_id(id: str):
+    """
+    Returns a subset (slim) by its id.
+
+    param: id: id of the subset (e.g. goslim_agr).
+    """
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 

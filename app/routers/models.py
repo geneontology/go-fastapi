@@ -1,3 +1,4 @@
+"""Model API router."""
 import logging
 from typing import List
 

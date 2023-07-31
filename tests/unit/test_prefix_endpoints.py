@@ -22,6 +22,9 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 
 class TestIdentifierAPI(unittest.TestCase):
+
+    """Test the identifier/prefix API endpoints."""
+
     def test_expander_endpoint(self):
         """Test expanding an identifier with a given prefix."""
         for gene_id in gene_ids:

@@ -1,3 +1,4 @@
+"""The users and groups endpoints."""
 import logging
 
 from fastapi import APIRouter, Query
@@ -16,7 +17,8 @@ router = APIRouter()
 @router.get("/api/users", tags=["users and groups"], deprecated=True)
 async def get_users():
     """
-    DEPRECATED
+    DEPRECATED.
+
     Returns metadata of all GO users
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
@@ -54,7 +56,8 @@ async def get_users():
 @router.get("/api/groups", tags=["users and groups"], deprecated=True)
 async def get_groups():
     """
-    DEPRECATED
+    DEPRECATED.
+
     Returns metadata of a GO group
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
@@ -87,7 +90,8 @@ async def get_group_metadata_by_name(
     name: str = Query(None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")
 ):
     """
-    DEPRECATED
+    DEPRECATED.
+
     Returns metadata of a GO group
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.

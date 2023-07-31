@@ -12,7 +12,7 @@ gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
 
 class TestApp(unittest.TestCase):
 
-    """Test the app."""
+    """Test the models endpoints."""
 
     def test_gometadata_by_model_ids(self):
         """Test the endpoint to retrieve GO metadata by model IDs."""

@@ -1,3 +1,4 @@
+"""Provides a route for fetching labels for CURIEs/IDs."""
 import logging
 from typing import List
 

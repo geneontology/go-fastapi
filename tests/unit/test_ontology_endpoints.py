@@ -16,6 +16,9 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestApp(unittest.TestCase):
+
+    """Test the ontology endpoints."""
+
     def test_term_id_endpoint(self):
         """Test the endpoint to get the details of a Gene Ontology term by its identifier."""
         for id in go_ids:

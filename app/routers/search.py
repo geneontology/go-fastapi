@@ -1,3 +1,4 @@
+"""search router."""
 import logging
 from enum import Enum
 
