@@ -1,6 +1,5 @@
 import logging
 import unittest
-import pytest
 from fastapi.testclient import TestClient
 from ontobio.sparql.sparql_ontology import EagerRemoteSparqlOntology
 
