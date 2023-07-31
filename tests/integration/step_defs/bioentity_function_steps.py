@@ -97,7 +97,7 @@ def response_code(result, code):
         extra_types=EXTRA_TYPES,
     )
 )
-def endpoint_returns(result, term):
+def endpoint_first_returns(result, term):
     """
     Then the response contains an association with object.id of {term}.
 
@@ -122,7 +122,7 @@ def endpoint_returns(result, term):
         extra_types=EXTRA_TYPES,
     )
 )
-def endpoint_returns(result, name):
+def endpoint_second_returns(result, name):
     """
     Then the response should have an association with object.label of {name}.
 
@@ -146,7 +146,7 @@ def endpoint_returns(result, name):
         extra_types=EXTRA_TYPES,
     )
 )
-def endpoint_retuns(result, qualifier):
+def endpoint_third_retuns(result, qualifier):
     """
     Then the response should have an association with qualifiers of {qualifier}.
 
@@ -172,7 +172,7 @@ def endpoint_retuns(result, qualifier):
         extra_types=EXTRA_TYPES,
     )
 )
-def endpoint_retuns(result, qualifier):
+def endpoint_fourth_retuns(result, qualifier):
     """
     Then the response should have an association with associations.negated is {qualifier}.
 

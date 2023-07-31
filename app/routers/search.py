@@ -32,8 +32,7 @@ async def autocomplete_term(
     ),
 ):
     """
-    Returns a list of matching concepts or entities over annotation classes (e.g. GO terms) and
-    bio-entities (e.g. gene names and symbols).
+    Returns a list of matching concepts or entities over annotation classes and bio-entities.
 
     :param term: The search term for autocomplete.
     :type term: str

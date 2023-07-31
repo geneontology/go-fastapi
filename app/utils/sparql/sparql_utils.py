@@ -5,8 +5,9 @@ SEPARATOR = "|"  # separator for splitting values
 
 def transform(data, keys_to_split=None):
     """
-    Transform a SPARQL json result by:
+    Transform a SPARQL json result.
 
+    by:
     1) outputting only { key : value }, removing datatype
     2) for some keys, transform them into array based on SEPARATOR.
     """

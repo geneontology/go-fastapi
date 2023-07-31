@@ -8,11 +8,7 @@ logger = logging.getLogger(__name__)
 
 # Respect the method name for run_sparql_on with enums
 def run_solr_on(solr_instance, category, id, fields):
-    """
-    Return the result of a solr query on the given solrInstance (Enum ESOLR), for a certain document_category (ESOLRDoc)
-    and id.
-
-    """
+    """Return the result of a solr query on the given solrInstance, for a certain document_category and id."""
     query = (
         solr_instance.value
         + 'select?q=*:*&fq=document_category:"'
@@ -29,11 +25,7 @@ def run_solr_on(solr_instance, category, id, fields):
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
 def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
-    """
-    Return the result of a solr query on the given solrInstance (Enum ESOLR),
-    for a certain document_category (ESOLRDoc) and id.
-
-    """
+    """Return the result of a solr query on the given solrInstance, for a certain document_category and id."""
     solr_url = solr_instance.value
 
     if optionals is None:

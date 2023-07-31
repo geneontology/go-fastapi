@@ -184,7 +184,7 @@ async def get_geneproducts_by_model_id(
 
 
 @router.get("/api/models/pmid", tags=["models"])
-async def get_geneproducts_by_model_id(
+async def get_publication_details_by_model_id(
     gocams: List[str] = Query(
         None,
         description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
@@ -224,7 +224,7 @@ async def get_geneproducts_by_model_id(
 
 
 @router.get("/api/models/{id}", tags=["models"])
-async def get_geneproducts_by_model_id(
+async def get_term_details_by_model_id(
     id: str = Query(
         None,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968))",

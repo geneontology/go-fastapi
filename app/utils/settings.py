@@ -18,7 +18,7 @@ def get_sparql_endpoint():
     global sparql_config
     if sparql_config is None:
         with open(CONFIG, "r") as f:
-            sparql_config = yaml.load(f, Loader=yaml.FullLoader)
+            sparql_config = yaml.safe_load(f)
     return sparql_config["sparql_url"]["url"]
 
 
@@ -35,7 +35,7 @@ def get_golr_config():
     global golr_config
     if golr_config is None:
         with open(CONFIG, "r") as f:
-            golr_config = yaml.load(f, Loader=yaml.FullLoader)
+            golr_config = yaml.safe_load(f)
     return golr_config
 
 

@@ -31,7 +31,11 @@ async def get_gocams_by_geneproduct_id(
         "this input gene",
     ),
 ):
-    """Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)."""
+    """
+    Returns GO-CAM models associated with a given Gene Product identifier.
+
+    (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).
+    """
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 

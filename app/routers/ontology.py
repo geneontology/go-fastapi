@@ -97,9 +97,9 @@ async def get_subsets_by_term(id: str):
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_metadata_by_id(id: str):
     """
-    Returns metadata of an ontology subset (slim)
-    id is the name of a slim subset, e.g., goslim_agr, goslim_generic.
+    Returns metadata of an ontology subset (slim) id is the name of a slim subset.
 
+    e.g., goslim_agr, goslim_generic.
     """
     q = "*:*"
     qf = ""
