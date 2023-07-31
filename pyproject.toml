@@ -15,28 +15,27 @@ style = "pep440"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.92.0"
-uvicorn = "^0.21.1"
+fastapi = ">=0.92.0"
+uvicorn = ">=0.21.1"
 python-multipart = "^0.0.6"
-ontobio = "^2.8.3"
-gunicorn = "^20.1.0"
+ontobio = ">=2.8.8"
+gunicorn = ">=20.1.0"
 pytest-bdd = "^6.1.1"
 Sphinx = "^5.0.2"
-sphinx-rtd-theme = "^1.2.0"
+sphinx-rtd-theme = ">=1.2.0"
 sphinxcontrib-napoleon = "^0.7"
-tox = "^3.28.0"
-httpx = "^0.23.3"
+tox = ">=3.28.0"
+httpx = ">=0.23.3"
 prefixmaps = "^0.1.4"
-linkml-runtime = "^1.5.0"
+linkml-runtime = ">=1.5.0"
 sparqlwrapper = "^2.0.0"
-greenlet = "=2.0.1"
 SQLAlchemy = "^1.4.32, !=1.4.46"
-oaklib = "^0.5.0"
+oaklib = ">=0.5.0"
 biothings-client = "^0.3.0"
 go-deploy = "0.4.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.3.0"
+pytest = ">=7.3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
