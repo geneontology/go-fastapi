@@ -51,30 +51,37 @@ async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.
     return data
 
 
+router = APIRouter()
+
 @router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(
     id: str,
-    cnode: str = Query(None, include_in_schema=False),
-    include_ancestors: bool = Query(True, include_in_schema=False),
-    include_descendants: bool = Query(True, include_in_schema=False),
-    relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
-    include_meta: bool = Query(False, include_in_schema=False),
+    cnode: str = None,
+    include_ancestors: bool = True,
+    include_descendants: bool = True,
+    relation: List[str] = None,
+    include_meta: bool = False,
 ):
     """Extract a subgraph from an ontology term."""
     qnodes = [id]
     if cnode is not None:
-        qnodes += cnode
+        qnodes.append(cnode)
+
+    # Set default value for 'relation' if not provided in the query
+    relations = relation or ["subClassOf", "BFO:0000050"]
+
+    # Set default value for 'include_meta' if not provided in the query
+    include_meta_value = include_meta
 
     # COMMENT: based on the CURIE of the id, we should be able to find out the ontology automatically
     ont = ontology_utils.get_ontology("go")
-    relations = relation
     log.info("Traversing: {} using {}".format(qnodes, relations))
     nodes = ont.traverse_nodes(qnodes, up=include_ancestors, down=include_descendants, relations=relations)
 
     subont = ont.subontology(nodes, relations=relations)
     # TODO: meta is included regardless of whether include_meta is True or False
-    ojr = OboJsonGraphRenderer(include_meta=include_meta)
-    json_obj = ojr.to_json(subont, include_meta=include_meta)
+    ojr = OboJsonGraphRenderer(include_meta=include_meta_value)
+    json_obj = ojr.to_json(subont, include_meta=include_meta_value)
     return json_obj
 
 
@@ -194,19 +201,26 @@ async def get_ancestors_shared_by_two_terms(subject: str, object: str):
 
 
 @router.get("/api/go/{id}", tags=["ontology"])
-async def get_go_term_detail_by_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
-):
+async def get_go_term_detail_by_go_id(id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
     Returns models for a given GO term ID
     e.g. GO:0008150
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
+    if id is None:
+        # Handle the case when 'id' is not provided in the query
+        # For example, you can return an error response or use a default GO term ID
+        # For now, we'll just return an empty dictionary
+        return {}
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
+
+    # Assuming that 'transform' is a custom function to transform the results,
+    # We'll keep using it as it is.
     return transform(
         results[0],
         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
