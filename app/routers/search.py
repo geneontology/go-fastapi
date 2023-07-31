@@ -26,12 +26,12 @@ async def autocomplete_term(
     rows: int = 100,
     category: AutocompleteCategory = Query(
         None,
-        description="The category of items to retrieve, can " "be 'gene' or 'term'",
+        description="The category of items to retrieve, can be 'gene' or 'term'",
     ),
 ):
     """
     Returns a list of matching concepts or entities over annotation classes (e.g. GO terms) and
-    bioentities (e.g. gene names and symbols).
+    bio-entities (e.g. gene names and symbols).
 
     :param term: The search term for autocomplete.
     :type term: str
@@ -45,6 +45,7 @@ async def autocomplete_term(
     :return: A dictionary containing the list of matching concepts or entities.
     :rtype: dict
     """
+
     # dictates the fields to return
     fields = "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
 
