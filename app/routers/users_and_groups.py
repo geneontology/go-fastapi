@@ -1,7 +1,9 @@
 import logging
+
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
+
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
 
@@ -10,14 +12,17 @@ logger = logging.getLogger(__name__)
 USER_AGENT = get_user_agent()
 router = APIRouter()
 
+
 @router.get("/api/users", tags=["users and groups"], deprecated=True)
 async def get_users():
+
     """
     DEPRECATED
     Returns metadata of all GO users
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """
@@ -46,6 +51,7 @@ async def get_users():
     results = si._sparql_query(query)
     results = transform_array(results, ["organizations", "affiliations"])
     return results
+
 
 @router.get("/api/groups", tags=["users and groups"], deprecated=True)
 async def get_groups():

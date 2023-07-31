@@ -1,8 +1,6 @@
 import logging
 import unittest
-from pprint import pprint
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -24,9 +22,7 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 class TestIdentifierAPI(unittest.TestCase):
     def test_expander_endpoint(self):
-        """
-        Test expanding an identifier with a given prefix.
-        """
+        """Test expanding an identifier with a given prefix."""
         for gene_id in gene_ids:
             response = test_client.get(f"/api/identifier/prefixes/expand/{gene_id}")
             self.assertEqual(response.status_code, 200)

@@ -11,8 +11,10 @@ log = logging.getLogger(__name__)
 USER_AGENT = get_user_agent()
 router = APIRouter()
 
-
 class AutocompleteCategory(str, Enum):
+    """
+    The category of items to retrieve, can be 'gene' or 'term'
+    """
     gene = "gene"
     term = "term"
 
@@ -28,8 +30,20 @@ async def autocomplete_term(
     ),
 ):
     """
-    Returns list of matching concepts or entities over annotation classes (e.g. GO terms) and
+    Returns a list of matching concepts or entities over annotation classes (e.g. GO terms) and
     bioentities (e.g. gene names and symbols).
+
+    :param term: The search term for autocomplete.
+    :type term: str
+    :param start: The starting index of the search results, defaults to 0.
+    :type start: int, optional
+    :param rows: The maximum number of rows to return in the search results, defaults to 100.
+    :type rows: int, optional
+    :param category: The category of items to retrieve, can be 'gene' or 'term', defaults to None.
+    :type category: AutocompleteCategory, optional
+
+    :return: A dictionary containing the list of matching concepts or entities.
+    :rtype: dict
     """
     # dictates the fields to return
     fields = "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"

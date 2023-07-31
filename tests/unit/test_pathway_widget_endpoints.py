@@ -2,7 +2,6 @@ import logging
 import unittest
 import urllib.parse
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -13,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestGeneProductAPI(unittest.TestCase):
-
     def test_get_gocams_by_geneproduct_id(self):
         """
         Test getting Gene Ontology models associated with a gene product by its ID.

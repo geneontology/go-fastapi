@@ -1,4 +1,5 @@
 import logging
+
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
@@ -6,6 +7,7 @@ from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
+
 from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
@@ -15,8 +17,10 @@ omap = {}
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 logger = logging.getLogger(__name__)
 
+
 def batch_fetch_labels(ids):
-    """Fetch all rdfs:label assertions for a set of CURIEs.
+    """
+    Fetch all rdfs:label assertions for a set of CURIEs.
 
     :param ids: List of CURIEs for which labels are to be fetched.
     :type ids: list
@@ -30,8 +34,10 @@ def batch_fetch_labels(ids):
             m[id] = label
     return m
 
+
 def goont_fetch_label(id):
-    """Fetch all rdfs:label assertions for a URI.
+    """
+    Fetch all rdfs:label assertions for a URI.
 
     :param id: The URI for which the label is to be fetched.
     :type id: str
@@ -49,8 +55,10 @@ def goont_fetch_label(id):
     rows = [r["label"]["value"] for r in bindings]
     return rows[0]
 
+
 def get_ontology_subsets_by_id(id: str):
-    """Get ontology subsets based on the provided identifier.
+    """
+    Get ontology subsets based on the provided identifier.
 
     :param id: The identifier for the ontology subset.
     :type id: str
@@ -127,7 +135,8 @@ def get_ontology_subsets_by_id(id: str):
 
 
 def get_category_terms(category):
-    """Get category terms based on the provided category.
+    """
+    Get category terms based on the provided category.
 
     :param category: The category for which terms are to be fetched.
     :type category: dict
@@ -142,7 +151,8 @@ def get_category_terms(category):
 
 
 def get_ontology(id):
-    """Get ontology based on the provided identifier.
+    """
+    Get ontology based on the provided identifier.
 
     :param id: The identifier for the ontology.
     :type id: str
@@ -240,7 +250,8 @@ agr_slim_order = [
 
 
 def create_go_summary_sparql(goid):
-    """Create SPARQL query for fetching GO summary.
+    """
+    Create SPARQL query for fetching GO summary.
 
     :param goid: The GO identifier for which the summary is to be fetched.
     :type goid: str
@@ -289,7 +300,8 @@ def create_go_summary_sparql(goid):
 
 
 def correct_goid(goid):
-    """Correct the format of the GO identifier.
+    """
+    Correct the format of the GO identifier.
 
     :param goid: The GO identifier to be corrected.
     :type goid: str
@@ -300,7 +312,8 @@ def correct_goid(goid):
 
 
 def get_go_subsets_sparql_query(goid):
-    """Create SPARQL query for fetching GO subsets.
+    """
+    Create SPARQL query for fetching GO subsets.
 
     :param goid: The GO identifier for which the subsets are to be fetched.
     :type goid: str
