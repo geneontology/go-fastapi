@@ -1,6 +1,4 @@
-"""
-Prefix steps.
-"""
+"""Prefix steps."""
 
 from pprint import pprint
 

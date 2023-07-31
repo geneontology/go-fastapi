@@ -1,6 +1,4 @@
-"""
-Bioentity Function Steps.
-"""
+"""Bioentity Function Steps."""
 
 from pprint import pprint
 
