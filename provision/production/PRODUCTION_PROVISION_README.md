@@ -34,6 +34,8 @@ Note: we have a docker-based environment with all these tools installed.
 
 DNS record is used for `go-fastapi`. Once the instance has been provisioned, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org`
 
+Note: if using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
+
 #### SSH Keys:
 
 For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
@@ -124,7 +126,7 @@ terraform -chdir=aws output           # shows public ip of aws instance
 
 ## Deploy go-fastapi stack via Ansible to AWS:
 
-* Make DNS names for go-fastapi point to the public IP address on AWS Route 53 - put IP into DNS
+* Make DNS names for go-fastapi point to the public IP address. If using cloudflare, put the ip in cloudflare DNS record. Otherwise put the ip in the AWS Route 53 DNS record. 
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
 * s3 credentials are placed in a file using the format described above
 * s3 uri if SSL is enabled. Location of SSL certs/key

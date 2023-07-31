@@ -8,6 +8,7 @@ solr_url: http://golr-aux.geneontology.io/solr/
 sparql_url: http://rdf.geneontology.org/sparql
 fastapi_host: REPLACE_ME
 fastapi_host_alias: '{{ fastapi_host }}'
-
 REDIRECT_HTTP: 0
 redirect_to: REPLACE_ME
+
+USE_CLOUDFLARE: 0

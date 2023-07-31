@@ -6,7 +6,7 @@ instance:
     tags:
        Name: REPLACE_ME  # This will be the tag used in AWS 
     instance_type: t2.large
-    use_elastic_ip: False
+    use_elastic_ip: True 
     disk_size: 200
     open_ports:
        - 80
