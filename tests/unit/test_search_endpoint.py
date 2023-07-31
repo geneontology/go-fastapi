@@ -1,7 +1,9 @@
 import logging
 import unittest
 from pprint import pprint
+
 from fastapi.testclient import TestClient
+
 from app.main import app
 from app.utils.settings import ESOLR, ESOLRDoc
 
@@ -16,7 +18,6 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestSearchAPI(unittest.TestCase):
-
     def test_golr_solr(self):
         """
         Test the GOLR Solr configuration.
@@ -69,5 +70,5 @@ class TestSearchAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

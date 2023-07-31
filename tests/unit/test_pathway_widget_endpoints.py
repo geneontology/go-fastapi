@@ -1,8 +1,10 @@
 import logging
-import urllib.parse
 import unittest
+import urllib.parse
+
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 test_client = TestClient(app)
@@ -12,16 +14,16 @@ logger = logging.getLogger(__name__)
 
 class TestGeneProductAPI(unittest.TestCase):
 
-    @pytest.mark.parametrize("id", gene_ids)
-    def test_get_gocams_by_geneproduct_id(self, id):
+    def test_get_gocams_by_geneproduct_id(self):
         """
         Test getting Gene Ontology models associated with a gene product by its ID.
 
         :param id: The identifier of the gene product. (parametrized)
         """
-        response = test_client.get(f"/api/gp/{id}/models")
-        self.assertGreater(len(response.json()), 0)
-        self.assertEqual(response.status_code, 200)
+        for gene_id in gene_ids:
+            response = test_client.get(f"/api/gp/{gene_id}/models")
+            self.assertGreater(len(response.json()), 0)
+            self.assertEqual(response.status_code, 200)
 
     def test_get_gocams_by_geneproduct_id_causal2(self):
         """
@@ -40,5 +42,5 @@ class TestGeneProductAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

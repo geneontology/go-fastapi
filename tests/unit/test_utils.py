@@ -1,8 +1,10 @@
 import logging
 import unittest
+
 from curies import Converter
 from fastapi.testclient import TestClient
 from prefixmaps import load_context
+
 from app.main import app
 from app.utils.prefixes.prefix_utils import remap_prefixes
 
@@ -16,7 +18,6 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 
 class TestPrefixUtils(unittest.TestCase):
-
     def test_prefix_utils(self):
         """
         Test the prefix utilities.
@@ -32,6 +33,5 @@ class TestPrefixUtils(unittest.TestCase):
         self.assertEqual(cmaps["MGI"], "http://identifiers.org/mgi/MGI:")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

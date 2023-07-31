@@ -1,7 +1,9 @@
 import logging
 import unittest
 from pprint import pprint
+
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 test_client = TestClient(app)
@@ -15,7 +17,6 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestSlimmerEndpoint(unittest.TestCase):
-
     @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_slimmer_endpoint_fgf8a(self):
         """
@@ -94,5 +95,5 @@ class TestSlimmerEndpoint(unittest.TestCase):
         self.assertGreater(len(response.json()), 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

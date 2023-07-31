@@ -1,6 +1,8 @@
 import logging
 import unittest
+
 from fastapi.testclient import TestClient
+
 from app.main import app
 from app.utils.settings import ESOLR, ESOLRDoc
 
@@ -16,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestBioentityEndpoints(unittest.TestCase):
-
     def test_golr_solr(self):
         """
         Test ESOLR constants for GOLR and ONTOLOGY.
@@ -103,5 +104,5 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

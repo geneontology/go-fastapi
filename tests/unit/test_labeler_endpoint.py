@@ -1,6 +1,8 @@
 import logging
 import unittest
+
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 test_client = TestClient(app)
@@ -15,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestLabelerEndpoint(unittest.TestCase):
-
     def test_labeler_endpoint(self):
         """
         Test the labeler endpoint with "GO:0003677".
@@ -30,5 +31,5 @@ class TestLabelerEndpoint(unittest.TestCase):
         self.assertEqual(map_response["GO:0003677"], "DNA binding")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

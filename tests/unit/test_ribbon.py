@@ -1,7 +1,9 @@
 import logging
 import unittest
+
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 test_client = TestClient(app)
@@ -16,13 +18,6 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestOntologyAPI(unittest.TestCase):
-
-    @pytest.mark.parametrize(
-        "endpoint",
-        [
-            "/api/ontology/ribbon/",
-        ],
-    )
     def test_ribbon_endpoint(self, endpoint):
         """
         Test the endpoint to get the ontology ribbon.
@@ -31,7 +26,7 @@ class TestOntologyAPI(unittest.TestCase):
         :return: None
         """
         data = {"subset": "goslim_agr", "subject": ["RGD:620474"]}
-        response = test_client.get(endpoint, params=data)
+        response = test_client.get("/api/ontology/ribbon/", params=data)
         self.assertEqual(response.status_code, 200)
 
     def test_zebrafish_ribbon(self):
@@ -55,6 +50,5 @@ class TestOntologyAPI(unittest.TestCase):
     # Add other test cases following a similar pattern
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-
