@@ -36,18 +36,10 @@ def test_zebrafish_ribbon():
         assert subject.get("label") == "shha"
         assert subject.get("taxon_label") == "Danio rerio"
         assert subject.get("groups").get("GO:0003674")
-        assert (  # molecular function
-            subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations") >= 5
-        )
-        assert (  # biological process
-            subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 93
-        )
-        assert (  # cell differentiation
-            subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations") >= 22
-        )
-        assert (  # cellular component
-            subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations") >= 4
-        )
+        assert subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations") >= 5  # molecular function
+        assert subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 93  # biological process
+        assert subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations") >= 22  # cell differentiation
+        assert subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations") >= 4  # cellular component
     assert response.status_code == 200
 
 

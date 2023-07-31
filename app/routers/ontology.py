@@ -69,9 +69,7 @@ async def get_subgraph_by_term_id(
     ont = ontology_utils.get_ontology("go")
     relations = relation
     log.info("Traversing: {} using {}".format(qnodes, relations))
-    nodes = ont.traverse_nodes(
-        qnodes, up=include_ancestors, down=include_descendants, relations=relations
-    )
+    nodes = ont.traverse_nodes(qnodes, up=include_ancestors, down=include_descendants, relations=relations)
 
     subont = ont.subontology(nodes, relations=relations)
     # TODO: meta is included regardless of whether include_meta is True or False
@@ -152,10 +150,10 @@ async def get_subset_metadata_by_id(id: str):
             for category in result:
                 if category["annotation_class"] == cat:
                     ordered_terms = []
-                    for ot in agr_category["terms"]:
-                        for uot in category["terms"]:
-                            if uot["annotation_class"] == ot:
-                                ordered_terms.append(uot)
+                    for ordered_term in agr_category["terms"]:
+                        for unordered_term in category["terms"]:
+                            if unordered_term["annotation_class"] == ordered_term:
+                                ordered_terms.append(unordered_term)
                                 break
                     category["terms"] = ordered_terms
                     temp.append(category)
@@ -216,9 +214,7 @@ async def get_go_term_detail_by_go_id(
 
 
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
-async def get_go_hierarchy_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
-):
+async def get_go_hierarchy_go_id(id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
     Returns parent and children relationships for a given GO ID
     e.g. GO:0005885
@@ -267,9 +263,7 @@ async def get_go_hierarchy_go_id(
 
 
 @router.get("/api/go/{id}/models", tags=["ontology"])
-async def get_gocam_models_by_go_id(
-    id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
-):
+async def get_gocam_models_by_go_id(id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
     Returns parent and children relationships for a given GO ID
     e.g. GO:0005885

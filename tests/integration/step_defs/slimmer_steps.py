@@ -1,4 +1,3 @@
-
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, scenario, then
 
@@ -77,9 +76,7 @@ def subject_id(result, bioentity_id):
     assert found_it
 
 
-@then(
-    parsers.cfparse("the response should have {term:String} in the slim", extra_types=EXTRA_TYPES)
-)
+@then(parsers.cfparse("the response should have {term:String} in the slim", extra_types=EXTRA_TYPES))
 def term_in_slim(result, term):
     data = result.json()
     found_it = False

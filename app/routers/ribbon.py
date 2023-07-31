@@ -45,21 +45,14 @@ async def get_subset_by_id(id: str):
 
 @router.get("/api/ontology/ribbon/", tags=["ontology"])
 async def get_ribbon_results(
-    subset: str = Query(
-        None, description="Name of the subset to map GO terms " "(e.g. goslim_agr)"
-    ),
-    subject: List[str] = Query(
-        None, description="List of Gene ids (e.g. " "MGI:98214, RGD:620474)"
-    ),
+    subset: str = Query(None, description="Name of the subset to map GO terms " "(e.g. goslim_agr)"),
+    subject: List[str] = Query(None, description="List of Gene ids (e.g. " "MGI:98214, RGD:620474)"),
     ecodes: List[str] = Query(
         None,
-        description="List of Evidence Codes to include (e.g. "
-        "EXP, IDA). Has priority over exclude_IBA",
+        description="List of Evidence Codes to include (e.g. " "EXP, IDA). Has priority over exclude_IBA",
     ),
     exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
-    exclude_PB: bool = Query(
-        False, description="If true, excludes direct annotations to protein binding"
-    ),
+    exclude_PB: bool = Query(False, description="If true, excludes direct annotations to protein binding"),
     cross_aspect: bool = Query(
         False,
         description="If true, can retrieve terms from "
@@ -102,9 +95,7 @@ async def get_ribbon_results(
                 {
                     "id": category["id"],
                     "label": "all " + category["label"].lower().replace("_", " "),
-                    "description": "Show all "
-                    + category["label"].lower().replace("_", " ")
-                    + " annotations",
+                    "description": "Show all " + category["label"].lower().replace("_", " ") + " annotations",
                     "type": "All",
                 }
             ]
@@ -227,9 +218,7 @@ async def get_ribbon_results(
                                 }
 
                             # for each annotation, add the term and increment the nb of annotations
-                            entity["groups"][group][annot["evidence_type"]]["terms"].add(
-                                annot["annotation_class"]
-                            )
+                            entity["groups"][group][annot["evidence_type"]]["terms"].add(annot["annotation_class"])
                             entity["groups"][group][annot["evidence_type"]]["nb_annotations"] += 1
                             entity["groups"][group]["ALL"]["terms"].add(annot["annotation_class"])
                             entity["groups"][group]["ALL"]["nb_annotations"] += 1
@@ -267,15 +256,11 @@ async def get_ribbon_results(
         # compute the number of classes for each group that have subgroup (annotations)
         for group in entity["groups"]:
             for subgroup in entity["groups"][group]:
-                entity["groups"][group][subgroup]["nb_classes"] = len(
-                    entity["groups"][group][subgroup]["terms"]
-                )
+                entity["groups"][group][subgroup]["nb_classes"] = len(entity["groups"][group][subgroup]["terms"])
                 if "-other" not in group:
                     del entity["groups"][group][subgroup]["terms"]
                 else:
-                    entity["groups"][group][subgroup]["terms"] = list(
-                        entity["groups"][group][subgroup]["terms"]
-                    )
+                    entity["groups"][group][subgroup]["terms"] = list(entity["groups"][group][subgroup]["terms"])
 
         entity["nb_classes"] = len(entity["terms"])
         del entity["terms"]

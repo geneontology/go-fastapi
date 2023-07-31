@@ -239,5 +239,5 @@ def test_create_go_summary_sparql():
 @pytest.mark.parametrize("id", go_ids)
 def test_get_go_hierarchy_go_id(id):
     response = test_client.get(f"/api/go/{id}/hierarchy")
-    assert len(response.json()) >= 0
+    assert len(response.json()) > 0
     assert response.status_code == 200

@@ -13,9 +13,7 @@ router = APIRouter()
 
 
 @router.get("/api/pmid/{id}/models", tags=["publications"])
-async def get_model_details_by_pmid(
-    id: str = Query(None, description="A PMID (e.g. 15314168 or 26954676)")
-):
+async def get_model_details_by_pmid(id: str = Query(None, description="A PMID (e.g. 15314168 or 26954676)")):
     """Returns models for a given PMID."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)

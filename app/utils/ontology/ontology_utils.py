@@ -100,10 +100,10 @@ def get_ontology_subsets_by_id(id: str):
             for category in result:
                 if category["annotation_class"] == cat:
                     ordered_terms = []
-                    for ot in agr_category["terms"]:
-                        for uot in category["terms"]:
-                            if uot["annotation_class"] == ot:
-                                ordered_terms.append(uot)
+                    for ordered_term in agr_category["terms"]:
+                        for unordered_term in category["terms"]:
+                            if unordered_term["annotation_class"] == ordered_term:
+                                ordered_terms.append(unordered_term)
                                 break
                     category["terms"] = ordered_terms
                     temp.append(category)

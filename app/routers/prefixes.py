@@ -19,9 +19,7 @@ async def get_all_prefixes():
 
 
 @router.get("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
-async def get_expand_curie(
-    id: str = Query(None, description="identifier in CURIE format of the resource to expand")
-):
+async def get_expand_curie(id: str = Query(None, description="identifier in CURIE format of the resource to expand")):
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 
