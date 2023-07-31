@@ -1,9 +1,8 @@
 import logging
 from pprint import pprint
-
+import unittest
 import pytest
 from fastapi.testclient import TestClient
-
 from app.main import app
 
 test_client = TestClient(app)
@@ -21,21 +20,40 @@ subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 
-@pytest.mark.parametrize("id", gene_ids)
-def test_expander_endpoint(id):
-    response = test_client.get(f"/api/identifier/prefixes/expand/{id}")
-    pprint(response.json())
-    assert response.status_code == 200
+class TestIdentifierAPI(unittest.TestCase):
+
+    @pytest.mark.parametrize("id", gene_ids)
+    def test_expander_endpoint(self, id):
+        """
+        Test expanding an identifier with a given prefix.
+
+        :param id: The identifier to be expanded with prefix. (parametrized)
+        """
+        response = test_client.get(f"/api/identifier/prefixes/expand/{id}")
+        pprint(response.json())
+        self.assertEqual(response.status_code, 200)
+
+    def test_contract_uri(self):
+        """
+        Test contracting a URI to a compact identifier.
+
+        :return: None
+        """
+        uri = "http://purl.obolibrary.org/obo/GO_0008150"
+        response = test_client.get("/api/identifier/prefixes/contract/", params={"uri": uri})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("GO:0008150", response.json())
+
+    def test_get_all_prefixes(self):
+        """
+        Test getting all available identifier prefixes.
+
+        :return: None
+        """
+        response = test_client.get("/api/identifier/prefixes")
+        self.assertGreater(len(response.json()), 50)
+        self.assertEqual(response.status_code, 200)
 
 
-def test_contract_uri():
-    uri = "http://purl.obolibrary.org/obo/GO_0008150"
-    response = test_client.get("/api/identifier/prefixes/contract/", params={"uri": uri})
-    assert response.status_code == 200
-    assert "GO:0008150" in response.json()
-
-
-def test_get_all_prefixes():
-    response = test_client.get("/api/identifier/prefixes")
-    assert len(response.json()) > 50
-    assert response.status_code == 200
+if __name__ == '__main__':
+    unittest.main()
