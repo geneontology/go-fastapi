@@ -28,6 +28,15 @@ USER_AGENT = get_user_agent()
 
 
 class RelationshipType(str, Enum):
+
+    """
+    Enumeration for Gene Ontology relationship types used for filtering associations.
+
+    :param INVOLVED_IN: The 'involved_in' relationship type.
+    :param ACTS_UPSTREAM_OF_OR_WITHIN: The 'acts_upstream_of_or_within' relationship type.
+    :param INVOLVED_IN_REGULATION_OF: The 'involved_in_regulation_of' relationship type.
+    """
+
     INVOLVED_IN = INVOLVED_IN
     ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
     INVOLVED_IN_REGULATION_OF = INVOLVED_IN_REGULATION_OF
@@ -67,7 +76,6 @@ async def get_bioentity_by_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
-
     # special case MGI, sigh
     if id.startswith("MGI:"):
         id = id.replace("MGI:", "MGI:MGI:")
@@ -97,7 +105,8 @@ async def get_annotations_by_goterm_id(
     start: int = 0,
     rows: int = 100,
 ):
-    """Returns annotations using the provided GO term.
+    """
+    Returns annotations using the provided GO term.
 
     Retrieves annotations based on the provided Gene Ontology (GO) term identifier.
     The GO term identifier should be represented in CURIE format (e.g., GO:0044598).
@@ -175,7 +184,8 @@ async def get_genes_by_goterm_id(
     start: int = 0,
     rows: int = 100,
 ):
-    """Returns genes annotated to the provided GO Term.
+    """
+    Returns genes annotated to the provided GO Term.
 
     Retrieves genes annotated to the provided Gene Ontology (GO) term. The GO term should be
     represented in CURIE format (e.g., GO:0044598).
@@ -261,7 +271,8 @@ async def get_taxon_by_goterm_id(
     start: int = 0,
     rows: int = 100,
 ):
-    """Returns taxon information for genes annotated to the provided GO term.
+    """
+    Returns taxon information for genes annotated to the provided GO term.
 
     Retrieves taxon information for genes annotated to the provided Gene Ontology (GO) term.
     The GO term should be represented in CURIE format (e.g., GO:0044598).
