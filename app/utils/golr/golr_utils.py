@@ -1,5 +1,4 @@
 import logging
-from pprint import pprint
 
 import requests
 
@@ -10,7 +9,7 @@ logger = logging.getLogger(__name__)
 def run_solr_on(solr_instance, category, id, fields):
     """
     Return the result of a solr query on the given solrInstance (Enum ESOLR),
-    for a certain document_category (ESOLRDoc) and id
+    for a certain document_category (ESOLRDoc) and id.
     """
     query = (
         solr_instance.value
@@ -25,11 +24,12 @@ def run_solr_on(solr_instance, category, id, fields):
     response = requests.get(query)
     return response.json()["response"]["docs"][0]
 
+
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
 def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     """
     Return the result of a solr query on the given solrInstance (Enum ESOLR),
-    for a certain document_category (ESOLRDoc) and id
+    for a certain document_category (ESOLRDoc) and id.
     """
     solr_url = solr_instance.value
 
@@ -56,10 +56,7 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
     # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document
     highlight_added = []
     for doc in response.json()["response"]["docs"]:
-        if (
-            doc.get("id") is not None
-            and doc.get("id") in response.json()["highlighting"]
-        ):
+        if doc.get("id") is not None and doc.get("id") in response.json()["highlighting"]:
             doc["highlighting"] = response.json()["highlighting"][doc["id"]]
             if doc.get("id").startswith("MGI:"):
                 doc["id"] = doc["id"].replace("MGI:MGI:", "MGI:")

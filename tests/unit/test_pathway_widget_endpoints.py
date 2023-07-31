@@ -1,8 +1,9 @@
 import logging
 import urllib.parse
-from pprint import pprint
-from fastapi.testclient import TestClient
+
 import pytest
+from fastapi.testclient import TestClient
+
 from app.main import app
 
 test_client = TestClient(app)

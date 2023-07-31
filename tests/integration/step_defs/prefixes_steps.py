@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from fastapi.testclient import TestClient
-from pytest_bdd import given, parsers, scenario, scenarios, then
+from pytest_bdd import given, parsers, scenario, then
 
 from app.main import app
 
@@ -10,9 +10,7 @@ EXTRA_TYPES = {
 }
 
 
-@scenario(
-    "../features/prefixes.feature", "Client code requires list of all prefixes in use"
-)
+@scenario("../features/prefixes.feature", "Client code requires list of all prefixes in use")
 def test_identifiers():
     # boilerplate
     pass
@@ -39,7 +37,7 @@ def test_exand_uri():
 )
 def api_result(endpoint):
     test_client = TestClient(app)
-    response = test_client.get(f"/api/identifier/prefixes")
+    response = test_client.get("/api/identifier/prefixes")
     return response
 
 
@@ -67,11 +65,7 @@ def response_code(result, code):
     assert result.status_code == code
 
 
-@then(
-    parsers.cfparse(
-        'the content should contain "{content:String}"', extra_types=EXTRA_TYPES
-    )
-)
+@then(parsers.cfparse('the content should contain "{content:String}"', extra_types=EXTRA_TYPES))
 def contains(result, content):
     content = content.replace('"', "")
     assert content in result.json()

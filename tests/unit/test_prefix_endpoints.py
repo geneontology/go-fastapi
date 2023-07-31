@@ -1,14 +1,21 @@
 import logging
 from pprint import pprint
+
 import pytest
 from fastapi.testclient import TestClient
-import urllib
+
 from app.main import app
 
 test_client = TestClient(app)
 logger = logging.getLogger(__name__)
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192", "MGI:MGI:3588192", "FB:FBgn0003731"]
+gene_ids = [
+    "ZFIN:ZDB-GENE-980526-388",
+    "ZFIN:ZDB-GENE-990415-8",
+    "MGI:3588192",
+    "MGI:MGI:3588192",
+    "FB:FBgn0003731",
+]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]

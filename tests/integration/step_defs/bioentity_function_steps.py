@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from fastapi.testclient import TestClient
-from pytest_bdd import given, parsers, scenario, scenarios, then
+from pytest_bdd import given, parsers, scenario, then
 
 from app.main import app
 

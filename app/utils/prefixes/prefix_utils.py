@@ -1,9 +1,8 @@
 import logging
-import json
-import urllib.request
-from prefixmaps import load_context
+
 from curies import Converter
-from pprint import pprint
+from prefixmaps import load_context
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,4 +22,3 @@ def get_prefixes(context: str = "go"):
     cmap_remapped = remap_prefixes(cmaps)
 
     return cmap_remapped
-

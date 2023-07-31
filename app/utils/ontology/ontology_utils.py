@@ -1,15 +1,14 @@
 import logging
 
 from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc
-from app.utils.golr.golr_utils import run_solr_text_on
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
+from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()
@@ -20,9 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def batch_fetch_labels(ids):
-    """
-    fetch all rdfs:label assertions for a set of CURIEs
-    """
+    """Fetch all rdfs:label assertions for a set of CURIEs."""
     m = {}
     for id in ids:
         label = goont_fetch_label(id)
@@ -32,9 +29,7 @@ def batch_fetch_labels(ids):
 
 
 def goont_fetch_label(id):
-    """
-    fetch all rdfs:label assertions for a URI
-    """
+    """Fetch all rdfs:label assertions for a URI."""
     ns = Namespaces()
     ns.add_prefixmap("go")
     iri = ns.uri_for(id)
@@ -64,7 +59,7 @@ def get_ontology_subsets_by_id(id: str):
         goslim_agr_ids = '" "'.join(terms_list)
         fq = '&fq=annotation_class:("' + goslim_agr_ids + '")'
 
-    fq = fq+"&rows=1000"
+    fq = fq + "&rows=1000"
     print("first get subset query")
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
 

@@ -1,8 +1,9 @@
 import logging
+from pprint import pprint
 
 import pytest
 from fastapi.testclient import TestClient
-from pprint import pprint
+
 from app.main import app
 
 test_client = TestClient(app)

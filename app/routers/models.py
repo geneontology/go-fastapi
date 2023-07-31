@@ -1,8 +1,10 @@
 import logging
 from typing import List
+
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
+
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
 
@@ -14,12 +16,8 @@ router = APIRouter()
 
 
 @router.get("/api/models", tags=["models"], deprecated=True)
-async def get_model_by_start_size(
-    start: int = None, size: int = None, last: int = None
-):
-    """
-    Returns metadata of an ontology term, e.g. GO:0003677
-    """
+async def get_model_by_start_size(start: int = None, size: int = None, last: int = None):
+    """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """
@@ -27,12 +25,12 @@ async def get_model_by_start_size(
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
         PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
-  
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids) 
+
+        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids)
                                     (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids) 
-                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames) 
-        WHERE 
+                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids)
+                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames)
+        WHERE
         {
             {
                 GRAPH ?gocam {
@@ -41,20 +39,20 @@ async def get_model_by_start_size(
                         dc:date ?date ;
                         dc:contributor ?orcid ;
                         providedBy: ?providedBy .
-    
+
                     BIND( IRI(?orcid) AS ?orcidIRI ).
                     BIND( IRI(?providedBy) AS ?providedByIRI ).
                 }
-         
+
                 optional {
                     ?providedByIRI rdfs:label ?providedByLabel .
                 }
                 optional { ?orcidIRI rdfs:label ?name }
                 BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-            }   
-  
+            }
+
         }
-        GROUP BY ?gocam ?date ?title 
+        GROUP BY ?gocam ?date ?title
         ORDER BY DESC(?date)
         """
     if size:
@@ -73,9 +71,7 @@ async def get_goterms_by_model_id(
         description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
     )
 ):
-    """
-    Returns go term details based on a GO-CAM model ID
-    """
+    """Returns go term details based on a GO-CAM model ID."""
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -92,7 +88,7 @@ async def get_goterms_by_model_id(
             PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
             PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
             SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
-            WHERE 
+            WHERE
             {
                 VALUES ?gocam { %s }
                 GRAPH ?gocam {
@@ -100,7 +96,7 @@ async def get_goterms_by_model_id(
                     ?entity rdf:type ?goids
                 }
 
-                VALUES ?goclasses { BP: MF: CC:  } . 
+                VALUES ?goclasses { BP: MF: CC:  } .
                 ?goids rdfs:subClassOf+ ?goclasses .
                 ?goids rdfs:label ?gonames .
                 ?goids definition: ?definitions .
@@ -146,9 +142,7 @@ async def get_geneproducts_by_model_id(
         description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
     )
 ):
-    """
-    Returns gene product details based on a GO-CAM model ID
-    """
+    """Returns gene product details based on a GO-CAM model ID."""
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -164,14 +158,14 @@ async def get_geneproducts_by_model_id(
             PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
             SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier;separator="@|@") as ?gpids)
                             (GROUP_CONCAT(distinct ?name;separator="@|@") as ?gpnames)
-            WHERE 
+            WHERE
             {
                 VALUES ?gocam { %s }
 
                 GRAPH ?gocam {
-                    ?s enabled_by: ?gpnode .    
+                    ?s enabled_by: ?gpnode .
                     ?gpnode rdf:type ?identifier .
-                    FILTER(?identifier != owl:NamedIndividual) .         
+                    FILTER(?identifier != owl:NamedIndividual) .
                 }
                 optional {
                     GRAPH <http://purl.obolibrary.org/obo/go/extensions/go-graphstore.owl> {
@@ -195,9 +189,7 @@ async def get_geneproducts_by_model_id(
         description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
     )
 ):
-    """
-    Returns pubmed details based on a GO-CAM model ID
-    """
+    """Returns pubmed details based on a GO-CAM model ID."""
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -210,19 +202,19 @@ async def get_geneproducts_by_model_id(
         """
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-  
-        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="@|@") as ?sources)              
-        WHERE 
-        {    
+
+        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="@|@") as ?sources)
+        WHERE
+        {
             values ?gocam { %s }
             GRAPH ?gocam {
                 ?s dc:source ?source .
                 BIND(REPLACE(?source, " ", "") AS ?source) .
                 FILTER((CONTAINS(?source, "PMID")))
-            }           
+            }
         }
         GROUP BY ?gocam
-         
+
     """
         % gocam
     )
@@ -237,21 +229,19 @@ async def get_geneproducts_by_model_id(
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968))",
     )
 ):
-    """
-    Returns term details based on a GO-CAM model ID
-    """
+    """Returns term details based on a GO-CAM model ID."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
-    
+
         SELECT ?subject ?predicate ?object
-        WHERE 
-        {     
+        WHERE
+        {
             GRAPH metago:%s {
                 ?subject ?predicate ?object
-            }      
+            }
         }
     """
         % id

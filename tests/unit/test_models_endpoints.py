@@ -1,12 +1,9 @@
 import logging
-import urllib.parse
-from pprint import pprint
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
 
 test_client = TestClient(app)
 
@@ -57,7 +54,7 @@ def test_models_size_endpoint():
         "start": "32",
         "size": "10",
     }
-    response = test_client.get(f"/api/models", params=data)
+    response = test_client.get("/api/models", params=data)
     for record in response.json():
         assert type(record.get("orcids")) == list
     assert response.status_code == 200

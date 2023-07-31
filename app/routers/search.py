@@ -1,6 +1,8 @@
 import logging
 from enum import Enum
+
 from fastapi import APIRouter, Query
+
 from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
@@ -27,9 +29,8 @@ async def autocomplete_term(
 ):
     """
     Returns list of matching concepts or entities over annotation classes (e.g. GO terms) and
-    bioentities (e.g. gene names and symbols)
+    bioentities (e.g. gene names and symbols).
     """
-
     # dictates the fields to return
     fields = "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
 
@@ -50,9 +51,7 @@ async def autocomplete_term(
         category = ESOLRDoc.ANNOTATION
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
-    data = run_solr_text_on(
-        ESOLR.GOLR, category, term + "*", query_fields, fields, optionals
-    )
+    data = run_solr_text_on(ESOLR.GOLR, category, term + "*", query_fields, fields, optionals)
     docs = []
 
     for item in data:

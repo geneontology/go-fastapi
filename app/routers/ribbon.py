@@ -1,17 +1,17 @@
 import logging
 from typing import List
+
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, replace
+
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_text_on
-from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
-                                get_user_agent)
+from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
-from pprint import pprint
 
 log = logging.getLogger(__name__)
 
@@ -23,13 +23,9 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_ontology_subsets_by_go_term_id(
-    id: str = Query(
-        None, description="'CURIE identifier of a GO term, e.g. GO:0006259"
-    )
+    id: str = Query(None, description="'CURIE identifier of a GO term, e.g. GO:0006259")
 ):
-    """
-    Returns subsets (slims) associated to an ontology term
-    """
+    """Returns subsets (slims) associated to an ontology term."""
     query = ontology_utils.get_go_subsets_sparql_query(id)
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
@@ -73,10 +69,7 @@ async def get_ribbon_results(
         "regulates_closure",
     ),
 ):
-    """
-    Fetch the summary of annotations for a given gene or set of genes
-    """
-
+    """Fetch the summary of annotations for a given gene or set of genes."""
     for s in subject:
         if "MGI:MGI" in s:
             subject.remove(s)
@@ -120,8 +113,7 @@ async def get_ribbon_results(
                 {
                     "id": category["id"],
                     "label": "other " + category["label"].lower().replace("_", " "),
-                    "description": "Represent all annotations not "
-                    "mapped to a specific term",
+                    "description": "Represent all annotations not " "mapped to a specific term",
                     "type": "Other",
                 }
             ]
@@ -131,9 +123,7 @@ async def get_ribbon_results(
     subject_ids = subject
 
     # ID conversion
-    subject_ids = [
-        x.replace("WormBase:", "WB:") if "WormBase:" in x else x for x in subject_ids
-    ]
+    subject_ids = [x.replace("WormBase:", "WB:") if "WormBase:" in x else x for x in subject_ids]
     slimmer_subjects = []
     mapped_ids = {}
     reverse_mapped_ids = {}
@@ -237,15 +227,11 @@ async def get_ribbon_results(
                                 }
 
                             # for each annotation, add the term and increment the nb of annotations
-                            entity["groups"][group][annot["evidence_type"]][
-                                "terms"
-                            ].add(annot["annotation_class"])
-                            entity["groups"][group][annot["evidence_type"]][
-                                "nb_annotations"
-                            ] += 1
-                            entity["groups"][group]["ALL"]["terms"].add(
+                            entity["groups"][group][annot["evidence_type"]]["terms"].add(
                                 annot["annotation_class"]
                             )
+                            entity["groups"][group][annot["evidence_type"]]["nb_annotations"] += 1
+                            entity["groups"][group]["ALL"]["terms"].add(annot["annotation_class"])
                             entity["groups"][group]["ALL"]["nb_annotations"] += 1
 
             terms = ontology_utils.get_category_terms(cat)
@@ -274,9 +260,7 @@ async def get_ribbon_results(
                                 "nb_annotations": 0,
                             }
                         other[annot["evidence_type"]]["nb_annotations"] += 1
-                        other[annot["evidence_type"]]["terms"].add(
-                            annot["annotation_class"]
-                        )
+                        other[annot["evidence_type"]]["terms"].add(annot["annotation_class"])
 
             entity["groups"][cat["id"] + "-other"] = other
 

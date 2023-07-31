@@ -1,6 +1,4 @@
 import logging
-import urllib.parse
-from pprint import pprint
 
 import pytest
 from fastapi.testclient import TestClient

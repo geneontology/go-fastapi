@@ -1,10 +1,12 @@
 import logging
 
-from fastapi.testclient import TestClient
-from app.utils.prefixes.prefix_utils import remap_prefixes
-from app.main import app
-from prefixmaps import load_context
 from curies import Converter
+from fastapi.testclient import TestClient
+from prefixmaps import load_context
+
+from app.main import app
+from app.utils.prefixes.prefix_utils import remap_prefixes
+
 test_client = TestClient(app)
 
 logger = logging.getLogger(__name__)
@@ -22,4 +24,4 @@ def test_prefix_utils():
     cmaps = converter.prefix_map
     # hacky solution to: https://github.com/geneontology/go-site/issues/2000
     cmaps = remap_prefixes(cmaps)
-    assert(cmaps["MGI"] == "http://identifiers.org/mgi/MGI:")
+    assert cmaps["MGI"] == "http://identifiers.org/mgi/MGI:"

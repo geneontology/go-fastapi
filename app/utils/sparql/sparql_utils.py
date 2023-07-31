@@ -5,7 +5,7 @@ def transform(data, keys_to_split=None):
     """
     Transform a SPARQL json result by:
     1) outputing only { key : value }, removing datatype
-    2) for some keys, transform them into array based on SEPARATOR
+    2) for some keys, transform them into array based on SEPARATOR.
     """
     transformed = {}
     for key in data:
@@ -17,9 +17,7 @@ def transform(data, keys_to_split=None):
 
 
 def transform_array(data, keys_to_split=None):
-    """
-    Transform a SPARQL json array based on the rules of transform
-    """
+    """Transform a SPARQL json array based on the rules of transform."""
     if keys_to_split is None:
         keys_to_split = []
     transformed = []

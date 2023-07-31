@@ -4,9 +4,19 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import (bioentity, labeler, models, ontology, pathway_widget,
-                         prefixes, publications, ribbon, search, slimmer,
-                         users_and_groups)
+from app.routers import (
+    bioentity,
+    labeler,
+    models,
+    ontology,
+    pathway_widget,
+    prefixes,
+    publications,
+    ribbon,
+    search,
+    slimmer,
+    users_and_groups,
+)
 
 log = logging.getLogger(__name__)
 

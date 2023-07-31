@@ -1,7 +1,6 @@
-from pprint import pprint
 
 from fastapi.testclient import TestClient
-from pytest_bdd import given, parsers, scenario, scenarios, then
+from pytest_bdd import given, parsers, scenario, then
 
 from app.main import app
 
@@ -31,7 +30,7 @@ def api_result(bioentity_id, slimterms):
     slimterms = slimterms.replace('"', "")
     slimterms_list = slimterms.split(",")
     data = {"subject": bioentity_id.replace('"', ""), "slim": slimterms_list}
-    response = test_client.get(f"/api/bioentityset/slimmer/function", params=data)
+    response = test_client.get("/api/bioentityset/slimmer/function", params=data)
     return response
 
 
@@ -79,9 +78,7 @@ def subject_id(result, bioentity_id):
 
 
 @then(
-    parsers.cfparse(
-        "the response should have {term:String} in the slim", extra_types=EXTRA_TYPES
-    )
+    parsers.cfparse("the response should have {term:String} in the slim", extra_types=EXTRA_TYPES)
 )
 def term_in_slim(result, term):
     data = result.json()

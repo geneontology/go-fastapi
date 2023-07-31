@@ -1,11 +1,13 @@
 import logging
 from enum import Enum
 from typing import List
+
 from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
+
 from app.utils.settings import ESOLR, get_user_agent
-from pprint import pprint
+
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
 FUNCTION_CATEGORY = "function"
@@ -39,10 +41,7 @@ async def slimmer_function(
     rows: int = -1,
     start: int = 0,
 ):
-    """
-    For a given gene(s), summarize its annotations over a defined set of slim
-    """
-
+    """For a given gene(s), summarize its annotations over a defined set of slim."""
     # Note that GO currently uses UniProt as primary ID
     # for some sources: https://github.com/biolink/biolink-api/issues/66
 
@@ -71,7 +70,7 @@ async def slimmer_function(
         # rows=-1 sets row limit to 100000 (max_rows set in GolrQuery) and also iterates
         # through results via GolrQuery method.
         rows=rows,
-        start=start
+        start=start,
     )
 
     # To the fullest extent possible return HGNC ids
@@ -94,9 +93,7 @@ async def slimmer_function(
 
 
 def gene_to_uniprot_from_mygene(id):
-    """
-    Query MyGeneInfo with a gene and get its corresponding UniProt ID
-    """
+    """Query MyGeneInfo with a gene and get its corresponding UniProt ID."""
     uniprot_ids = []
     mg = get_client("gene")
     if id.startswith("NCBIGene:"):
@@ -133,9 +130,7 @@ def gene_to_uniprot_from_mygene(id):
 
 
 def uniprot_to_gene_from_mygene(id):
-    """
-    Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene
-    """
+    """Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene."""
     gene_id = None
     if id.startswith("UniProtKB"):
         id = id.split(":", 1)[1]

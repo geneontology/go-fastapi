@@ -1,8 +1,9 @@
 import logging
 
+import pytest
 from fastapi.testclient import TestClient
 from ontobio.sparql.sparql_ontology import EagerRemoteSparqlOntology
-import pytest
+
 import app.utils.ontology.ontology_utils as ou
 from app.main import app
 from app.utils.settings import get_golr_config

@@ -2,17 +2,17 @@ import json
 import logging
 from enum import Enum
 from typing import List
+
+from curies import Converter
 from fastapi import APIRouter, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
-from app.utils.prefixes.prefix_utils import get_prefixes
-from curies import Converter
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
-from app.utils.settings import (ESOLR, ESOLRDoc, get_sparql_endpoint,
-                                get_user_agent)
+from app.utils.prefixes.prefix_utils import get_prefixes
+from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform, transform_array
 
 log = logging.getLogger(__name__)
@@ -27,9 +27,7 @@ class GraphType(str, Enum):
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(id: str):
-    """
-    Returns metadata of an ontology term, e.g. GO:0003677
-    """
+    """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -41,13 +39,8 @@ async def get_term_metadata_by_id(id: str):
 
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
-async def get_term_graph_by_id(
-    id: str, graph_type: GraphType = Query(GraphType.topology_graph)
-):
-    """
-    Returns graph of an ontology term
-    """
-
+async def get_term_graph_by_id(id: str, graph_type: GraphType = Query(GraphType.topology_graph)):
+    """Returns graph of an ontology term."""
     graph_type = graph_type + "_json"  # GOLR field names
     log.info(graph_type)
 
@@ -67,9 +60,7 @@ async def get_subgraph_by_term_id(
     relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
     include_meta: bool = Query(False, include_in_schema=False),
 ):
-    """
-    Extract a subgraph from an ontology term
-    """
+    """Extract a subgraph from an ontology term."""
     qnodes = [id]
     if cnode is not None:
         qnodes += cnode
@@ -91,9 +82,7 @@ async def get_subgraph_by_term_id(
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subsets_by_term(id: str):
-    """
-    Returns subsets (slims) associated to an ontology term
-    """
+    """Returns subsets (slims) associated to an ontology term."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
@@ -107,9 +96,8 @@ async def get_subsets_by_term(id: str):
 async def get_subset_metadata_by_id(id: str):
     """
     Returns metadata of an ontology subset (slim)
-    id is the name of a slim subset, e.g., goslim_agr, goslim_generic
+    id is the name of a slim subset, e.g., goslim_agr, goslim_generic.
     """
-
     q = "*:*"
     qf = ""
     fq = "&fq=subset:" + id + "&rows=1000"
@@ -179,12 +167,11 @@ async def get_subset_metadata_by_id(id: str):
 @router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_ancestors_shared_by_two_terms(subject: str, object: str):
     """
-    Returns the ancestor ontology terms shared by two ontology terms
+    Returns the ancestor ontology terms shared by two ontology terms.
 
     subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
     object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
-
     log.info(subject)
     log.info(object)
     fields = "isa_partof_closure,isa_partof_closure_label"
@@ -218,7 +205,6 @@ async def get_go_term_detail_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -254,14 +240,14 @@ async def get_go_hierarchy_go_id(
                 {
                     ?goquery rdfs:subClassOf+ ?GO .
                     ?GO rdfs:label ?label .
-                    FILTER (LANG(?label) != "en")    
+                    FILTER (LANG(?label) != "en")
                     BIND("parent" as ?hierarchy)
                     }
                 UNION
                 {
                     ?GO rdfs:subClassOf* ?goquery .
-                    ?GO rdfs:label ?label .    		
-                    FILTER (LANG(?label) != "en")    
+                    ?GO rdfs:label ?label .
+                    FILTER (LANG(?label) != "en")
                     BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
                 }
             }
@@ -299,14 +285,14 @@ async def get_gocam_models_by_go_id(
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
-        SELECT distinct ?gocam ?title 
-        WHERE 
+        SELECT distinct ?gocam ?title
+        WHERE
         {
             GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .    
+                ?gocam metago:graphType metago:noctuaCam .
                 ?entity rdf:type owl:NamedIndividual .
                 ?entity rdf:type ?goid .
-                ?gocam dc:title ?title . 
+                ?gocam dc:title ?title .
                 FILTER(?goid = <%s>)
             }
         }
