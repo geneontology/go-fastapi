@@ -61,7 +61,9 @@ extend-ignore = [
     "D211",  # `no-blank-line-before-class`
     "D212",  # `multi-line-summary-first-line`
     "D401",  # `First line of docstring should be in imperative mood`
-    ]
+    "S101",  # `Use of assert detected. It would be nice to keep this check for everything but the BDD tests.`
+    "B008",  # `Do not perform function calls in argument defaults.`
+]
 line-length = 120
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.

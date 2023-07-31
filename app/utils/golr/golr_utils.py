@@ -19,8 +19,18 @@ def run_solr_on(solr_instance, category, id, fields):
         + fields
         + "&wt=json&indent=on"
     )
-    response = requests.get(query)
-    return response.json()["response"]["docs"][0]
+
+    timeout_seconds = 60  # Set the desired timeout value in seconds
+
+    try:
+        response = requests.get(query, timeout=timeout_seconds)
+
+        return response.json()["response"]["docs"][0]
+        # Process the response here
+    except requests.Timeout:
+        print("Request timed out")
+    except requests.RequestException as e:
+        print(f"Request error: {e}")
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
@@ -45,7 +55,17 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + "&wt=json&indent=on"
         + optionals
     )
-    response = requests.get(query)
+    timeout_seconds = 60  # Set the desired timeout value in seconds
+
+    try:
+        response = requests.get(query, timeout=timeout_seconds)
+
+        return response.json()["response"]["docs"][0]
+        # Process the response here
+    except requests.Timeout:
+        print("Request timed out")
+    except requests.RequestException as e:
+        print(f"Request error: {e}")
 
     # solr returns matching text in the field "highlighting", but it is not included in the response.
     # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document

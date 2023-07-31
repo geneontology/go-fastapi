@@ -30,7 +30,7 @@ def test_exand_uri():
     parsers.cfparse("the {endpoint:String} is queried", extra_types=EXTRA_TYPES),
     target_fixture="result",
 )
-def api_result(endpoint):
+def api_result_first(endpoint):
     """
     Given the {endpoint} is queried.
 
@@ -51,7 +51,7 @@ def api_result(endpoint):
     ),
     target_fixture="result",
 )
-def api_result(endpoint, thing):
+def api_result_second(endpoint, thing):
     """
     Given the "{endpoint}" endpoint is queried with "{thing}".
 
