@@ -1,3 +1,6 @@
+"""
+slimmer steps
+"""
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, scenario, then
 

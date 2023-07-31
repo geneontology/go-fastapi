@@ -1,4 +1,4 @@
-"""bioentity router"""
+"""bioentity router."""
 import logging
 from enum import Enum
 from typing import List
@@ -368,11 +368,12 @@ async def get_annotations_by_gene_id(
 
      - ZFIN (e.g., ZFIN:ZDB-GENE-050417-357)
 
-    Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However, the standard for biolink is MGI:nnnn,
-    so you should use this (will be transparently mapped to legacy ID).
+    Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However, the standard for biolink is
+    MGI:nnnn, so you should use this (will be transparently mapped to legacy ID).
 
     Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
-    Again, this should be transparently handled; e.g., you can use NCBIGene:6469, and this will be mapped behind the scenes for querying.
+    Again, this should be transparently handled; e.g., you can use NCBIGene:6469, and this will be mapped behind the
+    scenes for querying.
     """
     if id is None:
         id = Query(

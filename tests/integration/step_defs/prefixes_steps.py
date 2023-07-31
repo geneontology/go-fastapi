@@ -1,3 +1,7 @@
+"""
+Prefix steps.
+"""
+
 from pprint import pprint
 
 from fastapi.testclient import TestClient

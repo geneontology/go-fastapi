@@ -1,3 +1,4 @@
+"""ontology utility functions."""
 import logging
 
 from linkml_runtime.utils.namespaces import Namespaces

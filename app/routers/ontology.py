@@ -23,6 +23,9 @@ router = APIRouter()
 
 
 class GraphType(str, Enum):
+
+    """Enum for the different types of graphs that can be returned."""
+
     topology_graph = "topology_graph"
 
 
@@ -96,6 +99,7 @@ async def get_subset_metadata_by_id(id: str):
     """
     Returns metadata of an ontology subset (slim)
     id is the name of a slim subset, e.g., goslim_agr, goslim_generic.
+
     """
     q = "*:*"
     qf = ""
@@ -199,7 +203,8 @@ async def get_go_term_detail_by_go_id(
     id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
 ):
     """
-    Returns models for a given GO term ID
+    Returns models for a given GO term ID.
+
     e.g. GO:0008150
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
@@ -217,7 +222,8 @@ async def get_go_term_detail_by_go_id(
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
 async def get_go_hierarchy_go_id(id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
-    Returns parent and children relationships for a given GO ID
+    Returns parent and children relationships for a given GO ID.
+
     e.g. GO:0005885
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
@@ -266,8 +272,8 @@ async def get_go_hierarchy_go_id(id: str = Query(None, description="A GO-Term ID
 @router.get("/api/go/{id}/models", tags=["ontology"])
 async def get_gocam_models_by_go_id(id: str = Query(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
-    Returns parent and children relationships for a given GO ID
-    e.g. GO:0005885
+    Returns parent and children relationships for a given GO ID, e.g. GO:0005885.
+
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """

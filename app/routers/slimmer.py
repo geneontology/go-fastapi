@@ -22,6 +22,9 @@ log = logging.getLogger(__name__)
 
 
 class RelationshipType(str, Enum):
+
+    """Relationship type for slimmer."""
+
     acts_upstream_of_or_within = ACTS_UPSTREAM_OF_OR_WITHIN
     involved_in = INVOLVED_IN
 
