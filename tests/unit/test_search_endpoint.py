@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_golr_solr():
-    assert ESOLR.GOLR.value == "http://golr-aux.geneontology.io/solr/"
+    assert ESOLR.GOLR.value == "https://golr-aux.geneontology.io/solr/"
     assert ESOLRDoc.ONTOLOGY.value == "ontology_class"
 
 
