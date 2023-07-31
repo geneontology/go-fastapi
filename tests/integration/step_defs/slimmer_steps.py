@@ -10,12 +10,12 @@ EXTRA_TYPES = {
 
 @scenario("../features/slimmer.feature", "slimmer routes work as expected")
 def test_slim():
-    """
-    Scenario: slimmer routes work as expected
-    """
+    """Scenario: slimmer routes work as expected."""
     pass
 
+
 # Given Steps
+
 
 @given(
     parsers.cfparse(
@@ -45,6 +45,7 @@ def api_result(bioentity_id, slimterms):
 
 
 # Then Steps
+
 
 @then(parsers.parse('the response status code is "{code:d}"'))
 def response_code(result, code):

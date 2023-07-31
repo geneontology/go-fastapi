@@ -1,54 +1,54 @@
 from pprint import pprint
+
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, scenario, then
+
 from app.main import app
 
 EXTRA_TYPES = {
     "String": str,
 }
 
+
 @scenario("../features/bioentityfunction.feature", "test function endpoint")
 def test_zfin():
-    """
-    Scenario: test function endpoint
-    """
+    """Scenario: test function endpoint."""
     # boilerplate
     pass
+
 
 @scenario(
     "../features/bioentityfunction.feature",
     "User fetches all GO functional assignments for a human gene using an HGNC id",
 )
 def test_hgnc():
-    """
-    Scenario: User fetches all GO functional assignments for a human gene using an HGNC id
-    """
+    """Scenario: User fetches all GO functional assignments for a human gene using an HGNC id."""
     # boilerplate
     pass
+
 
 @scenario(
     "../features/bioentityfunction.feature",
     "User fetches all GO functional assignments for a human gene using a NCBI ID",
 )
 def test_ncbi():
-    """
-    Scenario: User fetches all GO functional assignments for a human gene using a NCBI ID
-    """
+    """Scenario: User fetches all GO functional assignments for a human gene using a NCBI ID."""
     # boilerplate
     pass
+
 
 @scenario(
     "../features/bioentityfunction.feature",
     "User fetches GO functional assignments and wishes to filter negated results",
 )
 def test_negated():
-    """
-    Scenario: User fetches GO functional assignments and wishes to filter negated results
-    """
+    """Scenario: User fetches GO functional assignments and wishes to filter negated results."""
     # boilerplate
     pass
 
+
 # Given Steps
+
 
 @given(
     parsers.cfparse(
@@ -72,7 +72,9 @@ def api_result(bioentity_id):
     response = test_client.get(f"/api/bioentity/gene/{bioentity_id}/function")
     return response
 
+
 # Then Steps
+
 
 @then(parsers.parse('the response status code is "{code:d}"'))
 def response_code(result, code):
@@ -85,6 +87,7 @@ def response_code(result, code):
     :type code: int
     """
     assert result.status_code == code
+
 
 @then(
     parsers.cfparse(
@@ -110,6 +113,7 @@ def endpoint_returns(result, term):
             found_it = True
     assert found_it
 
+
 @then(
     parsers.cfparse(
         "the response should have an association with object.label of {name:String}",
@@ -132,6 +136,7 @@ def endpoint_returns(result, name):
         if name == str(association.get("object").get("label")):
             found_it = True
     assert found_it
+
 
 @then(
     parsers.cfparse(
@@ -157,6 +162,7 @@ def endpoint_retuns(result, qualifier):
                 if qualifier == item:
                     found_it = True
     assert found_it
+
 
 @then(
     parsers.cfparse(

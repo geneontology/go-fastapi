@@ -60,6 +60,7 @@ target-version = ["py39", "py310"]
 extend-ignore = [
     "D211",  # `no-blank-line-before-class`
     "D212",  # `multi-line-summary-first-line`
+    "D401",  # `First line of docstring should be in imperative mood`
     ]
 line-length = 120
 

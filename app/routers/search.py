@@ -11,10 +11,11 @@ log = logging.getLogger(__name__)
 USER_AGENT = get_user_agent()
 router = APIRouter()
 
+
 class AutocompleteCategory(str, Enum):
-    """
-    The category of items to retrieve, can be 'gene' or 'term'
-    """
+
+    """The category of items to retrieve, can be 'gene' or 'term'."""
+
     gene = "gene"
     term = "term"
 
@@ -45,7 +46,6 @@ async def autocomplete_term(
     :return: A dictionary containing the list of matching concepts or entities.
     :rtype: dict
     """
-
     # dictates the fields to return
     fields = "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
 

@@ -15,14 +15,12 @@ router = APIRouter()
 
 @router.get("/api/users", tags=["users and groups"], deprecated=True)
 async def get_users():
-
     """
     DEPRECATED
     Returns metadata of all GO users
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = """

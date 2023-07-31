@@ -47,10 +47,7 @@ router = APIRouter()
 
 @router.get("/api/bioentity/{id}", tags=["bioentity"])
 async def get_bioentity_by_id(
-    id: str = Query(
-        ...,
-        description="example: `CURIE identifier of a bioentity (e.g. a gene) " "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
-    ),
+    id: str = None,
     start: int = 0,
     rows: int = 100,
 ):
@@ -76,6 +73,12 @@ async def get_bioentity_by_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a bioentity (e.g. a gene) "
+            "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
+        )
     # special case MGI, sigh
     if id.startswith("MGI:"):
         id = id.replace("MGI:", "MGI:MGI:")
@@ -97,10 +100,7 @@ async def get_bioentity_by_id(
 
 @router.get("/api/bioentity/function/{id}", tags=["bioentity"])
 async def get_annotations_by_goterm_id(
-    id: str = Query(
-        ...,
-        description="example: `CURIE identifier of a function term " "(e.g. GO:0044598)`",
-    ),
+    id: str = None,
     evidence: List[str] = Query(None),
     start: int = 0,
     rows: int = 100,
@@ -132,6 +132,11 @@ async def get_annotations_by_goterm_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a GO term (e.g. GO:0044598)`",
+        )
     # dictates the fields to return, annotation_class,aspect
     fields = (
         "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon,"
@@ -165,7 +170,7 @@ async def get_annotations_by_goterm_id(
 
 @router.get("/api/bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_genes_by_goterm_id(
-    id: str = Query(..., description="CURIE identifier of a GO term"),
+    id: str = None,
     taxon: List[str] = Query(
         default=None,
         description="One or more taxon CURIE to filter " "associations by subject taxon",
@@ -208,6 +213,11 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a GO term (e.g. GO:0044598)`",
+        )
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         return search_associations(
             subject_category="gene",
@@ -260,7 +270,7 @@ async def get_genes_by_goterm_id(
 
 @router.get("/api/bioentity/function/{id}/taxons", tags=["bioentity"])
 async def get_taxon_by_goterm_id(
-    id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+    id: str = None,
     evidence: List[str] = Query(
         default=None,
         description="Object id, e.g. ECO:0000501 (for IEA; "
@@ -286,6 +296,12 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a GO term (e.g. GO:0044598)`",
+        )
+
     fields = "taxon,taxon_label"
     query_filters = (
         "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf="
@@ -322,8 +338,7 @@ async def get_taxon_by_goterm_id(
 
 @router.get("/api/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_annotations_by_gene_id(
-    id: str = Query(..., description="CURIE identifier of a GO term, e.g. ZFIN:ZDB-GENE-050417-357"),
-    # ... in query means "required" parameter.
+    id: str = None,
     slim: List[str] = Query(
         default=None,
         description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
@@ -359,6 +374,12 @@ async def get_annotations_by_gene_id(
     Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
     Again, this should be transparently handled; e.g., you can use NCBIGene:6469, and this will be mapped behind the scenes for querying.
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a bioentity (e.g. a gene) "
+            "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
+        )
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 
