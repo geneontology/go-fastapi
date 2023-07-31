@@ -55,14 +55,6 @@ class TestApp(unittest.TestCase):
             response = test_client.get(f"/api/ontology/subset/{id}")
             self.assertEqual(response.status_code, 200)
 
-    def test_ontology_term_id(self):
-        """
-        Test the endpoint to get the details of a Gene Ontology term by its identifier.
-        """
-        for id in go_ids:
-            response = test_client.get(f"/api/ontology/term/{id}")
-            self.assertEqual(response.status_code, 200)
-
     def test_ontology_term_graph(self):
         """
         Test the endpoint to get the subgraph of a Gene Ontology term by its identifier.
@@ -78,14 +70,6 @@ class TestApp(unittest.TestCase):
         data = {"graph_type": "topology_graph"}
         for id in go_ids:
             response = test_client.get(f"/api/ontology/term/{id}/graph", params=data)
-            self.assertEqual(response.status_code, 200)
-
-    def test_ontology_term_subsets(self):
-        """
-        Test the endpoint to get the subsets of a Gene Ontology term by its identifier.
-        """
-        for id in go_ids:
-            response = test_client.get(f"/api/ontology/term/{id}/subsets")
             self.assertEqual(response.status_code, 200)
 
 

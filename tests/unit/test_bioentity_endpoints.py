@@ -1,8 +1,6 @@
 import logging
-
-import pytest
+import unittest
 from fastapi.testclient import TestClient
-
 from app.main import app
 from app.utils.settings import ESOLR, ESOLRDoc
 
@@ -17,64 +15,93 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 logger = logging.getLogger(__name__)
 
 
-def test_golr_solr():
-    assert ESOLR.GOLR.value == "https://golr-aux.geneontology.io/solr/"
-    assert ESOLRDoc.ONTOLOGY.value == "ontology_class"
+class TestBioentityEndpoints(unittest.TestCase):
+
+    def test_golr_solr(self):
+        """
+        Test ESOLR constants for GOLR and ONTOLOGY.
+
+        :return: None
+        """
+        self.assertEqual(ESOLR.GOLR.value, "https://golr-aux.geneontology.io/solr/")
+        self.assertEqual(ESOLRDoc.ONTOLOGY.value, "ontology_class")
+
+    def test_bioenty_id_endpoints(self):
+        """
+        Test bioentity ID endpoints.
+
+        :return: None
+        """
+        for gene_id in gene_ids:
+            response = test_client.get(f"/api/bioentity/{gene_id}")
+            self.assertEqual(response.status_code, 200)
+
+    def test_bioenty_id_endpoints_MGI(self):
+        """
+        Test bioentity ID endpoint for MGI:3588192.
+
+        :return: None
+        """
+        response = test_client.get("/api/bioentity/MGI:3588192")
+        self.assertEqual(response.status_code, 200)
+        for item in response.json():
+            self.assertEqual(item.get("id"), "MGI:3588192")
+
+    def test_bioenty_function_id_endpoints(self):
+        """
+        Test bioentity function ID endpoints.
+
+        :return: None
+        """
+        for go_id in go_ids:
+            response = test_client.get(f"/api/bioentity/function/{go_id}")
+            self.assertEqual(response.status_code, 200)
+            self.assertGreater(len(response.json()), 99)
+
+    def test_bioenty_gene_endpoints(self):
+        """
+        Test bioentity gene endpoints.
+
+        :return: None
+        """
+        for go_id in go_ids:
+            response = test_client.get(f"/api/bioentity/gene/{go_id}/function")
+            self.assertEqual(response.status_code, 200)
+            self.assertGreaterEqual(len(response.json()), 4)
+
+    def test_bioenty_gene_function_endpoints(self):
+        """
+        Test bioentity gene function endpoints.
+
+        :return: None
+        """
+        for go_id in go_ids:
+            response = test_client.get(f"/api/bioentity/function/{go_id}/genes")
+            self.assertEqual(response.status_code, 200)
+            self.assertGreaterEqual(len(response.json()), 4)
+
+    def test_bioenty_gene_function_taxon_endpoint(self):
+        """
+        Test bioentity gene function taxon endpoint.
+
+        :return: None
+        """
+        for go_id in go_ids:
+            data = {"taxon": "NCBITaxon:9606"}
+            response = test_client.get(f"/api/bioentity/function/{go_id}/genes", params=data)
+            self.assertEqual(response.status_code, 200)
+            self.assertGreaterEqual(len(response.json()), 4)
+
+    def test_bioenty_gene_function_endpoints_taxons(self):
+        """
+        Test bioentity gene function endpoints taxons.
+
+        :return: None
+        """
+        for go_id in go_ids:
+            response = test_client.get(f"/api/bioentity/function/{go_id}/taxons")
+            self.assertEqual(response.status_code, 200)
 
 
-@pytest.mark.parametrize("id", gene_ids)
-def test_bioenty_id_endpoints(id):
-    response = test_client.get(f"/api/bioentity/{id}")
-    assert response.status_code == 200
-
-
-def test_bioenty_id_endpoints_MGI():
-    response = test_client.get("/api/bioentity/MGI:3588192")
-    for item in response.json():
-        assert item.get("id") == "MGI:3588192"
-    assert response.status_code == 200
-
-
-@pytest.mark.parametrize("id", go_ids)
-def test_bioenty_function_id_endpoints(id):
-    response = test_client.get(f"/api/bioentity/function/{id}")
-    assert response.status_code == 200
-    assert len(response.json()) > 99
-
-
-@pytest.mark.parametrize("id", go_ids)
-def test_bioenty_gene_endpoints(id):
-    response = test_client.get(f"/api/bioentity/gene/{id}/function")
-    assert response.status_code == 200
-    assert len(response.json()) >= 4
-
-
-@pytest.mark.parametrize("id", go_ids)
-def test_bioenty_gene_function_endpoints(id):
-    response = test_client.get(f"/api/bioentity/function/{id}/genes")
-    assert response.status_code == 200
-    assert len(response.json()) >= 4
-
-
-@pytest.mark.parametrize("id", go_ids)
-def test_bioenty_gene_function_endpoints(id):
-    response = test_client.get(f"/api/bioentity/function/{id}/genes")
-    assert response.status_code == 200
-    assert len(response.json()) >= 4
-
-
-example = ["GO:0002544"]
-
-
-@pytest.mark.parametrize("id", example)
-def test_bioenty_gene_function_taxon_endpoint(id):
-    data = {"taxon": "NCBITaxon:9606"}
-    response = test_client.get(f"/api/bioentity/function/{id}/genes", params=data)
-    assert response.status_code == 200
-    assert len(response.json()) >= 4
-
-
-@pytest.mark.parametrize("id", go_ids)
-def test_bioenty_gene_function_endpoints(id):
-    response = test_client.get(f"/api/bioentity/function/{id}/taxons")
-    assert response.status_code == 200
+if __name__ == '__main__':
+    unittest.main()
