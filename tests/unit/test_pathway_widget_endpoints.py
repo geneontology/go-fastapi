@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the pathway module."""
 import logging
 import unittest
 import urllib.parse

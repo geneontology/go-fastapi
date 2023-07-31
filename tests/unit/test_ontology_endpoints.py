@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the ontology module."""
 import unittest
 
 from fastapi.testclient import TestClient

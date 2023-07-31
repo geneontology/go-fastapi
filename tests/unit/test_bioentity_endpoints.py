@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the bioentity module."""
 import logging
 import unittest
 

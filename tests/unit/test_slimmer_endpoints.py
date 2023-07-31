@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the slimmer module."""
 import logging
 import unittest
 from pprint import pprint

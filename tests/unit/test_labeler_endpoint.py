@@ -1,6 +1,9 @@
+"""Unit tests for the endpoints in the labeler module."""
 import logging
 import unittest
+
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 test_client = TestClient(app)

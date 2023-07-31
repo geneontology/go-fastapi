@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the ribbon module."""
 import logging
 import unittest
 

@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the prefix module."""
 import logging
 import unittest
 

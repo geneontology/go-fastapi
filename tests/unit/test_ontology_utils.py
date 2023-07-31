@@ -1,3 +1,4 @@
+"""Unit tests for the endpoints in the ontology utils module."""
 import logging
 import unittest
 
