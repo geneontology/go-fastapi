@@ -76,8 +76,7 @@ async def get_bioentity_by_id(
     if id is None:
         id = Query(
             ...,
-            description="example: `CURIE identifier of a bioentity (e.g. a gene) "
-            "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
+            description="example: `CURIE identifier of a bioentity (e.g. a gene) " "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
         )
     # special case MGI, sigh
     if id.startswith("MGI:"):
@@ -377,8 +376,7 @@ async def get_annotations_by_gene_id(
     if id is None:
         id = Query(
             ...,
-            description="example: `CURIE identifier of a bioentity (e.g. a gene) "
-            "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
+            description="example: `CURIE identifier of a bioentity (e.g. a gene) " "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
         )
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")

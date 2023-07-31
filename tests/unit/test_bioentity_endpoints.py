@@ -27,7 +27,7 @@ class TestBioentityEndpoints(unittest.TestCase):
         self.assertEqual(ESOLR.GOLR.value, "https://golr-aux.geneontology.io/solr/")
         self.assertEqual(ESOLRDoc.ONTOLOGY.value, "ontology_class")
 
-    def test_bioenty_id_endpoints(self):
+    def test_bioentity_id_endpoints(self):
         """
         Test bioentity ID endpoints.
 
@@ -37,7 +37,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             response = test_client.get(f"/api/bioentity/{gene_id}")
             self.assertEqual(response.status_code, 200)
 
-    def test_bioenty_id_endpoints_MGI(self):
+    def test_bioentity_id_endpoints_MGI(self):
         """
         Test bioentity ID endpoint for MGI:3588192.
 
@@ -48,7 +48,7 @@ class TestBioentityEndpoints(unittest.TestCase):
         for item in response.json():
             self.assertEqual(item.get("id"), "MGI:3588192")
 
-    def test_bioenty_function_id_endpoints(self):
+    def test_bioentity_function_id_endpoints(self):
         """
         Test bioentity function ID endpoints.
 
@@ -59,7 +59,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreater(len(response.json()), 99)
 
-    def test_bioenty_gene_endpoints(self):
+    def test_bioentity_gene_endpoints(self):
         """
         Test bioentity gene endpoints.
 
@@ -70,7 +70,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json()), 4)
 
-    def test_bioenty_gene_function_endpoints(self):
+    def test_bioentity_gene_function_endpoints(self):
         """
         Test bioentity gene function endpoints.
 
@@ -81,7 +81,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json()), 4)
 
-    def test_bioenty_gene_function_taxon_endpoint(self):
+    def test_bioentity_gene_function_taxon_endpoint(self):
         """
         Test bioentity gene function taxon endpoint.
 
@@ -93,7 +93,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json()), 4)
 
-    def test_bioenty_gene_function_endpoints_taxons(self):
+    def test_bioentity_gene_function_endpoints_taxons(self):
         """
         Test bioentity gene function endpoints taxons.
 
