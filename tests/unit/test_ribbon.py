@@ -18,11 +18,10 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestOntologyAPI(unittest.TestCase):
-    def test_ribbon_endpoint(self, endpoint):
+    def test_ribbon_endpoint(self):
         """
         Test the endpoint to get the ontology ribbon.
 
-        :param endpoint: The endpoint to be tested. (parametrized)
         :return: None
         """
         data = {"subset": "goslim_agr", "subject": ["RGD:620474"]}
