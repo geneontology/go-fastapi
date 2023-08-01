@@ -357,6 +357,7 @@ async def get_annotations_by_gene_id(
     Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
     Again, this should be transparently handled; e.g., you can use NCBIGene:6469, and this will be mapped behind the
     scenes for querying.
+    
     """
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
