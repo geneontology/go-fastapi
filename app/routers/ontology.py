@@ -31,7 +31,8 @@ class GraphType(str, Enum):
 
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
-async def get_term_metadata_by_id(id: str):
+async def get_term_metadata_by_id(id: str = Path(..., description="The ID of the term to extract the metadata from,  "
+                                                                  "e.g. GO:0003677")):
     """
     Returns metadata of an ontology term, e.g. GO:0003677.
 
