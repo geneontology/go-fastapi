@@ -1,7 +1,7 @@
 """The users and groups endpoints."""
 import logging
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
@@ -87,7 +87,7 @@ async def get_groups():
 
 @router.get("/api/groups/{name}", tags=["users and groups"], deprecated=True)
 async def get_group_metadata_by_name(
-    name: str = Query(None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")
+    name: str = Path(None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")
 ):
     """
     DEPRECATED.

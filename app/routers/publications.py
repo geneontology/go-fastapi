@@ -2,7 +2,7 @@
 
 import logging
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
@@ -15,8 +15,12 @@ router = APIRouter()
 
 
 @router.get("/api/pmid/{id}/models", tags=["publications"])
-async def get_model_details_by_pmid(id: str = Query(None, description="A PMID (e.g. 15314168 or 26954676)")):
-    """Returns models for a given PMID."""
+async def get_model_details_by_pmid(id: str = Path(..., description="A publication identifier (PMID)"
+                                                                    " (e.g. 15314168 or 26954676)")):
+    """
+    Returns models for a given publication identifier (PMID).
+
+    """
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
 

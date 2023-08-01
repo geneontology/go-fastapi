@@ -2,7 +2,7 @@
 import logging
 
 from curies import Converter
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
@@ -19,10 +19,7 @@ router = APIRouter()
 
 @router.get("/api/gp/{id}/models", tags=["pathways"])
 async def get_gocams_by_geneproduct_id(
-    id: str = Query(
-        None,
-        description="A Gene Product CURIE (e.g. MGI:3588192, MGI:MGI:3588192, ZFIN:ZDB-GENE-000403-1)",
-    ),
+    id: str = Path(..., description="The CURIE of the gene product, e.g. MGI:3588192"),
     causalmf: int = Query(
         None,
         deprecated=True,

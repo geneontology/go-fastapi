@@ -2,7 +2,7 @@
 import logging
 from enum import Enum
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Path
 
 from app.utils.golr.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
@@ -23,7 +23,7 @@ class AutocompleteCategory(str, Enum):
 
 @router.get("/api/search/entity/autocomplete/{term}", tags=["search"])
 async def autocomplete_term(
-    term: str = Query(..., description="example: `biological`"),
+    term: str = Path(..., description="e.g., `biological`"),
     start: int = 0,
     rows: int = 100,
     category: AutocompleteCategory = Query(
