@@ -1,6 +1,8 @@
+"""bioentity router."""
 import logging
 from enum import Enum
 from typing import List
+
 from fastapi import APIRouter, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
@@ -27,6 +29,15 @@ USER_AGENT = get_user_agent()
 
 
 class RelationshipType(str, Enum):
+
+    """
+    Enumeration for Gene Ontology relationship types used for filtering associations.
+
+    :param INVOLVED_IN: The 'involved_in' relationship type.
+    :param ACTS_UPSTREAM_OF_OR_WITHIN: The 'acts_upstream_of_or_within' relationship type.
+    :param INVOLVED_IN_REGULATION_OF: The 'involved_in_regulation_of' relationship type.
+    """
+
     INVOLVED_IN = INVOLVED_IN
     ACTS_UPSTREAM_OF_OR_WITHIN = ACTS_UPSTREAM_OF_OR_WITHIN
     INVOLVED_IN_REGULATION_OF = INVOLVED_IN_REGULATION_OF
@@ -37,18 +48,37 @@ router = APIRouter()
 
 @router.get("/api/bioentity/{id}", tags=["bioentity"])
 async def get_bioentity_by_id(
-    id: str = Query(
-        ...,
-        description="example: `CURIE identifier of a bioentity (e.g. a gene) "
-        "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
-    ),
+    id: str = None,
     start: int = 0,
     rows: int = 100,
 ):
     """
-    Get bioentities by their ids (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
-    """
+    Get bio-entities by their identifiers.
 
+    Retrieves bio-entities (e.g., genes) based on their identifiers in CURIE format.
+
+    :param id: The CURIE identifier of the bioentity to be retrieved. (required)
+    :param start: The starting index for pagination. Default is 0. (optional)
+    :param rows: The number of results per page. Default is 100. (optional)
+
+    :return: A dictionary containing the bioentity information retrieved from the database.
+             The dictionary will contain fields such as 'id', 'bioentity_name', 'synonym', 'taxon',
+             and 'taxon_label' associated with the specified bioentity.
+
+    :raises HTTPException: If the bioentity with the provided identifier is not found in the database.
+
+    :note:
+        - For example, to get a gene with the identifier 'ZFIN:ZDB-GENE-990415-1', the URL should be:
+          '/api/bioentity/ZFIN:ZDB-GENE-990415-1'.
+        - The 'start' and 'rows' parameters can be used for pagination of results.
+          'start' determines the starting index for fetching results, and 'rows' specifies
+          the number of results to be retrieved per page.
+    """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a bioentity (e.g. a gene) " "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
+        )
     # special case MGI, sigh
     if id.startswith("MGI:"):
         id = id.replace("MGI:", "MGI:MGI:")
@@ -64,27 +94,49 @@ async def get_bioentity_by_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
-    bioentity = run_solr_text_on(
-        ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals
-    )
+    bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
     return bioentity
 
 
 @router.get("/api/bioentity/function/{id}", tags=["bioentity"])
 async def get_annotations_by_goterm_id(
-    id: str = Query(
-        ...,
-        description="example: `CURIE identifier of a function term "
-        "(e.g. GO:0044598)`",
-    ),
+    id: str = None,
     evidence: List[str] = Query(None),
     start: int = 0,
     rows: int = 100,
 ):
     """
-    Returns annotations using the provided GO term, (e.g. GO:0044598)
-    """
+    Returns annotations using the provided GO term.
 
+    Retrieves annotations based on the provided Gene Ontology (GO) term identifier.
+    The GO term identifier should be represented in CURIE format (e.g., GO:0044598).
+
+    :param id: The CURIE identifier of the GO term to be used for annotation retrieval. (required)
+    :param evidence: List of evidence codes to filter the results. Default is None. (optional)
+    :param start: The starting index for pagination. Default is 0. (optional)
+    :param rows: The number of results per page. Default is 100. (optional)
+
+    :return: A dictionary containing the annotation information retrieved from the database.
+             The dictionary will contain fields such as 'date', 'assigned_by', 'bioentity_label',
+             'bioentity_name', 'synonym', 'taxon', 'taxon_label', 'panther_family', 'panther_family_label',
+             'evidence', 'evidence_type', 'reference', 'annotation_extension_class',
+             and 'annotation_extension_class_label' associated with the provided GO term.
+
+    :rtype: dict
+
+    :note:
+        - For example, to get annotations for the GO term 'GO:0044598', the URL should be:
+          '/api/bioentity/function/GO:0044598'.
+        - The 'evidence' parameter can be used to filter annotations by specific evidence codes.
+        - The 'start' and 'rows' parameters can be used for pagination of results.
+          'start' determines the starting index for fetching results, and 'rows' specifies
+          the number of results to be retrieved per page.
+    """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a GO term (e.g. GO:0044598)`",
+        )
     # dictates the fields to return, annotation_class,aspect
     fields = (
         "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon,"
@@ -111,20 +163,17 @@ async def get_annotations_by_goterm_id(
         evidence += ")"
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
-    data = run_solr_text_on(
-        ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
-    )
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
 
     return data
 
 
 @router.get("/api/bioentity/function/{id}/genes", tags=["bioentity"])
 async def get_genes_by_goterm_id(
-    id: str = Query(..., description="CURIE identifier of a GO term"),
+    id: str = None,
     taxon: List[str] = Query(
         default=None,
-        description="One or more taxon CURIE to filter "
-        "associations by subject taxon",
+        description="One or more taxon CURIE to filter " "associations by subject taxon",
     ),
     relationship_type: RelationshipType = Query(
         default=RelationshipType.INVOLVED_IN,
@@ -135,16 +184,40 @@ async def get_genes_by_goterm_id(
     relation: str = Query(None, description="A relation CURIE to filter associations"),
     slim: List[str] = Query(
         default=None,
-        description="Map objects up slim to a higher level"
-        " category. Value can be ontology "
-        "class ID or subset ID",
+        description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
     ),
     start: int = 0,
     rows: int = 100,
 ):
     """
-    Returns genes annotated to the provided GO Term, (e.g. GO:0044598)
+    Returns genes annotated to the provided GO Term.
+
+    Retrieves genes annotated to the provided Gene Ontology (GO) term. The GO term should be
+    represented in CURIE format (e.g., GO:0044598).
+
+    :param id: The CURIE identifier of the GO term to be used for gene retrieval. (required)
+    :param taxon: One or more taxon CURIEs to filter associations by subject taxon. Default is None. (optional)
+    :param relationship_type: Relationship type for filtering associations.
+                              Options: 'involved_in', 'involved_in_regulation_of', or 'acts_upstream_of_or_within'.
+                              Default is 'involved_in'. (optional)
+    :param relation: A relation CURIE to filter associations. Default is None. (optional)
+    :param slim: Map objects up slim to a higher-level category. Value can be an ontology class ID or subset ID.
+                 Default is None. (optional)
+    :param start: The starting index for pagination. Default is 0. (optional)
+    :param rows: The number of results per page. Default is 100. (optional)
+
+    :return: A dictionary containing the gene annotation information retrieved from the database.
+             The dictionary will contain fields such as 'date', 'assigned_by', 'bioentity_label',
+             'bioentity_name', 'synonym', 'taxon', 'taxon_label', 'panther_family', 'panther_family_label',
+             'evidence', 'evidence_type', 'reference', 'annotation_extension_class',
+             and 'annotation_extension_class_label' associated with the provided GO term.
+
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a GO term (e.g. GO:0044598)`",
+        )
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         return search_associations(
             subject_category="gene",
@@ -197,7 +270,7 @@ async def get_genes_by_goterm_id(
 
 @router.get("/api/bioentity/function/{id}/taxons", tags=["bioentity"])
 async def get_taxon_by_goterm_id(
-    id: str = Query(..., description="CURIE identifier of a GO term, e.g. GO:0044598"),
+    id: str = None,
     evidence: List[str] = Query(
         default=None,
         description="Object id, e.g. ECO:0000501 (for IEA; "
@@ -209,8 +282,25 @@ async def get_taxon_by_goterm_id(
     rows: int = 100,
 ):
     """
-    Returns taxon information for genes annotated to the provided GO term (e.g. GO:0044598)
+    Returns taxon information for genes annotated to the provided GO term.
+
+    Retrieves taxon information for genes annotated to the provided Gene Ontology (GO) term.
+    The GO term should be represented in CURIE format (e.g., GO:0044598).
+
+    :param id: The CURIE identifier of the GO term to be used for taxon retrieval. (required)
+    :param evidence: List of object ids used for evidence filtering.
+                     Example: ['ECO:0000501', 'ZFIN:ZDB-PUB-060503-2']. Default is None. (optional)
+    :param start: The starting index for pagination. Default is 0. (optional)
+    :param rows: The number of results per page. Default is 100. (optional)
+
+    :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
+             The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a GO term (e.g. GO:0044598)`",
+        )
 
     fields = "taxon,taxon_label"
     query_filters = (
@@ -240,54 +330,56 @@ async def get_taxon_by_goterm_id(
         taxon_restrictions = taxon_restrictions[:-1]
         taxon_restrictions += ")"
 
-    optionals = (
-        "&defType=edismax&start="
-        + str(start)
-        + "&rows="
-        + str(rows)
-        + evidence
-        + taxon_restrictions
-    )
-    data = run_solr_text_on(
-        ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals
-    )
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
 
     return data
 
 
 @router.get("/api/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_annotations_by_gene_id(
-    id: str = Query(..., description="CURIE identifier of a GO term, e.g. ZFIN:ZDB-GENE-050417-357"),
-    # ... in query means "required" parameter.
+    id: str = None,
     slim: List[str] = Query(
         default=None,
-        description="Map objects up slim to a higher level"
-        " category. Value can be ontology "
-        "class ID or subset ID",
+        description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
     ),
     start: int = 0,
     rows: int = 100,
 ):
     """
-    Returns GO terms associated to a gene. (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
+    Returns GO terms associated with a gene.
+
+    Retrieves Gene Ontology (GO) terms associated with a gene identified by its CURIE identifier.
+    The gene identifier should be represented in CURIE format (e.g., ZFIN:ZDB-GENE-050417-357).
+
+    :param id: The CURIE identifier of the gene for which GO term associations are retrieved. (required)
+    :param slim: Map objects up slim to a higher-level category. Value can be an ontology class ID or subset ID.
+                 Default is None. (optional)
+    :param start: The starting index for pagination. Default is 0. (optional)
+    :param rows: The number of results per page. Default is 100. (optional)
+
+    :return: A dictionary containing the GO term associations for the provided gene.
+             The dictionary will contain fields such as 'numFound' and 'associations' associated with the gene.
 
     IMPLEMENTATION DETAILS
     ----------------------
 
-    Note: currently this is implemented as a query to the GO/AmiGO solr instance.
-    This directly supports IDs such as:
+    Note: This method is implemented as a query to the GO/AmiGO Solr instance. The supported gene IDs include:
 
-     - ZFIN e.g. ZFIN:ZDB-GENE-050417-357
+     - ZFIN (e.g., ZFIN:ZDB-GENE-050417-357)
 
-    Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However,
-    the standard for biolink is MGI:nnnn, so you should use this (will be transparently
-    mapped to legacy ID)
+    Note that the AmiGO GOlr natively stores MGI annotations to MGI:MGI:nn. However, the standard for biolink is
+    MGI:nnnn, so you should use this (will be transparently mapped to legacy ID).
 
     Additionally, for some species such as Human, GO has the annotation attached to the UniProt ID.
-    Again, this should be transparently handled; e.g. you can use NCBIGene:6469, and this will be
-    mapped behind the scenes for querying.
+    Again, this should be transparently handled; e.g., you can use NCBIGene:6469, and this will be mapped behind the
+    scenes for querying.
     """
-
+    if id is None:
+        id = Query(
+            ...,
+            description="example: `CURIE identifier of a bioentity (e.g. a gene) " "(e.g. ZFIN:ZDB-GENE-990415-1, )`",
+        )
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 
