@@ -2,7 +2,7 @@
 import logging
 
 from curies import Converter
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Path
 
 from app.utils.prefix_utils import get_prefixes
 
@@ -21,7 +21,7 @@ async def get_all_prefixes():
 
 
 @router.get("/api/identifier/prefixes/expand/{id}", tags=["identifier/prefixes"])
-async def get_expand_curie(id: str = Query(None, description="identifier in CURIE format of the resource to expand")):
+async def get_expand_curie(id: str = Path(..., description="identifier in CURIE format of the resource to expand")):
     """
     Enter a CURIE of the identified resource to expand to full URI format.
 
