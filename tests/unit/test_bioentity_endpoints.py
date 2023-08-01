@@ -19,10 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 class TestBioentityEndpoints(unittest.TestCase):
-    """
-    Test the bioentity endpoints.
 
-    """
+    """Test the bioentity endpoints."""
+
     def test_golr_solr(self):
         """
         Test ESOLR constants for GOLR and ONTOLOGY.
