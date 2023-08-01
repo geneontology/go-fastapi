@@ -24,7 +24,7 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_ontology_subsets_by_go_term_id(
-    id: str = Query(None, description="'CURIE identifier of a GO term, e.g. GO:0006259")
+    id: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0006259")
 ):
     """Returns subsets (slims) associated to an ontology term."""
 
