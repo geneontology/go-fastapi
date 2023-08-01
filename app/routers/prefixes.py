@@ -4,7 +4,7 @@ import logging
 from curies import Converter
 from fastapi import APIRouter, Query
 
-from app.utils.prefixes.prefix_utils import get_prefixes
+from app.utils.prefix_utils import get_prefixes
 
 log = logging.getLogger(__name__)
 

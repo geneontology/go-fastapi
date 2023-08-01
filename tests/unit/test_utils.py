@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from prefixmaps import load_context
 
 from app.main import app
-from app.utils.prefixes.prefix_utils import remap_prefixes
+from app.utils.prefix_utils import remap_prefixes
 
 test_client = TestClient(app)
 logger = logging.getLogger(__name__)

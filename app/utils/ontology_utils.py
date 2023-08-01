@@ -9,7 +9,7 @@ from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
-from app.utils.golr.golr_utils import run_solr_text_on
+from app.utils.golr_utils import run_solr_text_on
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()

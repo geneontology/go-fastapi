@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Query
 
-from app.utils.ontology.ontology_utils import batch_fetch_labels
+from app.utils.ontology_utils import batch_fetch_labels
 from app.utils.settings import get_user_agent
 
 log = logging.getLogger(__name__)

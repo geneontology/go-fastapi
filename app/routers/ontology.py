@@ -10,11 +10,11 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utils import run_solr_on
-from app.utils.prefixes.prefix_utils import get_prefixes
+import app.utils.ontology_utils as ontology_utils
+from app.utils.golr_utils import run_solr_on
+from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
-from app.utils.sparql.sparql_utils import transform, transform_array
+from app.utils.sparql_utils import transform, transform_array
 
 log = logging.getLogger(__name__)
 

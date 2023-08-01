@@ -7,10 +7,10 @@ from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utils import run_solr_text_on
+import app.utils.ontology_utils as ontology_utils
+from app.utils.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
-from app.utils.sparql.sparql_utils import transform_array
+from app.utils.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
 
