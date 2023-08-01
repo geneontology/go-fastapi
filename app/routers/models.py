@@ -2,7 +2,7 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
@@ -17,7 +17,10 @@ router = APIRouter()
 
 
 @router.get("/api/models", tags=["models"], deprecated=True)
-async def get_model_by_start_size(start: int = None, size: int = None, last: int = None):
+async def get_model_by_start_size(
+        start: int = Query(None, description="start"),
+        size: int = Query(None, description="Number of models to look for")
+):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -69,10 +72,13 @@ async def get_model_by_start_size(start: int = None, size: int = None, last: int
 async def get_goterms_by_model_id(
     gocams: List[str] = Query(
         None,
-        description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
+        description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
     )
 ):
-    """Returns go term details based on a GO-CAM model ID."""
+    """
+    Returns go term details based on a GO-CAM model ID.
+
+    """
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -140,7 +146,7 @@ async def get_goterms_by_model_id(
 async def get_geneproducts_by_model_id(
     gocams: List[str] = Query(
         None,
-        description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
+        description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
     )
 ):
     """Returns gene product details based on a GO-CAM model ID."""
@@ -187,10 +193,13 @@ async def get_geneproducts_by_model_id(
 async def get_publication_details_by_model_id(
     gocams: List[str] = Query(
         None,
-        description="A list of GO-CAM IDs separated by , (e.g. 59a6110e00000067,SYNGO_369))",
+        description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
     )
 ):
-    """Returns pubmed details based on a GO-CAM model ID."""
+    """
+    Returns pubmed details based on a GO-CAM model ID.
+
+    """
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -225,12 +234,15 @@ async def get_publication_details_by_model_id(
 
 @router.get("/api/models/{id}", tags=["models"])
 async def get_term_details_by_model_id(
-    id: str = Query(
-        None,
-        description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968))",
+    id: str = Path(
+        ...,
+        description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
     )
 ):
-    """Returns term details based on a GO-CAM model ID."""
+    """
+    Returns term details based on a GO-CAM model ID.
+
+    """
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (

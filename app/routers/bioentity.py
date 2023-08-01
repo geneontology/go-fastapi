@@ -49,8 +49,8 @@ router = APIRouter()
 @router.get("/api/bioentity/{id}", tags=["bioentity"])
 async def get_bioentity_by_id(
     id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-1)"),
-    start: int = 0,
-    rows: int = 100,
+    start: int = Query(0, description="The starting index for pagination. Default is 0."),
+    rows: int = Query(100, description="The number of results per page. Default is 100.")
 ):
     """
     Get bio-entities (genes) by their identifiers.
@@ -97,8 +97,8 @@ async def get_bioentity_by_id(
 async def get_annotations_by_goterm_id(
     id: str = Path(..., description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)"),
     evidence: List[str] = Query(None),
-    start: int = 0,
-    rows: int = 100,
+    start: int = Query(0, description="The starting index for pagination. Default is 0."),
+    rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
     """
     Returns annotations using the provided GO term.
@@ -176,8 +176,8 @@ async def get_genes_by_goterm_id(
         default=None,
         description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
     ),
-    start: int = 0,
-    rows: int = 100,
+    start: int = Query(0, description="The starting index for pagination. Default is 0."),
+    rows: int = Query(100, description="The number of results per page. Default is 100.")
 ):
     """
     Returns genes annotated to the provided GO Term.
@@ -263,8 +263,8 @@ async def get_taxon_by_goterm_id(
         "specific publication or other supporting "
         "object, e.g. ZFIN:ZDB-PUB-060503-2",
     ),
-    start: int = 0,
-    rows: int = 100,
+    start: int = Query(0, description="The starting index for pagination. Default is 0."),
+    rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
     """
     Returns taxon information for genes annotated to the provided GO term.
@@ -326,8 +326,8 @@ async def get_annotations_by_gene_id(
         default=None,
         description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
     ),
-    start: int = 0,
-    rows: int = 100,
+    start: int = Query(0, description="The starting index for pagination. Default is 0."),
+    rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
     """
     Returns GO terms associated with a gene.
