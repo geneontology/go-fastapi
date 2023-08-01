@@ -28,7 +28,6 @@ async def get_ontology_subsets_by_go_term_id(
     id: str = Query(None, description="'CURIE identifier of a GO term, e.g. GO:0006259")
 ):
     """Returns subsets (slims) associated to an ontology term."""
-    query = ontology_utils.get_go_subsets_sparql_query(id)
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -40,7 +39,7 @@ async def get_ontology_subsets_by_go_term_id(
 
 
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
-async def get_subset_by_id(id: str = Path(..., description="Name of the subset to map GO terms " "(e.g. goslim_agr)")):
+async def get_subset_by_id(id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)")):
     """
     Returns a subset (slim) by its id.
 
@@ -136,7 +135,7 @@ async def get_ribbon_results(
         else:
             slimmer_subjects.append(s)
 
-    log.info("SLIMMER SUBS : ", slimmer_subjects)
+    log.info("SLIMMER SUBS : %s", slimmer_subjects)
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject
@@ -304,7 +303,8 @@ async def get_ribbon_results(
     for entity in to_remove:
         subjects.remove(entity)
 
-    # http://golr-aux.geneontology.io/solr/select/?q=*:*&fq=document_category:%22bioentity%22&rows=10&wt=json&fl=bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
+    # http://golr-aux.geneontology.io/solr/select/?q=*:*&fq=document_category:%22bioentity%22&rows=10&wt=json&fl=
+    # bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
 
     result = {"categories": categories, "subjects": subjects}
     return result
