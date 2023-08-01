@@ -95,10 +95,7 @@ async def slimmer_function(
 
 
 def gene_to_uniprot_from_mygene(id: str):
-    """
-    Query MyGeneInfo with a gene and get its corresponding UniProt ID.
-
-    """
+    """Query MyGeneInfo with a gene and get its corresponding UniProt ID."""
     uniprot_ids = []
     mg = get_client("gene")
     if id.startswith("NCBIGene:"):
@@ -135,10 +132,7 @@ def gene_to_uniprot_from_mygene(id: str):
 
 
 def uniprot_to_gene_from_mygene(id: str):
-    """
-    Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene.
-
-    """
+    """Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene."""
     gene_id = None
     if id.startswith("UniProtKB"):
         id = id.split(":", 1)[1]

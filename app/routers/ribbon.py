@@ -3,10 +3,9 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, Query, Path
+from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import replace
 
 import app.utils.ontology.ontology_utils as ontology_utils
 from app.utils.golr.golr_utils import run_solr_text_on
@@ -22,6 +21,7 @@ router = APIRouter()
 
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
+
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subsets_by_term(id: str):
     """Returns subsets (slims) associated to an ontology term."""
@@ -33,12 +33,10 @@ async def get_subsets_by_term(id: str):
     results = (results, "subset", "OBO:go#", "")
     return results
 
+
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_by_id(id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)")):
-    """
-    Returns a subset (slim) by its id.
-
-    """
+    """Returns a subset (slim) by its id."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 

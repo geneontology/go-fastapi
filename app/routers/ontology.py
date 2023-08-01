@@ -5,7 +5,7 @@ from enum import Enum
 from typing import List
 
 from curies import Converter
-from fastapi import APIRouter, Query, Path
+from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
@@ -23,20 +23,17 @@ router = APIRouter()
 
 
 class GraphType(str, Enum):
-    """
-    Enum for the different types of graphs that can be returned.
 
-    """
+    """Enum for the different types of graphs that can be returned."""
+
     topology_graph = "topology_graph"
 
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
-async def get_term_metadata_by_id(id: str = Path(..., description="The ID of the term to extract the metadata from,  "
-                                                                  "e.g. GO:0003677")):
-    """
-    Returns metadata of an ontology term, e.g. GO:0003677.
-
-    """
+async def get_term_metadata_by_id(
+    id: str = Path(..., description="The ID of the term to extract the metadata from,  " "e.g. GO:0003677")
+):
+    """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -49,13 +46,10 @@ async def get_term_metadata_by_id(id: str = Path(..., description="The ID of the
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(
-        id: str = Path(..., description="The ID of the term to extract the graph from,  e.g. GO:0003677"),
-        graph_type: GraphType = Query(GraphType.topology_graph)
+    id: str = Path(..., description="The ID of the term to extract the graph from,  e.g. GO:0003677"),
+    graph_type: GraphType = Query(GraphType.topology_graph),
 ):
-    """
-    Returns graph of an ontology term.
-
-    """
+    """Returns graph of an ontology term."""
     graph_type = graph_type + "_json"  # GOLR field names
     log.info(graph_type)
 
@@ -75,10 +69,7 @@ async def get_subgraph_by_term_id(
     relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
     include_meta: bool = Query(False, include_in_schema=False),
 ):
-    """
-    Extract a subgraph from an ontology term. e.g. GO:0003677.
-
-    """
+    """Extract a subgraph from an ontology term. e.g. GO:0003677."""
     qnodes = [id]
     if cnode is not None:
         qnodes += cnode
@@ -96,10 +87,11 @@ async def get_subgraph_by_term_id(
     json_obj = ojr.to_json(subont, include_meta=include_meta)
     return json_obj
 
+
 @router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_ancestors_shared_by_two_terms(
-        subject: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0006259'"),
-        object: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0046483'")
+    subject: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0006259'"),
+    object: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0046483'"),
 ):
     """
     Returns the ancestor ontology terms shared by two ontology terms.
@@ -107,7 +99,6 @@ async def get_ancestors_shared_by_two_terms(
     subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
     object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
-
     fields = "isa_partof_closure,isa_partof_closure_label"
 
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
@@ -130,9 +121,7 @@ async def get_ancestors_shared_by_two_terms(
 
 
 @router.get("/api/go/{id}", tags=["ontology"])
-async def get_go_term_detail_by_go_id(
-    id: str = Path(..., description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)")
-):
+async def get_go_term_detail_by_go_id(id: str = Path(..., description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)")):
     """
     Returns models for a given GO term ID.
 

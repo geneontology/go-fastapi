@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 from typing import List
 
-from fastapi import APIRouter, Query, Path
+from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 
@@ -281,7 +281,6 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
-
     fields = "taxon,taxon_label"
     query_filters = (
         "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf="
@@ -318,8 +317,11 @@ async def get_taxon_by_goterm_id(
 
 @router.get("/api/bioentity/gene/{id}/function", tags=["bioentity"])
 async def get_annotations_by_gene_id(
-    id: str = Path(..., description="The CURIE identifier of the gene for which GO term associations are retrieved."
-                                    "(e.g., ZFIN:ZDB-GENE-050417-357)"),
+    id: str = Path(
+        ...,
+        description="The CURIE identifier of the gene for which GO term associations are retrieved."
+        "(e.g., ZFIN:ZDB-GENE-050417-357)",
+    ),
     slim: List[str] = Query(
         default=None,
         description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
@@ -356,7 +358,6 @@ async def get_annotations_by_gene_id(
     Again, this should be transparently handled; e.g., you can use NCBIGene:6469, and this will be mapped behind the
     scenes for querying.
     """
-
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 

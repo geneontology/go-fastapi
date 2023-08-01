@@ -39,20 +39,14 @@ class TestApp(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_ontology_term_graph(self):
-        """
-        Test the endpoint to get the graph of a Gene Ontology term by its identifier.
-
-        """
+        """Test the endpoint to get the graph of a Gene Ontology term by its identifier."""
         data = {"graph_type": "topology_graph"}
         for id in go_ids:
             response = test_client.get(f"/api/ontology/term/{id}/graph", params=data)
             self.assertEqual(response.status_code, 200)
 
     def test_ontology_term_subgraph(self):
-        """
-        Test the endpoint to get the subgraph of a Gene Ontology term by its identifier.
-
-        """
+        """Test the endpoint to get the subgraph of a Gene Ontology term by its identifier."""
         for id in go_ids:
             response = test_client.get(f"/api/ontology/term/{id}/subgraph")
             self.assertIn("'id': 'GO:0098699'", str(response.json()))
