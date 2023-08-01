@@ -96,24 +96,6 @@ async def get_subgraph_by_term_id(
     json_obj = ojr.to_json(subont, include_meta=include_meta)
     return json_obj
 
-
-@router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
-async def get_subsets_by_term(
-        id: str = Path(..., description="The ID of the term to extract the subsets from,  e.g. GO:0003677")
-):
-    """
-    Returns subsets (slims) associated to an ontology term.
-
-    """
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = ontology_utils.get_go_subsets_sparql_query(id)
-    results = si._sparql_query(query)
-    results = transform_array(results, [])
-    results = (results, "subset", "OBO:go#", "")
-    return results
-
-
 @router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
 async def get_ancestors_shared_by_two_terms(
         subject: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0006259'"),
