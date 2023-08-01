@@ -49,6 +49,7 @@ class TestSearchAPI(unittest.TestCase):
         """
         data = {"category": "gene"}
         response = test_client.get("/api/search/entity/autocomplete/shh", params=data)
+        print(response.json())
         self.assertIn("id", response.json().get("docs")[0])
         self.assertEqual(response.status_code, 200)
 
