@@ -2,7 +2,7 @@ name: go-fastapi-QC
 
 on:
   pull_request:
-    branches: [ main ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
