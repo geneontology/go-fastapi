@@ -11,7 +11,7 @@ from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 
 import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utils import run_solr_on, run_solr_text_on
+from app.utils.golr.golr_utils import run_solr_on
 from app.utils.prefixes.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform, transform_array
@@ -86,16 +86,14 @@ async def get_subgraph_by_term_id(
     # COMMENT: based on the CURIE of the id, we should be able to find out the ontology automatically
     ont = ontology_utils.get_ontology("go")
     relations = relation
-    log.info("Traversing: {} using {}".format(qnodes, relations))
     nodes = ont.traverse_nodes(qnodes, up=include_ancestors, down=include_descendants, relations=relations)
-
     subont = ont.subontology(nodes, relations=relations)
 
     # TODO: meta is included regardless of whether include_meta is True or False
 
     ojr = OboJsonGraphRenderer(include_meta=include_meta)
-    json_obj = ojr.to_json(subont, include_meta=include_meta)
 
+    json_obj = ojr.to_json(subont, include_meta=include_meta)
     return json_obj
 
 
@@ -126,8 +124,7 @@ async def get_ancestors_shared_by_two_terms(
     subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
     object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
-    log.info(subject)
-    log.info(object)
+
     fields = "isa_partof_closure,isa_partof_closure_label"
 
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
@@ -151,7 +148,7 @@ async def get_ancestors_shared_by_two_terms(
 
 @router.get("/api/go/{id}", tags=["ontology"])
 async def get_go_term_detail_by_go_id(
-    id: str = Path(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")
+    id: str = Path(..., description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)")
 ):
     """
     Returns models for a given GO term ID.
@@ -171,7 +168,7 @@ async def get_go_term_detail_by_go_id(
 
 
 @router.get("/api/go/{id}/hierarchy", tags=["ontology"])
-async def get_go_hierarchy_go_id(id: str = Path(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
+async def get_go_hierarchy_go_id(id: str = Path(..., description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
     Returns parent and children relationships for a given GO ID.
 
@@ -221,7 +218,7 @@ async def get_go_hierarchy_go_id(id: str = Path(None, description="A GO-Term ID(
 
 
 @router.get("/api/go/{id}/models", tags=["ontology"])
-async def get_gocam_models_by_go_id(id: str = Path(None, description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
+async def get_gocam_models_by_go_id(id: str = Path(..., description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
     Returns parent and children relationships for a given GO ID, e.g. GO:0005885.
 

@@ -173,6 +173,7 @@ def get_ontology(id):
     else:
         logging.info("Using cached for {}".format(handle))
 
+    print("handle: " + handle)
     return omap[handle]
 
 
