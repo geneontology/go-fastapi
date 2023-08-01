@@ -99,7 +99,8 @@ async def get_subgraph_by_term_id(
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subsets_by_term(
-        id: str = Path(..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677")):
+        id: str = Path(..., description="The ID of the term to extract the subsets from,  e.g. GO:0003677")
+):
     """
     Returns subsets (slims) associated to an ontology term.
 
