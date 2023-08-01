@@ -31,7 +31,7 @@ class GraphType(str, Enum):
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(
-    id: str = Path(..., description="The ID of the term to extract the metadata from,  " "e.g. GO:0003677")
+    id: str = Path(..., description="The ID of the term to extract the metadata from, e.g. GO:0003677")
 ):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())

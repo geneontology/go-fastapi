@@ -174,7 +174,7 @@ async def get_genes_by_goterm_id(
     relation: str = Query(None, description="A relation CURIE to filter associations"),
     slim: List[str] = Query(
         default=None,
-        description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
+        description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
@@ -324,7 +324,7 @@ async def get_annotations_by_gene_id(
     ),
     slim: List[str] = Query(
         default=None,
-        description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
+        description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
