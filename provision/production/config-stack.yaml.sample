@@ -6,7 +6,7 @@ stack:
    vars:
       PROD_MODE: 1
       stage_dir: /home/ubuntu/stage_dir
-      apache_proxy_image: geneontology/apache-proxy:v5
+      apache_proxy_image: geneontology/apache-proxy:v6
       S3_CRED_FILE: /tmp/go-aws-credentials
       S3_BUCKET: REPLACE_ME_APACHE_LOG_BUCKET
 
@@ -25,4 +25,6 @@ stack:
 
       REDIRECT_HTTP: 1
       redirect_to: REPLACE_ME # aes-test-go-fastapi.geneontology.org
+
+      USE_CLOUDFLARE: 0  # Enable if planning to use behind proxy
    scripts: [ "stage.yaml", "start_services.yaml" ]

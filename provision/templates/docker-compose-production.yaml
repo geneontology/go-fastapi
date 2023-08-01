@@ -35,6 +35,7 @@ services:
       - S3_BUCKET={{ S3_BUCKET }}
       - USE_SSL={{ USE_SSL }}
       - S3_SSL_CERTS_LOCATION={{ S3_SSL_CERTS_LOCATION }}
+      - USE_CLOUDFLARE={{ USE_CLOUDFLARE }}
     init: true
     restart: unless-stopped
     depends_on:
