@@ -2,7 +2,7 @@
 import logging
 
 from curies import Converter
-from fastapi import APIRouter, Query, Path
+from fastapi import APIRouter, Path, Query
 
 from app.utils.prefix_utils import get_prefixes
 

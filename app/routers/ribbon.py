@@ -23,12 +23,10 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
-async def get_subsets_by_term(id: str =
-                              Path(..., description="The ID of the term to extract the subsets from, e.g. GO:0003677")):
-    """
-    Returns subsets (slims) associated to an ontology term.
-
-    """
+async def get_subsets_by_term(
+    id: str = Path(..., description="The ID of the term to extract the subsets from, e.g. GO:0003677")
+):
+    """Returns subsets (slims) associated to an ontology term."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)

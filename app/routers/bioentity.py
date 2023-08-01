@@ -50,7 +50,7 @@ router = APIRouter()
 async def get_bioentity_by_id(
     id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-1)"),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100.")
+    rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
     """
     Get bio-entities (genes) by their identifiers.
@@ -177,7 +177,7 @@ async def get_genes_by_goterm_id(
         description="Map objects up slim to a higher level" " category. Value can be ontology " "class ID or subset ID",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100.")
+    rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
     """
     Returns genes annotated to the provided GO Term.
