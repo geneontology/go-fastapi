@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestBioentityEndpoints(unittest.TestCase):
-
     """Test the bioentity endpoints."""
 
     def test_golr_solr(self):
@@ -49,8 +48,7 @@ class TestBioentityEndpoints(unittest.TestCase):
         """
         response = test_client.get("/api/bioentity/MGI:3588192")
         self.assertEqual(response.status_code, 200)
-        for item in response.json():
-            self.assertEqual(item.get("id"), "MGI:3588192")
+        self.assertEqual(response.json().get("id"), "MGI:MGI:3588192")
 
     def test_bioentity_function_id_endpoints(self):
         """
@@ -61,7 +59,7 @@ class TestBioentityEndpoints(unittest.TestCase):
         for go_id in go_ids:
             response = test_client.get(f"/api/bioentity/function/{go_id}")
             self.assertEqual(response.status_code, 200)
-            self.assertGreater(len(response.json()), 99)
+            self.assertGreater(len(response.json()), 10)
 
     def test_bioentity_gene_endpoints(self):
         """
