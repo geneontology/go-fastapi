@@ -3,15 +3,14 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.golr.golr_query import replace
 
-import app.utils.ontology.ontology_utils as ontology_utils
-from app.utils.golr.golr_utils import run_solr_text_on
+import app.utils.ontology_utils as ontology_utils
+from app.utils.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
-from app.utils.sparql.sparql_utils import transform_array
+from app.utils.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
 
@@ -24,39 +23,33 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
-async def get_ontology_subsets_by_go_term_id(
-    id: str = Query(None, description="'CURIE identifier of a GO term, e.g. GO:0006259")
+async def get_subsets_by_term(
+    id: str = Path(..., description="The ID of the term to extract the subsets from, e.g. GO:0003677")
 ):
     """Returns subsets (slims) associated to an ontology term."""
-    query = ontology_utils.get_go_subsets_sparql_query(id)
-
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
-    query = ontology_utils.create_go_summary_sparql(id)
+    query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
     results = transform_array(results, [])
-    results = replace(results, "subset", "OBO:go#", "")
+    results = (results, "subset", "OBO:go#", "")
     return results
 
 
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
-async def get_subset_by_id(id: str):
-    """
-    Returns a subset (slim) by its id.
-
-    param: id: id of the subset (e.g. goslim_agr).
-    """
+async def get_subset_by_id(id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)")):
+    """Returns a subset (slim) by its id."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 
 
 @router.get("/api/ontology/ribbon/", tags=["ontology"])
 async def get_ribbon_results(
-    subset: str = Query(None, description="Name of the subset to map GO terms " "(e.g. goslim_agr)"),
-    subject: List[str] = Query(None, description="List of Gene ids (e.g. " "MGI:98214, RGD:620474)"),
+    subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)"),
+    subject: List[str] = Query(None, description="List of Gene ids (e.g. MGI:98214, RGD:620474)"),
     ecodes: List[str] = Query(
         None,
-        description="List of Evidence Codes to include (e.g. " "EXP, IDA). Has priority over exclude_IBA",
+        description="List of Evidence Codes to include (e.g. EXP, IDA). Has priority over exclude_IBA",
     ),
     exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
     exclude_PB: bool = Query(False, description="If true, excludes direct annotations to protein binding"),
@@ -111,7 +104,7 @@ async def get_ribbon_results(
                 {
                     "id": category["id"],
                     "label": "other " + category["label"].lower().replace("_", " "),
-                    "description": "Represent all annotations not " "mapped to a specific term",
+                    "description": "Represent all annotations not mapped to a specific term",
                     "type": "Other",
                 }
             ]
@@ -137,7 +130,7 @@ async def get_ribbon_results(
         else:
             slimmer_subjects.append(s)
 
-    log.info("SLIMMER SUBS : ", slimmer_subjects)
+    log.info("SLIMMER SUBS: ", slimmer_subjects)
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject
@@ -305,7 +298,8 @@ async def get_ribbon_results(
     for entity in to_remove:
         subjects.remove(entity)
 
-    # http://golr-aux.geneontology.io/solr/select/?q=*:*&fq=document_category:%22bioentity%22&rows=10&wt=json&fl=bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
+    # http://golr-aux.geneontology.io/solr/select/?q=*:*&fq=document_category:%22bioentity%22&rows=10&wt=json&fl=
+    # bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
 
     result = {"categories": categories, "subjects": subjects}
     return result

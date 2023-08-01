@@ -2,9 +2,9 @@
 import logging
 from enum import Enum
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Path, Query
 
-from app.utils.golr.golr_utils import run_solr_text_on
+from app.utils.golr_utils import run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 log = logging.getLogger(__name__)
@@ -23,9 +23,9 @@ class AutocompleteCategory(str, Enum):
 
 @router.get("/api/search/entity/autocomplete/{term}", tags=["search"])
 async def autocomplete_term(
-    term: str = Query(..., description="example: `biological`"),
-    start: int = 0,
-    rows: int = 100,
+    term: str = Path(..., description="e.g., `biological`"),
+    start: int = Query(0, description="The starting index of the search results."),
+    rows: int = Query(100, description="The maximum number of rows to return in the search results."),
     category: AutocompleteCategory = Query(
         None,
         description="The category of items to retrieve, can be 'gene' or 'term'",

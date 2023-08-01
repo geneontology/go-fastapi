@@ -17,9 +17,6 @@ start:
 start-dev:
 	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8081
 
-run:
-	start
-
 test: unit-tests integration-tests
 
 integration-tests:

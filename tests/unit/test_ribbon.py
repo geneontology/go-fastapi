@@ -51,6 +51,18 @@ class TestOntologyAPI(unittest.TestCase):
 
     # Add other test cases following a similar pattern
 
+    def test_term_subsets_endpoint(self):
+        """Test the endpoint to get the subsets of a Gene Ontology term by its identifier."""
+        for id in go_ids:
+            response = test_client.get(f"/api/ontology/term/{id}/subsets")
+            self.assertEqual(response.status_code, 200)
+
+    def test_term_by_subset_endpoint(self):
+        """Test the endpoint to get the Gene Ontology terms associated with a given subset."""
+        for id in subsets:
+            response = test_client.get(f"/api/ontology/subset/{id}")
+            self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -35,13 +35,11 @@ async def slimmer_function(
     subject: List[str] = Query(..., description="example: ZFIN:ZDB-GENE-980526-388, MGI:3588192"),
     slim: List[str] = Query(
         ...,
-        description="Map objects up (slim) to a higher level category. "
-        "Value can be ontology class ID, "
-        "example: GO:0005575",
+        description="example: GO:0008150, GO:0003674, GO:0005575",
     ),
     exclude_automatic_assertions: bool = False,
-    rows: int = -1,
-    start: int = 0,
+    rows: int = Query(default=-1, description="Number of rows to return, -1 for all"),
+    start: int = Query(default=0, description="Row to start at"),
 ):
     """For a given gene(s), summarize its annotations over a defined set of slim."""
     # Note that GO currently uses UniProt as primary ID
@@ -94,7 +92,7 @@ async def slimmer_function(
     return results
 
 
-def gene_to_uniprot_from_mygene(id):
+def gene_to_uniprot_from_mygene(id: str):
     """Query MyGeneInfo with a gene and get its corresponding UniProt ID."""
     uniprot_ids = []
     mg = get_client("gene")
@@ -103,7 +101,7 @@ def gene_to_uniprot_from_mygene(id):
         id = id.replace("NCBIGene", "entrezgene")
     try:
         results = mg.query(id, fields="uniprot")
-        log.info("results from mygene for ", id, ": ", results)
+        log.info("results from mygene for %s", id, ": ", results["hits"])
         if results["hits"]:
             for hit in results["hits"]:
                 if "uniprot" not in hit:
@@ -131,7 +129,7 @@ def gene_to_uniprot_from_mygene(id):
     return uniprot_ids
 
 
-def uniprot_to_gene_from_mygene(id):
+def uniprot_to_gene_from_mygene(id: str):
     """Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene."""
     gene_id = None
     if id.startswith("UniProtKB"):

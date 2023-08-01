@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Query
 
-from app.utils.ontology.ontology_utils import batch_fetch_labels
+from app.utils.ontology_utils import batch_fetch_labels
 from app.utils.settings import get_user_agent
 
 log = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get("/api/ontol/labeler", tags=["ontol/labeler"])
-async def expand_curie(id: List[str] = Query(...)):
+async def expand_curie(id: List[str] = Query(..., description="CURIEs/IDs to fetch labels for.")):
     """Fetches a map from CURIEs/IDs to labels."""
     for i in id:
         if "MGI:MGI" in i:
