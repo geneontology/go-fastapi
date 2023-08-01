@@ -272,7 +272,6 @@ async def get_ribbon_results(
     qf = ""
     fq = '&fq=bioentity:("' + '" or "'.join(mod_ids) + '")&rows=100000'
     fields = "bioentity,bioentity_label,taxon,taxon_label"
-    print("heres the second call???")
     data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, q, qf, fields, fq)
 
     for entity in subjects:
