@@ -1,104 +1,104 @@
-import logging
-import urllib.parse
-from pprint import pprint
+"""Unit tests for the endpoints in the models module."""
 
-import pytest
+import unittest
+
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.utils.settings import ESOLR, ESOLRDoc, get_golr_config
 
 test_client = TestClient(app)
-
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-go_ids = ["GO:0008150"]
-subsets = ["goslim_agr"]
-shared_ancestors = [("GO:0006259", "GO:0046483")]
-uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
-
-logger = logging.getLogger(__name__)
 
 
-def test_gometadata_by_model_ids():
-    data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
-    response = test_client.get("/api/models/go", params=data)
-    assert response.status_code == 200
-    assert len(response.json()) == 2
+class TestApp(unittest.TestCase):
+
+    """Test the models endpoints."""
+
+    def test_gometadata_by_model_ids(self):
+        """Test the endpoint to retrieve GO metadata by model IDs."""
+        data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
+        response = test_client.get("/api/models/go", params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+
+    def test_geneproductmetadata_by_model_ids(self):
+        """Test the endpoint to retrieve gene product metadata by model IDs."""
+        data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
+        response = test_client.get("/api/models/gp", params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+
+    def test_pubmedmetadata_by_model_ids(self):
+        """Test the endpoint to retrieve PubMed metadata by model IDs."""
+        data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
+        response = test_client.get("/api/models/pmid", params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+
+    def test_bioenty_id_endpoints(self):
+        """Test the bioentity endpoint for each given ID."""
+        for id in gene_ids:
+            response = test_client.get(f"/api/bioentity/{id}")
+            self.assertEqual(response.status_code, 200)
+
+    def test_gocam_by_model_ids(self):
+        """Test the endpoint to retrieve GO-CAMs by model IDs."""
+        response = test_client.get("/api/models/581e072c00000820")
+        self.assertGreater(len(response.json()), 125)
+        self.assertEqual(response.status_code, 200)
+
+    def test_models_size_endpoint(self):
+        """Test the endpoint to retrieve models with specified size."""
+        data = {
+            "start": "32",
+            "size": "10",
+        }
+        response = test_client.get("/api/models", params=data)
+        for record in response.json():
+            self.assertIsInstance(record.get("orcids"), list)
+        self.assertEqual(response.status_code, 200)
+
+    def test_userlist(self):
+        """Test the endpoint to retrieve the list of users."""
+        response = test_client.get("/api/users")
+        self.assertGreater(len(response.json()), 100)
+        self.assertEqual(response.status_code, 200)
+
+    def test_grouplist(self):
+        """Test the endpoint to retrieve the list of groups."""
+        response = test_client.get("/api/groups")
+        self.assertGreater(len(response.json()), 15)
+        self.assertEqual(response.status_code, 200)
+
+    def test_groups_by_name(self):
+        """Test the endpoint to retrieve groups by name."""
+        response = test_client.get("/api/groups/MGI")
+        self.assertGreater(len(response.json()), 10)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_modelid_by_pmid(self):
+        """Test the endpoint to retrieve model IDs by PubMed ID."""
+        response = test_client.get("/api/pmid/15314168/models")
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_go_term_detail_by_go_id(self):
+        """Test the endpoint to retrieve GO term details by GO ID."""
+        response = test_client.get("/api/go/GO_0008150")
+        self.assertIn("goid", response.json())
+        self.assertIn("label", response.json())
+        self.assertEqual(response.json()["goid"], "http://purl.obolibrary.org/obo/GO_0008150")
+        self.assertEqual(response.json()["label"], "biological_process")
+        self.assertIsInstance(response.json(), dict)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_gocam_models_by_go_id(self):
+        """Test the endpoint to retrieve GO-CAM models by GO ID."""
+        id = "GO:0008150"
+        response = test_client.get(f"/api/go/{id}/models")
+        self.assertGreater(len(response.json()), 100)
+        self.assertEqual(response.status_code, 200)
 
 
-def test_geneproductmetadata_by_model_ids():
-    data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
-    response = test_client.get("/api/models/gp", params=data)
-    assert response.status_code == 200
-    assert len(response.json()) == 2
-
-
-def test_pubmedmetadata_by_model_ids():
-    data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
-    response = test_client.get("/api/models/pmid", params=data)
-    assert response.status_code == 200
-    assert len(response.json()) == 2
-
-
-@pytest.mark.parametrize("id", gene_ids)
-def test_bioenty_id_endpoints(id):
-    response = test_client.get(f"/api/bioentity/{id}")
-    assert response.status_code == 200
-
-
-def test_gocam_by_model_ids():
-    response = test_client.get("/api/models/581e072c00000820")
-    assert len(response.json()) > 125
-    assert response.status_code == 200
-
-
-def test_models_size_endpoint():
-    data = {
-        "start": "32",
-        "size": "10",
-    }
-    response = test_client.get(f"/api/models", params=data)
-    for record in response.json():
-        assert type(record.get("orcids")) == list
-    assert response.status_code == 200
-
-
-def test_userlist():
-    response = test_client.get("/api/users")
-    assert len(response.json()) > 100
-    assert response.status_code == 200
-
-
-def test_grouplist():
-    response = test_client.get("/api/groups")
-    assert len(response.json()) > 15
-    assert response.status_code == 200
-
-
-def test_groups_by_name():
-    response = test_client.get("/api/groups/MGI")
-    assert len(response.json()) > 10
-    assert response.status_code == 200
-
-
-def test_get_modelid_by_pmid():
-    response = test_client.get("/api/pmid/15314168/models")
-    assert len(response.json()) == 1
-    assert response.status_code == 200
-
-
-def test_get_go_term_detail_by_go_id():
-    response = test_client.get("/api/go/GO_0008150")
-    assert "goid" in response.json()
-    assert "label" in response.json()
-    assert response.json().get("goid") == "http://purl.obolibrary.org/obo/GO_0008150"
-    assert response.json().get("label") == "biological_process"
-    assert type(response.json()) == dict
-    assert response.status_code == 200
-
-
-def test_get_gocam_models_by_go_id():
-    id = "GO:0008150"
-    response = test_client.get(f"/api/go/{id}/models")
-    assert len(response.json()) > 100
-    assert response.status_code == 200
+if __name__ == "__main__":
+    unittest.main()

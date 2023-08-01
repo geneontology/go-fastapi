@@ -1,2 +1,3 @@
 [virtualenvs]
 in-project = true
+max-line-length = 120

@@ -1,12 +1,23 @@
+"""main application entry point."""
 import logging
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import (bioentity, labeler, models, ontology, pathway_widget,
-                         prefixes, publications, ribbon, search, slimmer,
-                         users_and_groups)
+from app.routers import (
+    bioentity,
+    labeler,
+    models,
+    ontology,
+    pathway_widget,
+    prefixes,
+    publications,
+    ribbon,
+    search,
+    slimmer,
+    users_and_groups,
+)
 
 log = logging.getLogger(__name__)
 
@@ -45,4 +56,4 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080)
+    uvicorn.run("main:app", host="127.0.0.1", port=8080)

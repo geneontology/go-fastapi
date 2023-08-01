@@ -1,24 +1,22 @@
+"""prefix utility functions."""
 import logging
-import json
-import urllib.request
-from prefixmaps import load_context
+
 from curies import Converter
-from pprint import pprint
+from prefixmaps import load_context
+
 logger = logging.getLogger(__name__)
 
 
 # have to remap prefixes from prefixmaps in order to match the prefixes in Minerva
 def remap_prefixes(cmap):
-    response = urllib.request.urlopen("https://raw.githubusercontent.com/ExposuresProvider/cam-pipeline/kg-tsv/supplemental-namespaces.json")
-    data = json.loads(response.read().decode())
-    for k, v in data.items():
-        cmap[v] = k
+    """Remaps prefixes from prefixmaps in order to match the prefixes in Minerva."""
     cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
     cmap["WB"] = "http://identifiers.org/wormbase/"
     return cmap
 
 
 def get_prefixes(context: str = "go"):
+    """Returns a dictionary of all prefixes in the GO namespace."""
     context = load_context(context)
     extended_prefix_map = context.as_extended_prefix_map()
     converter = Converter.from_extended_prefix_map(extended_prefix_map)
@@ -27,4 +25,3 @@ def get_prefixes(context: str = "go"):
     cmap_remapped = remap_prefixes(cmaps)
 
     return cmap_remapped
-

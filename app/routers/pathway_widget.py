@@ -1,12 +1,15 @@
+"""Pathway widget API endpoints."""
 import logging
-from app.utils.prefixes.prefix_utils import get_prefixes
+
+from curies import Converter
 from fastapi import APIRouter, Query
-from oaklib.implementations.sparql.sparql_implementation import \
-    SparqlImplementation
+from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
+
+from app.utils.prefixes.prefix_utils import get_prefixes
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql.sparql_utils import transform_array
-from curies import Converter
+
 logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
@@ -24,12 +27,14 @@ async def get_gocams_by_geneproduct_id(
         None,
         deprecated=True,
         description="Used by the pathway widget The model has a chain of at least three functions connected "
-                    "by at least two consecutive causal relation edges.  One of these functions is enabled_by "
-                    "this input gene"
+        "by at least two consecutive causal relation edges.  One of these functions is enabled_by "
+        "this input gene",
     ),
 ):
     """
-    Returns GO-CAM models associated with a given Gene Product identifier (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1)
+    Returns GO-CAM models associated with a given Gene Product identifier.
+
+    (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).
     """
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
@@ -51,15 +56,15 @@ async def get_gocams_by_geneproduct_id(
 
             SELECT distinct ?gocam ?title
 
-            WHERE 
+            WHERE
             {
 
               GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .    
-                ?s enabled_by: ?gpnode .    
+                ?gocam metago:graphType metago:noctuaCam .
+                ?s enabled_by: ?gpnode .
                 ?gpnode rdf:type ?identifier .
-                ?gocam dc:title ?title .   
-                FILTER(?identifier = <%s>) .            
+                ?gocam dc:title ?title .
+                FILTER(?identifier = <%s>) .
               }
 
             }
@@ -99,7 +104,7 @@ async def get_gocams_by_geneproduct_id(
       PREFIX hint: <http://www.bigdata.com/queryHints#>
       SELECT DISTINCT ?gocam ?title
       WHERE {
-        GRAPH ?gocam  {  
+        GRAPH ?gocam  {
           # Inject gene product ID here
           ?gene rdf:type <%s> .
         }
@@ -108,46 +113,46 @@ async def get_gocams_by_geneproduct_id(
         }
         ?gocam dc:title ?title .
         FILTER (
-          EXISTS {  
+          EXISTS {
             GRAPH ?gocam  {      ?ind1 enabled_by: ?gene . }
-            GRAPH ?gocam { ?ind1 ?causal1 ?ind2 } 
+            GRAPH ?gocam { ?ind1 ?causal1 ?ind2 }
             ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-            ?ind1 causally_upstream_of_or_within: ?ind2 . 
+            ?ind1 causally_upstream_of_or_within: ?ind2 .
             GRAPH ?gocam  {       ?ind2 enabled_by: ?gpnode2 . }
             GRAPH ?gocam { ?ind2 ?causal2 ?ind3 }
             ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-            ?ind2 causally_upstream_of_or_within: ?ind3 . 
+            ?ind2 causally_upstream_of_or_within: ?ind3 .
             GRAPH ?gocam  {       ?ind3 enabled_by: ?gpnode3 . }
-            FILTER(?gene != ?gpnode2) 
-            FILTER(?gene != ?gpnode3) 
+            FILTER(?gene != ?gpnode2)
+            FILTER(?gene != ?gpnode3)
             FILTER(?gpnode2 != ?gpnode3)
-          } ||  
-          EXISTS {          
+          } ||
+          EXISTS {
             GRAPH ?gocam  {       ?ind1 enabled_by: ?gpnode1 . }
-            GRAPH ?gocam { ?ind1 ?causal1 ?ind2 } 
+            GRAPH ?gocam { ?ind1 ?causal1 ?ind2 }
             ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-            ?ind1 causally_upstream_of_or_within: ?ind2 . 
+            ?ind1 causally_upstream_of_or_within: ?ind2 .
             GRAPH ?gocam  {          ?ind2 enabled_by: ?gene . }
             GRAPH ?gocam { ?ind2 ?causal2 ?ind3 }
             ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-            ?ind2 causally_upstream_of_or_within: ?ind3 . 
+            ?ind2 causally_upstream_of_or_within: ?ind3 .
             GRAPH ?gocam  {           ?ind3 enabled_by: ?gpnode3 . }
-            FILTER(?gpnode1 != ?gene) 
-            FILTER(?gpnode1 != ?gpnode3) 
+            FILTER(?gpnode1 != ?gene)
+            FILTER(?gpnode1 != ?gpnode3)
             FILTER(?gene != ?gpnode3)
           } ||
           EXISTS {
             GRAPH ?gocam  {       ?ind1 enabled_by: ?gpnode1 . }
-            GRAPH ?gocam { ?ind1 ?causal1 ?ind2 } 
+            GRAPH ?gocam { ?ind1 ?causal1 ?ind2 }
             ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-            ?ind1 causally_upstream_of_or_within: ?ind2 . 
+            ?ind1 causally_upstream_of_or_within: ?ind2 .
             GRAPH ?gocam  {           ?ind2 enabled_by: ?gpnode2 . }
             GRAPH ?gocam { ?ind2 ?causal2 ?ind3 }
             ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-            ?ind2 causally_upstream_of_or_within: ?ind3 . 
+            ?ind2 causally_upstream_of_or_within: ?ind3 .
             GRAPH ?gocam  {         ?ind3 enabled_by: ?gene . }
-            FILTER(?gpnode1 != ?gpnode2) 
-            FILTER(?gpnode1 != ?gene) 
+            FILTER(?gpnode1 != ?gpnode2)
+            FILTER(?gpnode1 != ?gene)
             FILTER(?gpnode2 != ?gene)
           }
         )

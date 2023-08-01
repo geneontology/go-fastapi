@@ -15,27 +15,26 @@ style = "pep440"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.92.0"
-uvicorn = "^0.21.1"
+fastapi = ">=0.92.0"
+uvicorn = ">=0.23.2"
 python-multipart = "^0.0.6"
-ontobio = "^2.8.3"
-gunicorn = "^20.1.0"
-pytest-bdd = "^6.1.1"
-Sphinx = "^5.0.2"
-sphinx-rtd-theme = "^1.2.0"
-sphinxcontrib-napoleon = "^0.7"
-tox = "^3.28.0"
-httpx = "^0.23.3"
+ontobio = ">=2.8.8"
+gunicorn = ">=20.1.0"
 prefixmaps = "^0.1.4"
-linkml-runtime = "^1.5.0"
-sparqlwrapper = "^2.0.0"
-greenlet = "=2.0.1"
-SQLAlchemy = "^1.4.32, !=1.4.46"
-oaklib = "^0.5.0"
+linkml-runtime = ">=1.5.5"
+sparqlwrapper = ">=2.0.0"
+oaklib = ">=0.5.12"
+go-deploy = ">=0.4.1"
 biothings-client = "^0.3.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.3.0"
+pytest = ">=7.4.0"
+pytest-bdd = "^6.1.1"
+Sphinx = "^5.0.2"
+sphinx-rtd-theme = ">=1.2.2"
+sphinxcontrib-napoleon = "^0.7"
+tox = ">=4.6.4"
+httpx = ">=0.18.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
@@ -52,3 +51,42 @@ testpaths = [
 
 [tool.poetry.extras]
 docs = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-mermaid"]
+
+[tool.black]
+line-length = 120
+target-version = ["py39", "py310"]
+
+[tool.ruff]
+extend-ignore = [
+    "D211",  # `no-blank-line-before-class`
+    "D212",  # `multi-line-summary-first-line`
+    "D401",  # `First line of docstring should be in imperative mood`
+    "S101",  # `Use of assert detected. It would be nice to keep this check for everything but the BDD tests.`
+    "B008",  # `Do not perform function calls in argument defaults.`
+]
+line-length = 120
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+
+# Select or ignore from https://beta.ruff.rs/docs/rules/
+select = [
+    "B",  # bugbear
+    "D",  # pydocstyle
+    "E",  # pycodestyle errors
+    "F",  # Pyflakes
+    "I",  # isort
+    "S",  # flake8-bandit
+    "W",  # Warning
+]
+
+unfixable = []
+target-version = "py310"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.codespell]
+skip = "*.po,*.ts,.git,pyproject.toml"
+count = ""
+quiet-level = 3
