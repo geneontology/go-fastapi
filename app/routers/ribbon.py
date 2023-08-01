@@ -110,7 +110,7 @@ async def get_ribbon_results(
                 {
                     "id": category["id"],
                     "label": "other " + category["label"].lower().replace("_", " "),
-                    "description": "Represent all annotations not " "mapped to a specific term",
+                    "description": "Represent all annotations not mapped to a specific term",
                     "type": "Other",
                 }
             ]
