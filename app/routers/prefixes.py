@@ -13,10 +13,7 @@ router = APIRouter()
 
 @router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
 async def get_all_prefixes():
-    """
-    Returns a list of all prefixes in the GO namespace.
-
-    """
+    """Returns a list of all prefixes in the GO namespace."""
     all_prefixes = []
     for k, _v in get_prefixes("go").items():
         all_prefixes.append(k)
