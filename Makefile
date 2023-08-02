@@ -17,10 +17,16 @@ start:
 start-dev:
 	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8081
 
-test: unit-tests integration-tests
+test: unit-tests integration-tests lint spell
 
 integration-tests:
 	poetry run pytest tests/integration/step_defs/*.py
+
+lint:
+	poetry run tox -e lint-fix
+
+spell:
+	poetry run tox -e codespell
 
 unit-tests:
 	poetry run pytest tests/unit/*.py
