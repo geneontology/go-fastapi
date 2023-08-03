@@ -23,8 +23,7 @@ log = logging.getLogger(__name__)
 
 app = FastAPI(
     title="GO API",
-    description="Gene Ontology API based on the BioLink Model, an integration layer for linked biological "
-    "objects.\n\n __Source:__ 'https://github.com/geneontology/go-fastapi'",
+    description="The Gene Ontology API.\n\n __Source:__ 'https://github.com/geneontology/go-fastapi'",
     version="1.0.0",
     terms_of_service="http://example.com/terms/",
     contact={

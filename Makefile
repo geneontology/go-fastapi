@@ -17,10 +17,16 @@ start:
 start-dev:
 	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8081
 
-test: unit-tests integration-tests
+test: unit-tests integration-tests lint spell
 
 integration-tests:
 	poetry run pytest tests/integration/step_defs/*.py
+
+lint:
+	poetry run tox -e lint-fix
+
+spell:
+	poetry run tox -e codespell
 
 unit-tests:
 	poetry run pytest tests/unit/*.py
@@ -36,6 +42,8 @@ help:
 	@echo "make all -- installs requirements, deploys and starts the site locally"
 	@echo "make install -- install dependencies"
 	@echo "make start -- start the API locally"
-	@echo "make test -- runs tests"
+	@echo "make test -- runs tests, linter in fix mode, and spell checker"
+	@echo "make lint -- runs linter in fix mode"
+	@echo "make spell -- runs spell checker"
 	@echo "make help -- show this help"
 	@echo ""
