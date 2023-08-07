@@ -44,6 +44,8 @@ For testing purposes you can you your own ssh keys. But for production please as
 
 ## Provisioning EC2 instances: 
 
+This is all completed in a dockerized development environment (all commands take place inside the docker container).
+
 1. Spin up the provided dockerized development environment:
 
 ```bash
@@ -125,6 +127,7 @@ terraform -chdir=aws output           # shows public ip of aws instance
 ```
 
 ## Deploy go-fastapi stack via Ansible to AWS:
+These commands continue to be run in the dockerized development environment.
 
 * Make DNS names for go-fastapi point to the public IP address. If using cloudflare, put the ip in cloudflare DNS record. Otherwise put the ip in the AWS Route 53 DNS record. 
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
@@ -141,14 +144,17 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-stack.yaml
 ```
 
+## Testing deployment:
+
+1. Access go-fastapi from the command line by ssh'ing into the newly provisioned EC2 instance (this too is run via the dockerized dev environment):
 ssh -i /tmp/go-ssh ubuntu@IP_ADDRESS
 
-1. Access go-fastapi from a browser:
+2. Access go-fastapi from a browser:
 
 We use health checks in the `docker-compose` file.  
 Use go-fastapi DNS name. http://{go-fastapi_host}/docs
 
-2. Debugging:
+3. Debugging:
 
 * Use -dry-run and copy and paste the command and execute it manually
 * ssh to the machine; the username is ubuntu. Try using DNS names to make sure they are fine.
@@ -160,7 +166,7 @@ docker-compose -f stage_dir/docker-compose.yaml up -d
 docker-compose -f stage_dir/docker-compose.yaml logs -f 
 ```
 
-3. Testing LogRotate:
+4. Testing LogRotate:
 
 ```bash
 docker exec -u 0 -it apache_fastapi bash # enter the container
@@ -172,13 +178,14 @@ logrotate -v -f /etc/logrotate.d/apache2 # Use -f option to force log rotation.
 cat /tmp/logrotate-to-s3.log # make sure uploading to s3 was fine
 ```
 
-4. Testing Health Check:
+5. Testing Health Check:
 
 ```sh
 docker inspect --format "{{json .State.Health }}" go-fastapi
 ```
 
-5. Destroy Instance and Delete Workspace:
+
+### Destroy Instance and Delete Workspace:
 
 ```bash
 # Make sure you point to the correct workspace before destroying the stack.
@@ -194,7 +201,7 @@ terraform -chdir=aws workspace select default # change to default workspace
 terraform -chdir=aws workspace delete <name_of_workspace>  # delete workspace.
 ```
 
-## Using the shared docker container (go-dev):
+### Helpful commands for the docker container used as a development environment (go-dev):
 
 1. start the docker container `go-dev` in interactive mode.
 
