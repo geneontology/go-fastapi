@@ -88,7 +88,7 @@ go-deploy --working-directory aws -list-workspaces -verbose
 
 4. Provision instance on AWS:
 
-If a workspace exists above, then you can skip the provisioning of the AWS instance.  
+If a workspace exists above, then you can skip the provisioning of the AWS instance.  If use the same workspace, then in destructive mode.
 Else, create a workspace using the following namespace pattern `production-YYYY-MM-DD`.  e.g.: `production-2023-01-30`
 
 ```bash

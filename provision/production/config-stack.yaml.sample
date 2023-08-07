@@ -18,13 +18,18 @@ stack:
       USE_QOS: 1
       QS_ClientEventBlockCount: 350
       QS_ClientEventBlockCountSeconds: 100
-      QS_ClientEventBlockExcludeIP: "9.9.9.9"
+      QS_ClientEventBlockExcludeIP: "9.9.9.9" 
 
-      fastapi_host: REPLACE_ME # aes-test-go-fastapi
-      fastapi_tag: 0.2.0
-
+      fastapi_host: REPLACE_ME # aes-test-go-fastapi 
+      fastapi_tag: 0.2.1 # update me if needed, as new docker containers become available.
+      fastapi_host_alias: api.geneontology.org  # should never need to change this, all TEST instances should have PROD capability. 
+      
       REDIRECT_HTTP: 1
-      redirect_to: REPLACE_ME # aes-test-go-fastapi.geneontology.org
+      redirect_to: REPLACE_ME # aes-xxx.geneontology.org e.g. always is the FQDN (fully qualified domain name) hostname.geneontolog.org 
 
       USE_CLOUDFLARE: 0  # Enable if planning to use behind proxy
+
+      solr_url: "https://golr-aux.geneontology.io/solr/"
+      sparql_url: "http://rdf.geneontology.org/sparql"
+
    scripts: [ "stage.yaml", "start_services.yaml" ]
