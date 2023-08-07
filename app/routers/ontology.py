@@ -49,7 +49,10 @@ async def get_term_graph_by_id(
     id: str = Path(..., description="The ID of the term to extract the graph from,  e.g. GO:0003677"),
     graph_type: GraphType = Query(GraphType.topology_graph),
 ):
-    """Returns graph of an ontology term."""
+    """
+    Returns graph of an ontology term.
+
+    """
     graph_type = graph_type + "_json"  # GOLR field names
     log.info(graph_type)
 
