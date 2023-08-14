@@ -139,10 +139,16 @@ These commands continue to be run in the dockerized development environment.
 ```bash
 cp ./production/config-stack.yaml.sample ./config-stack.yaml
 emacs ./config-stack.yaml    # Verify contents and modify if needed.
-
 export ANSIBLE_HOST_KEY_CHECKING=False
+````
+
+NOTE: change the command below to point to the terraform workspace you use above. 
 go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-stack.yaml
+
+```bash
+go-deploy --workspace [TERRAFORM WORKSPACE CHANGEME] --working-directory aws -verbose --conf config-stack.yaml
 ```
+
 
 ## Testing deployment:
 
