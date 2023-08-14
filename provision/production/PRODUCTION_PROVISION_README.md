@@ -100,25 +100,30 @@ cp ./production/config-instance.yaml.sample config-instance.yaml
 emacs config-instance.yaml  # verify the location of the ssh keys for your AWS instance in your copy of `config-instance.yaml` under `ssh_keys`.
                             # verify the location of the public ssh key in `aws/main.tf`
 
-# test the deployment
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -dry-run --conf config-instance.yaml
-
-# deploy if all looks good.
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-instance.yaml
-# will produce an IP address in the resulting inventory.json file.
-
-# The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
 ```
 
-Note: write down the IP address of the AWS instance that is created. This can be found in REPLACE_ME_WITH_TERRAFORM_BACKEND.cfg # production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg
+5. test the deployment
+```bash
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -dry-run --conf config-instance.yaml
+```
+
+7. deploy if all looks good.
+```bash
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-instance.yaml
+```
+
+This will produce an IP address in the resulting inventory.json file.
+The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
+
+NOTE: write down the IP address of the AWS instance that is created. This can be found in REPLACE_ME_WITH_TERRAFORM_BACKEND.cfg # e.g. production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg
 
 If you need to check what you have just done, here are some helpful Terraform commands:
 
 ```bash
-cat REPLACE_ME_WITH_TERRAFORM_BACKEND.tfvars.json # production-YYYY-MM-DD.tfvars.json, sm-test-go-fastapi-alias.tfvars.json
+cat REPLACE_ME_WITH_TERRAFORM_BACKEND.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json, sm-test-go-fastapi-alias.tfvars.json
 
 # The previous command creates an ansible inventory file.
-cat REPLACE_ME_WITH_TERRAFORM_BACKEND-inventory.cfg  # production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
+cat REPLACE_ME_WITH_TERRAFORM_BACKEND-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
 
 # Useful terraform commands to check what you have just done
 terraform -chdir=aws workspace show   # current terraform workspace
