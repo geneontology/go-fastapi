@@ -129,7 +129,9 @@ The previous command creates an ansible inventory file.
 cat REPLACE_ME_WITH_TERRAFORM_BACKEND-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
 ```
 
-# Useful terraform commands to check what you have just done
+Useful terraform commands to check what you have just done
+
+```bash
 terraform -chdir=aws workspace show   # current terraform workspace
 terraform -chdir=aws show             # current state deployed ...
 terraform -chdir=aws output           # shows public ip of aws instance 
