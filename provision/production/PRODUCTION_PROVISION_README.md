@@ -3,7 +3,7 @@
 This guide describes the deployment of the `go-fastapi` stack to AWS using Terraform, ansible, and the "go-deploy" Python library. 
 
 ## Prerequisites: 
-Note: we have a docker-based environment with all these tools installed. 
+**NOTE**: we have a docker-based environment with all these tools installed. 
 
 #### software:
 
@@ -34,7 +34,7 @@ Note: we have a docker-based environment with all these tools installed.
 
 DNS record is used for `go-fastapi`. Once the instance has been provisioned, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org`
 
-Note: if using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
+**NOTE**: if using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
 
 #### SSH Keys:
 
@@ -58,7 +58,7 @@ cd go-fastapi/provision
 
 The credentials are used by Terraform to provision the AWS instance and by the provisioned instance to access the certificate store and the s3 buckets used to store Apache logs.  Copy and modify the aws credential file to the default location `/tmp/go-aws-credentials` 
 
-Note: you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file.
+**NOTE**: you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file.
 
 ```bash
 cp production/go-aws-credentials.sample /tmp/go-aws-credentials
@@ -115,16 +115,19 @@ go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws 
 This will produce an IP address in the resulting inventory.json file.
 The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
 
-NOTE: write down the IP address of the AWS instance that is created. 
-This can be found in `REPLACE_ME_WITH_TERRAFORM_BACKEND.cfg` # e.g. production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg
+**NOTE**: write down the IP address of the AWS instance that is created.
 
+This can be found in `REPLACE_ME_WITH_TERRAFORM_BACKEND.cfg`  (e.g. production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg)
 If you need to check what you have just done, here are some helpful Terraform commands:
 
 ```bash
 cat REPLACE_ME_WITH_TERRAFORM_BACKEND.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json, sm-test-go-fastapi-alias.tfvars.json
+```
 
-# The previous command creates an ansible inventory file.
+The previous command creates an ansible inventory file.
+```bash
 cat REPLACE_ME_WITH_TERRAFORM_BACKEND-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
+```
 
 # Useful terraform commands to check what you have just done
 terraform -chdir=aws workspace show   # current terraform workspace
@@ -148,7 +151,7 @@ emacs ./config-stack.yaml    # Verify contents and modify if needed.
 export ANSIBLE_HOST_KEY_CHECKING=False
 ````
 
-NOTE: change the command below to point to the terraform workspace you use above. 
+**NOTE**: change the command below to point to the terraform workspace you use above. 
 go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-stack.yaml
 
 ```bash
