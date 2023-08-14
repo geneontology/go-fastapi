@@ -143,10 +143,10 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ````
 
 NOTE: change the command below to point to the terraform workspace you use above. 
-go-deploy --workspace production-YYYY-MM-DD --working-directory aws -verbose --conf config-stack.yaml
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-stack.yaml
 
 ```bash
-go-deploy --workspace [TERRAFORM WORKSPACE CHANGEME] --working-directory aws -verbose --conf config-stack.yaml
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-stack.yaml
 ```
 
 
