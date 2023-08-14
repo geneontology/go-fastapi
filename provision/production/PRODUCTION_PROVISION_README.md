@@ -42,7 +42,7 @@ For testing purposes you can you your own ssh keys. But for production please as
 /tmp/go-ssh.pub
 /tmp/go-ssh
 
-## Provisioning EC2 instances: 
+## Configuring and deploying EC2 _instances_: 
 
 This is all completed in a dockerized development environment (all commands take place inside the docker container).
 
@@ -137,7 +137,7 @@ terraform -chdir=aws show             # current state deployed ...
 terraform -chdir=aws output           # shows public ip of aws instance 
 ```
 
-## Deploy go-fastapi stack via Ansible to AWS:
+## Configuring and deploying software (go-fastapi) _stack_:
 These commands continue to be run in the dockerized development environment.
 
 * Make DNS names for go-fastapi point to the public IP address. If using cloudflare, put the ip in cloudflare DNS record. Otherwise put the ip in the AWS Route 53 DNS record. 
