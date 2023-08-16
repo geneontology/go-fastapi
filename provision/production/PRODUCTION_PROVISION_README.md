@@ -215,7 +215,7 @@ terraform -chdir=aws destroy        # You would need to type Yes to approve.
 # Now delete the workspace.
 
 terraform -chdir=aws workspace select default # change to default workspace
-terraform -chdir=aws workspace delete <name_of_workspace>  # delete workspace.
+terraform -chdir=aws workspace delete <NAME_OF_WORKSPACE_THAT_IS_NOT_DEFAULT>  # delete workspace.
 ```
 
 ### Helpful commands for the docker container used as a development environment (go-dev):
