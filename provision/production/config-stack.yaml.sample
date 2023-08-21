@@ -20,11 +20,10 @@ stack:
       QS_ClientEventBlockCountSeconds: 100
       QS_ClientEventBlockExcludeIP: "9.9.9.9"
 
-      fastapi_host: REPLACE_ME # aes-test-go-fastapi
+      fastapi_host: REPLACE_ME # USE FQDN aes-test-go-fastapi.geneontology.org
       fastapi_tag: 0.2.0
 
       REDIRECT_HTTP: 1
-      redirect_to: REPLACE_ME # aes-test-go-fastapi.geneontology.org
 
       USE_CLOUDFLARE: 0  # Enable if planning to use behind proxy
    scripts: [ "stage.yaml", "start_services.yaml" ]

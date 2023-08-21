@@ -11,7 +11,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 - Terraform: v1.1.4
 - Ansible: 2.10.7
 - aws cli
-- go-deploy: `poetry install go-deploy==0.4.1` # requires python >=3.8
+- go-deploy: `poetry install go-deploy==0.4.2` # requires python >=3.8
 
 #### configuration files:
 
@@ -32,7 +32,8 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 
 #### DNS: 
 
-DNS record is used for `go-fastapi`. Once the instance has been provisioned, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org`
+DNS record is used for `go-fastapi` and the go-deploy tool allows for creating a DNS record of type A that would be populated by the public ip address of the aws instance. If
+you don't use this option, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org`
 
 **NOTE**: if using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
 
@@ -110,8 +111,13 @@ go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws 
 7. deploy if all looks good.
 ```bash
 go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-instance.yaml
+# display the terraform state. The aws resources that were created.
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -show
+# display the public ip address of the aws instance
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -output
 ```
 
+Useful Details for troubleshooting:
 This will produce an IP address in the resulting inventory.json file.
 The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
 
@@ -205,6 +211,13 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 ### Destroy Instance and Delete Workspace:
 
 ```bash
+# Destroy Using Tool.
+# Make sure you point to the correct workspace before destroying the stack by using the -show command or the -output command
+go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -destroy
+```
+
+```bash
+# Destroy Manually
 # Make sure you point to the correct workspace before destroying the stack.
 
 terraform -chdir=aws workspace list
@@ -223,14 +236,14 @@ terraform -chdir=aws workspace delete <NAME_OF_WORKSPACE_THAT_IS_NOT_DEFAULT>  #
 1. start the docker container `go-dev` in interactive mode.
 
 ```bash
-docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
+docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.2  /bin/bash
 ```
 
 In the command above we used the `--rm` option which means the container will be deleted when you exit.
 If that is not the intent and you want to delete it later at your own convenience. Use the following `docker run` command.
 
 ```bash
-docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
+docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.2  /bin/bash
 ```
 
 2. To exit or stop the container:
