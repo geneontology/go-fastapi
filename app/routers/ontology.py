@@ -93,7 +93,7 @@ async def get_subgraph_by_term_id(
         if child["id"] == id:
             pass
         else:
-            child = {"id": child["id"], "label": child["annotation_class_label"]}
+            child = {"id": child["id"]}
             descendents.append(child)
 
 
@@ -102,12 +102,8 @@ async def get_subgraph_by_term_id(
     ancestor_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
                                        optionals)
     ancestors = []
-    for parent in ancestor_data:
-        if parent["id"] == id:
-            pass
-        else:
-            parent = {"id": parent["id"], "label": parent["annotation_class_label"]}
-            ancestors.append(parent)
+    for parent in ancestor_data[0]["isa_partof_closure"]:
+        ancestors.append({"id": parent})
 
     data = {"descendents": descendents, "ancestors": ancestors}
     # step required as these graphs are made into strings in the json

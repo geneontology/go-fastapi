@@ -50,6 +50,10 @@ class TestApp(unittest.TestCase):
         for id in subgraphs:
             response = test_client.get(f"/api/ontology/term/{id}/subgraph")
             self.assertEqual(response.status_code, 200)
+            if id == "GO:0009453":
+                print(response.json())
+                self.assertGreaterEqual(len(response.json()["ancestors"]), 6)
+                self.assertGreaterEqual(len(response.json()["descendents"]), 11)
 
 
 if __name__ == "__main__":
