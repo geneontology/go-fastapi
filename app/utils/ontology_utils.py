@@ -324,7 +324,6 @@ def get_purl(goid):
     return "http://purl.obolibrary.org/obo/" + goid
 
 
-
 def get_go_subsets_sparql_query(goid):
     """
     Create SPARQL query for fetching GO subsets.
@@ -350,4 +349,3 @@ def get_go_subsets_sparql_query(goid):
     }
     """
     )
-

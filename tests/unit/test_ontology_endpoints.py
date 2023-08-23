@@ -15,6 +15,7 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 subgraphs = ["GO:0009453", "GO:0052128", "GO:0052131"]  # energy taxis, positive energy taxis, positive aerotaxis
 
+
 class TestApp(unittest.TestCase):
 
     """Test the ontology endpoints."""

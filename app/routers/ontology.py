@@ -2,6 +2,7 @@
 import json
 import logging
 from enum import Enum
+
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -30,10 +31,7 @@ class GraphType(str, Enum):
 async def get_term_metadata_by_id(
     id: str = Path(..., description="The ID of the term to extract the metadata from, e.g. GO:0003677")
 ):
-    """
-    Returns metadata of an ontology term, e.g. GO:0003677.
-
-    """
+    """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -49,10 +47,7 @@ async def get_term_graph_by_id(
     id: str = Path(..., description="The ID of the term to extract the graph from,  e.g. GO:0003677"),
     graph_type: GraphType = Query(GraphType.topology_graph),
 ):
-    """
-    Returns graph of an ontology term.
-
-    """
+    """Returns graph of an ontology term."""
     graph_type = graph_type + "_json"  # GOLR field names
     log.info(graph_type)
 
@@ -67,7 +62,7 @@ async def get_term_graph_by_id(
 async def get_subgraph_by_term_id(
     id: str = Path(..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677"),
     start: int = Query(0, description="The start index of the results to return"),
-    rows: int = Query(100, description="The number of results to return")
+    rows: int = Query(100, description="The number of results to return"),
 ):
     """
     Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships "is_a" and "part_of".
@@ -77,15 +72,13 @@ async def get_subgraph_by_term_id(
     :param rows: The number of results to return
     :return: A is_a/part_of subgraph of the ontology term including the term's ancestors and descendants, label and ID.
     """
-
     query_filters = ""
     golr_field_to_search = "isa_partof_closure"
-    where_statement = "*:*&fq=" + golr_field_to_search + ":" +'"' + id +'"'
+    where_statement = "*:*&fq=" + golr_field_to_search + ":" + '"' + id + '"'
     fields = "id,annotation_class_label,isa_partof_closure,isa_partof_closure_label"
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
 
-    descendent_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
-                            optionals)
+    descendent_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals)
 
     descendents = []
     for child in descendent_data:
@@ -95,11 +88,9 @@ async def get_subgraph_by_term_id(
             child = {"id": child["id"]}
             descendents.append(child)
 
-
     golr_field_to_search = "id"
-    where_statement = "*:*&fq=" + golr_field_to_search + ":" +'"' + id +'"'
-    ancestor_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
-                                       optionals)
+    where_statement = "*:*&fq=" + golr_field_to_search + ":" + '"' + id + '"'
+    ancestor_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals)
     ancestors = []
     for parent in ancestor_data[0]["isa_partof_closure"]:
         ancestors.append({"id": parent})
