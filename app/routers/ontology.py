@@ -2,7 +2,7 @@
 import json
 import logging
 from enum import Enum
-
+from pprint import pprint
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -109,9 +109,9 @@ async def get_subgraph_by_term_id(
             parent = {"id": parent["id"], "label": parent["annotation_class_label"]}
             ancestors.append(parent)
 
-    data = {"descendents": descendents, "ancestors": ancestor_data}
+    data = {"descendents": descendents, "ancestors": ancestors}
     # step required as these graphs are made into strings in the json
-    print(data)
+    pprint(data)
     return data
 
 
