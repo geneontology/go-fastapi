@@ -11,7 +11,7 @@ from oaklib.resource import OntologyResource
 from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 
 import app.utils.ontology_utils as ontology_utils
-from app.utils.golr_utils import run_solr_on
+from app.utils.golr_utils import run_solr_on, run_solr_text_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform, transform_array
@@ -33,7 +33,10 @@ class GraphType(str, Enum):
 async def get_term_metadata_by_id(
     id: str = Path(..., description="The ID of the term to extract the metadata from, e.g. GO:0003677")
 ):
-    """Returns metadata of an ontology term, e.g. GO:0003677."""
+    """
+    Returns metadata of an ontology term, e.g. GO:0003677.
+
+    """
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -49,7 +52,10 @@ async def get_term_graph_by_id(
     id: str = Path(..., description="The ID of the term to extract the graph from,  e.g. GO:0003677"),
     graph_type: GraphType = Query(GraphType.topology_graph),
 ):
-    """Returns graph of an ontology term."""
+    """
+    Returns graph of an ontology term.
+
+    """
     graph_type = graph_type + "_json"  # GOLR field names
     log.info(graph_type)
 
@@ -63,29 +69,33 @@ async def get_term_graph_by_id(
 @router.get("/api/ontology/term/{id}/subgraph", tags=["ontology"])
 async def get_subgraph_by_term_id(
     id: str = Path(..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677"),
-    cnode: str = Query(None, include_in_schema=False),
-    include_ancestors: bool = Query(True, include_in_schema=False),
-    include_descendants: bool = Query(True, include_in_schema=False),
-    relation: List[str] = Query(["subClassOf", "BFO:0000050"], include_in_schema=False),
-    include_meta: bool = Query(False, include_in_schema=False),
+    start: int = Query(0, description="The start index of the results to return"),
+    rows: int = Query(100, description="The number of results to return")
 ):
-    """Extract a subgraph from an ontology term. e.g. GO:0003677."""
-    qnodes = [id]
-    if cnode is not None:
-        qnodes += cnode
-    print(qnodes)
+    """
+    Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships "is_a" and "part_of".
 
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = ontology_utils.generate_subgraph_sparql_query(id)
-    print(query)
-    results = si._sparql_query(query)
+    :param id: The ID of the term to extract the subgraph from,  e.g. GO:0003677
+    :param start: The start index of the results to return
+    :param rows: The number of results to return
+    :return: A is_a/part_of subgraph of the ontology term including the term's ancestors and descendants, label and ID.
+    """
 
-    print(results)
-    ojr = OboJsonGraphRenderer(include_meta=include_meta)
-    #
-    json_obj = ojr.to_json(results, include_meta=include_meta)
-    return json_obj
+    query_filters = ""
+    golr_field_to_search = "isa_partof_closure"
+    where_statement = "*:*&fq=" + golr_field_to_search + ":" +'"' + id +'"'
+    print(type(where_statement))
+    fields = "id,annotation_class_label,isa_partof_closure,isa_partof_closure_label"
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
+
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
+                            optionals)
+
+    print(data)
+
+    # step required as these graphs are made into strings in the json
+
+    return data
 
 
 @router.get("/api/ontology/shared/{subject}/{object}", tags=["ontology"])
