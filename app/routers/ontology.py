@@ -73,18 +73,18 @@ async def get_subgraph_by_term_id(
     qnodes = [id]
     if cnode is not None:
         qnodes += cnode
+    print(qnodes)
 
-    # COMMENT: based on the CURIE of the id, we should be able to find out the ontology automatically
-    ont = ontology_utils.get_ontology("go")
-    relations = relation
-    nodes = ont.traverse_nodes(qnodes, up=include_ancestors, down=include_descendants, relations=relations)
-    subont = ont.subontology(nodes, relations=relations)
+    ont_r = OntologyResource(url=get_sparql_endpoint())
+    si = SparqlImplementation(ont_r)
+    query = ontology_utils.generate_subgraph_sparql_query(id)
+    print(query)
+    results = si._sparql_query(query)
 
-    # TODO: meta is included regardless of whether include_meta is True or False
-
+    print(results)
     ojr = OboJsonGraphRenderer(include_meta=include_meta)
-
-    json_obj = ojr.to_json(subont, include_meta=include_meta)
+    #
+    json_obj = ojr.to_json(results, include_meta=include_meta)
     return json_obj
 
 

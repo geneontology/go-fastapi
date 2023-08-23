@@ -161,7 +161,7 @@ def get_ontology(id):
     handle = id
     for c in cfg["ontologies"]:
         if c["id"] == id:
-            logging.info("getting handle for id: {} from cfg".format(id))
+            print("getting handle for id: {} from cfg".format(id))
             handle = c["handle"]
 
     if handle not in omap:
@@ -311,6 +311,20 @@ def correct_goid(goid):
     return goid.replace(":", "_")
 
 
+def get_purl(goid):
+    """
+    Retrieve the PURL for the GO identifier.
+
+    :param goid: The GO identifier to be corrected.
+    :type goid: str
+    :return: URI for goid.
+    :rtype: str
+    """
+    goid = correct_goid(goid)
+    return "http://purl.obolibrary.org/obo/" + goid
+
+
+
 def get_go_subsets_sparql_query(goid):
     """
     Create SPARQL query for fetching GO subsets.
@@ -336,3 +350,44 @@ def get_go_subsets_sparql_query(goid):
     }
     """
     )
+
+
+def generate_subgraph_sparql_query(goid):
+    """
+    Create SPARQL query for fetching GO terms related to the given GO term.
+
+    :param goid: The GO identifier for which the related terms are to be fetched.
+    :type goid: str
+
+    :return: SPARQL query string.
+    """
+
+    goid = get_purl(goid)
+    query_template = """
+PREFIX wikidata: <http://www.wikidata.org/entity/>
+PREFIX oio: <http://www.geneontology.org/formats/oboInOwl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?o
+WHERE {
+    {
+        ?s ?p ?o .
+        ?o a owl:Class .
+        VALUES ?s { <%s> } .
+        VALUES ?p { <http://www.w3.org/2000/01/rdf-schema#subClassOf> }
+    }
+    UNION
+    {
+        ?s ?p ?o .
+        ?s a owl:Class .
+        VALUES ?o { <%s> } .
+        VALUES ?p { <http://www.w3.org/2000/01/rdf-schema#subClassOf> }
+    }
+}
+    """
+
+    query = query_template % (goid, goid)
+    return query
