@@ -2,7 +2,6 @@
 import json
 import logging
 from enum import Enum
-from pprint import pprint
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -106,8 +105,6 @@ async def get_subgraph_by_term_id(
         ancestors.append({"id": parent})
 
     data = {"descendents": descendents, "ancestors": ancestors}
-    # step required as these graphs are made into strings in the json
-    pprint(data)
     return data
 
 
@@ -225,7 +222,6 @@ async def get_gocam_models_by_go_id(id: str = Path(..., description="A GO-Term I
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
-    print(id)
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
