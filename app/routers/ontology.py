@@ -2,13 +2,11 @@
 import json
 import logging
 from enum import Enum
-from typing import List
 
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from ontobio.io.ontol_renderers import OboJsonGraphRenderer
 
 import app.utils.ontology_utils as ontology_utils
 from app.utils.golr_utils import run_solr_on, run_solr_text_on
@@ -84,17 +82,36 @@ async def get_subgraph_by_term_id(
     query_filters = ""
     golr_field_to_search = "isa_partof_closure"
     where_statement = "*:*&fq=" + golr_field_to_search + ":" +'"' + id +'"'
-    print(type(where_statement))
     fields = "id,annotation_class_label,isa_partof_closure,isa_partof_closure_label"
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
 
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
+    descendent_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
                             optionals)
 
-    print(data)
+    descendents = []
+    for child in descendent_data:
+        if child["id"] == id:
+            pass
+        else:
+            child = {"id": child["id"], "label": child["annotation_class_label"]}
+            descendents.append(child)
 
+
+    golr_field_to_search = "id"
+    where_statement = "*:*&fq=" + golr_field_to_search + ":" +'"' + id +'"'
+    ancestor_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields,
+                                       optionals)
+    ancestors = []
+    for parent in ancestor_data:
+        if parent["id"] == id:
+            pass
+        else:
+            parent = {"id": parent["id"], "label": parent["annotation_class_label"]}
+            ancestors.append(parent)
+
+    data = {"descendents": descendents, "ancestors": ancestor_data}
     # step required as these graphs are made into strings in the json
-
+    print(data)
     return data
 
 

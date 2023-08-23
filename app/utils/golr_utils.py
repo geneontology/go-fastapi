@@ -68,7 +68,6 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + optionals
     )
 
-    print(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 
     try:
