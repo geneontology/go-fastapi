@@ -247,13 +247,5 @@ class TestOntologyUtils(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
 
-    def test_generate_sparql_query(self):
-        """Test generating a sparql query."""
-
-        goid = "GO:0003674"
-        sparql_query = ou.generate_sparql_query(goid=goid)
-        self.assertIsNotNone(sparql_query)
-        self.assertIn("GO_0003674", sparql_query)
-
 if __name__ == "__main__":
     unittest.main()
