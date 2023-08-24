@@ -20,6 +20,7 @@ def run_solr_on(solr_instance, category, id, fields):
         + "&wt=json&indent=on"
     )
 
+    print(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 
     try:
@@ -35,7 +36,18 @@ def run_solr_on(solr_instance, category, id, fields):
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
 def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
-    """Return the result of a solr query on the given solrInstance, for a certain document_category and id."""
+    """
+    Return the result of a solr query on the given solrInstance, for a certain document_category and id.
+
+    :param solr_instance: The solr instance to query
+    :param category: The document category to query
+    :param q: The query string
+    :param qf: The query fields
+    :param fields: The fields to return
+    :param optionals: The optional parameters
+    :return: The result of the query
+
+    """
     solr_url = solr_instance.value
 
     if optionals is None:
@@ -55,6 +67,7 @@ def run_solr_text_on(solr_instance, category, q, qf, fields, optionals):
         + "&wt=json&indent=on"
         + optionals
     )
+
     timeout_seconds = 60  # Set the desired timeout value in seconds
 
     try:

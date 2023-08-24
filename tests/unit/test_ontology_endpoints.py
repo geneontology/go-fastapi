@@ -13,6 +13,7 @@ go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
+subgraphs = ["GO:0009453", "GO:0052128", "GO:0052131"]  # energy taxis, positive energy taxis, positive aerotaxis
 
 
 class TestApp(unittest.TestCase):
@@ -47,10 +48,12 @@ class TestApp(unittest.TestCase):
 
     def test_ontology_term_subgraph(self):
         """Test the endpoint to get the subgraph of a Gene Ontology term by its identifier."""
-        for id in go_ids:
+        for id in subgraphs:
             response = test_client.get(f"/api/ontology/term/{id}/subgraph")
-            self.assertIn("'id': 'GO:0098699'", str(response.json()))
             self.assertEqual(response.status_code, 200)
+            if id == "GO:0009453":
+                self.assertGreaterEqual(len(response.json()["ancestors"]), 6)
+                self.assertGreaterEqual(len(response.json()["descendents"]), 11)
 
 
 if __name__ == "__main__":

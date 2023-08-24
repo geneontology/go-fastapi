@@ -161,7 +161,7 @@ def get_ontology(id):
     handle = id
     for c in cfg["ontologies"]:
         if c["id"] == id:
-            logging.info("getting handle for id: {} from cfg".format(id))
+            print("getting handle for id: {} from cfg".format(id))
             handle = c["handle"]
 
     if handle not in omap:
@@ -309,6 +309,19 @@ def correct_goid(goid):
     :rtype: str
     """
     return goid.replace(":", "_")
+
+
+def get_purl(goid):
+    """
+    Retrieve the PURL for the GO identifier.
+
+    :param goid: The GO identifier to be corrected.
+    :type goid: str
+    :return: URI for goid.
+    :rtype: str
+    """
+    goid = correct_goid(goid)
+    return "http://purl.obolibrary.org/obo/" + goid
 
 
 def get_go_subsets_sparql_query(goid):
