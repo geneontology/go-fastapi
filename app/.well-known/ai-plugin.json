@@ -1,0 +1,16 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "Gene Ontology Consortium",
+    "name_for_model": "goapi",
+    "description_for_human": "Search and retrieve basic information from the Gene Ontology Consortium.",
+    "description_for_model": "Search and retrieve basic information from the Gene Ontology Consortium. You can search for entities such as genes, go-cam models, gene ontology terms by name to get the associated identifier. You can retrieve associations between entities via their identifiers, get general information about sets of entities, and search for genes and gene ontology annotations. Do not assume the user is familiar with gene ontology terminology, and always add additional information such as lay descriptions of molecular functions, biological processes, and cellular components. Use your best judgement for setting the offset and limit parameters to answer the users' questions, for example by retrieving more associations if the user asks for a summary.\n\nIMPORTANT: indicate the total number of results available so the user is not led to believe that the results are exhaustive.\n\nIMPORTANT: Include links to the gene ontology for all results. For example, instead of 'pigmentation', include a markdown link: '[pigmentation](https://amigo.geneontology.org/amigo/search/ontology?q=pigmentation)', and instead of 'Hr38', use '[Hr38](https://amigo.geneontology.org/amigo/gene_product/FB:FBgn0014859)'.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "http://0.0.0.0:8080/openapi.json",
+      "is_user_authenticated": false
+    },
+    "contact_email": "smoxon@lbl.gov.org"
+  }
