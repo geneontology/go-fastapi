@@ -2,7 +2,8 @@
 import logging
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from  import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import (
@@ -53,6 +54,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Log request method and URL
+        print(f"Request URL: {request.url} | Method: {request.method}")
+
+        # Log request headers
+        print(f"Headers: {dict(request.headers)}")
+
+        # If you need the request body, handle with care:
+        body = await request.body()
+        print(f"Body: {body.decode()}")
+
+        # Since the body is read and can't be read again,
+        # you need to make it available for the actual route again
+        request._body = body
+
+        response = await call_next(request)
+        return response
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8080)
