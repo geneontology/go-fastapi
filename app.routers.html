@@ -293,7 +293,7 @@ The dictionary will contain fields such as ‘taxon’ and ‘taxon_label’ ass
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.labeler.expand_curie">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.labeler.</span></span><span class="sig-name descname"><span class="pre">expand_curie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.labeler.expand_curie" title="Permalink to this definition"></a></dt>
-<dd><p>Fetches a map from CURIEs/IDs to labels.</p>
+<dd><p>Fetches a map from IDs to labels e.g. <a class="reference external" href="GO:0003677">GO:0003677</a>.</p>
 </dd></dl>
 
 </section>
@@ -341,9 +341,15 @@ supported in its current form in the future.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.ontology.get_gocam_models_by_go_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_gocam_models_by_go_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_gocam_models_by_go_id" title="Permalink to this definition"></a></dt>
-<dd><p>Returns parent and children relationships for a given GO ID, e.g. <a class="reference external" href="GO:0005885">GO:0005885</a>.</p>
-<p>please note, this endpoint was migrated from the GO-CAM service api and may not be
-supported in its current form in the future.</p>
+<dd><p>Returns GO-CAM model identifiers for a given GO term ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> – A GO-Term ID(e.g. <a class="reference external" href="GO:0005885">GO:0005885</a>, <a class="reference external" href="GO:0097136">GO:0097136</a> …)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GO-CAM model identifiers for a given GO term ID.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -367,7 +373,7 @@ supported in its current form in the future.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.ontology.get_term_graph_by_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_term_graph_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#app.routers.ontology.GraphType" title="app.routers.ontology.GraphType"><span class="pre">GraphType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(topology_graph)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_term_graph_by_id" title="Permalink to this definition"></a></dt>
-<dd><p>Returns graph of an ontology term.</p>
+<dd><p>Returns graph of an ontology term, e.g. <a class="reference external" href="GO:0003677">GO:0003677</a>.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -388,7 +394,7 @@ supported in its current form in the future.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.prefixes.get_contract_uri">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.prefixes.</span></span><span class="sig-name descname"><span class="pre">get_contract_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.prefixes.get_contract_uri" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.prefixes.</span></span><span class="sig-name descname"><span class="pre">get_contract_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.prefixes.get_contract_uri" title="Permalink to this definition"></a></dt>
 <dd><p>Enter a full URI of the identified resource to contract to CURIE format.</p>
 <p>e.g. <a class="reference external" href="http://purl.obolibrary.org/obo/GO_0008150">http://purl.obolibrary.org/obo/GO_0008150</a>.</p>
 </dd></dl>
@@ -413,7 +419,7 @@ supported in its current form in the future.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.ribbon.get_subset_by_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ribbon.</span></span><span class="sig-name descname"><span class="pre">get_subset_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ribbon.get_subset_by_id" title="Permalink to this definition"></a></dt>
-<dd><p>Returns a subset (slim) by its id.</p>
+<dd><p>Returns a subset (slim) by its id which is usually a name.</p>
 </dd></dl>
 
 <dl class="py function">
