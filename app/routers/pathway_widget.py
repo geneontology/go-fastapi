@@ -17,10 +17,12 @@ SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 
-@router.get("/api/gp/{id}/models",
-            tags=["pathways"],
-            description="Returns GO-CAM models associated with a given Gene Product identifier. "
-                        "(e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).")
+@router.get(
+    "/api/gp/{id}/models",
+    tags=["pathways"],
+    description="Returns GO-CAM models associated with a given Gene Product identifier. "
+    "(e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).",
+)
 async def get_gocams_by_geneproduct_id(
     id: str = Path(..., description="The CURIE of the gene product, e.g. MGI:3588192"),
     causalmf: int = Query(

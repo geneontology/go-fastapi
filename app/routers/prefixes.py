@@ -20,10 +20,12 @@ async def get_all_prefixes():
     return all_prefixes
 
 
-@router.get("/api/identifier/prefixes/expand/{id}",
-            tags=["identifier/prefixes"],
-            description="Enter a CURIE of the identified resource to expand to full URI format.  "
-                        "e.g. MGI:3588192, MGI:MGI:3588192")
+@router.get(
+    "/api/identifier/prefixes/expand/{id}",
+    tags=["identifier/prefixes"],
+    description="Enter a CURIE of the identified resource to expand to full URI format.  "
+    "e.g. MGI:3588192, MGI:MGI:3588192",
+)
 async def get_expand_curie(id: str = Path(..., description="identifier in CURIE format of the resource to expand")):
     """
     Enter a CURIE of the identified resource to expand to full URI format.
@@ -40,10 +42,12 @@ async def get_expand_curie(id: str = Path(..., description="identifier in CURIE 
     return converter.expand(id)
 
 
-@router.get("/api/identifier/prefixes/contract/",
-            tags=["identifier/prefixes"],
-            description="Enter a full URI of the identified resource to contract to CURIE format, "
-                        "e.g. 'http://purl.obolibrary.org/obo/GO_0008150'.")
+@router.get(
+    "/api/identifier/prefixes/contract/",
+    tags=["identifier/prefixes"],
+    description="Enter a full URI of the identified resource to contract to CURIE format, "
+    "e.g. 'http://purl.obolibrary.org/obo/GO_0008150'.",
+)
 async def get_contract_uri(uri: str = Query(..., description="URI of the resource to contract")):
     """
     Enter a full URI of the identified resource to contract to CURIE format.

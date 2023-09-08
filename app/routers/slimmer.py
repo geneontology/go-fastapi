@@ -32,9 +32,11 @@ class RelationshipType(str, Enum):
 @router.get("/api/bioentityset/slimmer/function", tags=["bioentityset/slimmer"])
 async def slimmer_function(
     relationship_type: RelationshipType = Query(default=RelationshipType.acts_upstream_of_or_within),
-    subject: List[str] = Query(...,
-                               description="example: ZFIN:ZDB-GENE-980526-388, MGI:3588192",
-                               example="ZFIN:ZDB-GENE-980526-388, MGI:3588192"),
+    subject: List[str] = Query(
+        ...,
+        description="example: ZFIN:ZDB-GENE-980526-388, MGI:3588192",
+        example="ZFIN:ZDB-GENE-980526-388, MGI:3588192",
+    ),
     slim: List[str] = Query(
         ...,
         description="a set of GO term ids to use as the slim, example: GO:0008150, GO:0003674, GO:0005575",

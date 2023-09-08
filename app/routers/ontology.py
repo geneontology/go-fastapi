@@ -58,10 +58,12 @@ async def get_term_graph_by_id(
     return data
 
 
-@router.get("/api/ontology/term/{id}/subgraph",
-            tags=["ontology"],
-            description="Extract a subgraph from an ontology term. e.g. GO:0003677 "
-                        "using the relationships is_a and part_of.")
+@router.get(
+    "/api/ontology/term/{id}/subgraph",
+    tags=["ontology"],
+    description="Extract a subgraph from an ontology term. e.g. GO:0003677 "
+    "using the relationships is_a and part_of.",
+)
 async def get_subgraph_by_term_id(
     id: str = Path(..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677"),
     start: int = Query(0, description="The start index of the results to return"),
@@ -102,9 +104,11 @@ async def get_subgraph_by_term_id(
     return data
 
 
-@router.get("/api/ontology/shared/{subject}/{object}",
-            tags=["ontology"],
-            description="Returns the ancestor ontology terms shared by two ontology terms. ")
+@router.get(
+    "/api/ontology/shared/{subject}/{object}",
+    tags=["ontology"],
+    description="Returns the ancestor ontology terms shared by two ontology terms. ",
+)
 async def get_ancestors_shared_by_two_terms(
     subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259"),
     object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483"),
@@ -136,10 +140,11 @@ async def get_ancestors_shared_by_two_terms(
     return {"goids": shared, "gonames: ": shared_labels}
 
 
-@router.get("/api/go/{id}",
-            tags=["ontology"],
-            description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150"
-            )
+@router.get(
+    "/api/go/{id}",
+    tags=["ontology"],
+    description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150",
+)
 async def get_go_term_detail_by_go_id(id: str = Path(..., description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)")):
     """
     Returns models for a given GO term ID.
@@ -158,9 +163,11 @@ async def get_go_term_detail_by_go_id(id: str = Path(..., description="A GO-Term
     )
 
 
-@router.get("/api/go/{id}/hierarchy",
-            tags=["ontology"],
-            description="Returns parent and children relationships for a given GO ID, e.g. GO:0005885")
+@router.get(
+    "/api/go/{id}/hierarchy",
+    tags=["ontology"],
+    description="Returns parent and children relationships for a given GO ID, e.g. GO:0005885",
+)
 async def get_go_hierarchy_go_id(id: str = Path(..., description="A GO-Term ID, e.g. GO:0097136")):
     """
     Returns parent and children relationships for a given GO ID.
@@ -210,9 +217,11 @@ async def get_go_hierarchy_go_id(id: str = Path(..., description="A GO-Term ID, 
     return collated_results
 
 
-@router.get("/api/go/{id}/models",
-            tags=["ontology"],
-            description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150")
+@router.get(
+    "/api/go/{id}/models",
+    tags=["ontology"],
+    description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150",
+)
 async def get_gocam_models_by_go_id(id: str = Path(..., description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
     """
     Returns GO-CAM model identifiers for a given GO term ID.

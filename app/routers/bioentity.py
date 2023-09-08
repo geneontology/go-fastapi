@@ -46,9 +46,7 @@ class RelationshipType(str, Enum):
 router = APIRouter()
 
 
-@router.get("/api/bioentity/{id}",
-            tags=["bioentity"],
-            description="Get bio-entities (genes) by their identifiers.")
+@router.get("/api/bioentity/{id}", tags=["bioentity"], description="Get bio-entities (genes) by their identifiers.")
 async def get_bioentity_by_id(
     id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-1)"),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
@@ -95,9 +93,11 @@ async def get_bioentity_by_id(
     return bioentity
 
 
-@router.get("/api/bioentity/function/{id}",
-            tags=["bioentity"],
-            description="Get gene or gene product information via a GO term id, e.g. GO:0044598.")
+@router.get(
+    "/api/bioentity/function/{id}",
+    tags=["bioentity"],
+    description="Get gene or gene product information via a GO term id, e.g. GO:0044598.",
+)
 async def get_annotations_by_goterm_id(
     id: str = Path(..., description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)"),
     evidence: List[str] = Query(None),
@@ -162,9 +162,11 @@ async def get_annotations_by_goterm_id(
     return data
 
 
-@router.get("/api/bioentity/function/{id}/genes",
-            tags=["bioentity"],
-            description="Returns genes annotated to the provided GO Term. e.g. GO:0044598")
+@router.get(
+    "/api/bioentity/function/{id}/genes",
+    tags=["bioentity"],
+    description="Returns genes annotated to the provided GO Term. e.g. GO:0044598",
+)
 async def get_genes_by_goterm_id(
     id: str = Path(..., description="The CURIE of the GO term to be used for gene retrieval. (e.g. GO:0044598)"),
     taxon: List[str] = Query(
@@ -259,9 +261,11 @@ async def get_genes_by_goterm_id(
         )
 
 
-@router.get("/api/bioentity/function/{id}/taxons",
-            tags=["bioentity"],
-            description="Returns taxon information for genes annotated to the provided GO term, e.g. GO:0044598")
+@router.get(
+    "/api/bioentity/function/{id}/taxons",
+    tags=["bioentity"],
+    description="Returns taxon information for genes annotated to the provided GO term, e.g. GO:0044598",
+)
 async def get_taxon_by_goterm_id(
     id: str = Path(..., description="The CURIE of the GO term to be used for taxon retrieval. (e.g. GO:0044598)"),
     evidence: List[str] = Query(
@@ -323,9 +327,11 @@ async def get_taxon_by_goterm_id(
     return data
 
 
-@router.get("/api/bioentity/gene/{id}/function",
-            tags=["bioentity"],
-            description="Returns GO terms associated with a gene, e.g. ZFIN:ZDB-GENE-050417-357")
+@router.get(
+    "/api/bioentity/gene/{id}/function",
+    tags=["bioentity"],
+    description="Returns GO terms associated with a gene, e.g. ZFIN:ZDB-GENE-050417-357",
+)
 async def get_annotations_by_gene_id(
     id: str = Path(
         ...,
