@@ -38,7 +38,7 @@ async def get_subsets_by_term(
 
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
 async def get_subset_by_id(id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)")):
-    """Returns a subset (slim) by its id."""
+    """Returns a subset (slim) by its id which is usually a name."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 

@@ -26,6 +26,7 @@ sparqlwrapper = ">=2.0.0"
 oaklib = ">=0.5.12"
 go-deploy = ">=0.4.1"
 biothings-client = "^0.3.0"
+email-validator = "^2.0.0.post2"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.4.0"

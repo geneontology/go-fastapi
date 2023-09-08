@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.get("/api/ontol/labeler", tags=["ontol/labeler"])
 async def expand_curie(id: List[str] = Query(..., description="CURIEs/IDs to fetch labels for.")):
-    """Fetches a map from CURIEs/IDs to labels."""
+    """Fetches a map from CURIEs/IDs to labels e.g. GO:0003677."""
     for i in id:
         if "MGI:MGI" in i:
             id.remove(i)

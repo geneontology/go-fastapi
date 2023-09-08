@@ -21,9 +21,11 @@ class AutocompleteCategory(str, Enum):
     term = "term"
 
 
-@router.get("/api/search/entity/autocomplete/{term}", tags=["search"])
+@router.get("/api/search/entity/autocomplete/{term}",
+            tags=["search"],
+            description="Returns a list of matching concepts or entities over annotation classes and bio-entities.")
 async def autocomplete_term(
-    term: str = Path(..., description="e.g., `biological`"),
+    term: str = Path(..., description="e.g., biological"),
     start: int = Query(0, description="The starting index of the search results."),
     rows: int = Query(100, description="The maximum number of rows to return in the search results."),
     category: AutocompleteCategory = Query(

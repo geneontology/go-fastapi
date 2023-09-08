@@ -1,6 +1,6 @@
 ---
 ###############
-# Point stage_dir to a different locatiom. By default it will reside in the current directory.
+# Point stage_dir to a different locatiom. By default, it will reside in the current directory.
 ##############
 stage_dir: "{{ lookup('env', 'PWD') }}/stage_dir"
 

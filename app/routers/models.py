@@ -193,6 +193,7 @@ async def get_publication_details_by_model_id(
     )
 ):
     """Returns pubmed details based on a GO-CAM model ID."""
+
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -232,7 +233,7 @@ async def get_term_details_by_model_id(
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
     )
 ):
-    """Returns term details based on a GO-CAM model ID."""
+    """Returns model details based on a GO-CAM model ID."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
