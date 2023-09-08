@@ -106,8 +106,8 @@ async def get_subgraph_by_term_id(
             tags=["ontology"],
             description="Returns the ancestor ontology terms shared by two ontology terms. ")
 async def get_ancestors_shared_by_two_terms(
-    subject: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0006259'"),
-    object: str = Path(..., description="'CURIE identifier of a GO term, e.g. GO:0046483'"),
+    subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259"),
+    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483"),
 ):
     """
     Returns the ancestor ontology terms shared by two ontology terms.
@@ -161,7 +161,7 @@ async def get_go_term_detail_by_go_id(id: str = Path(..., description="A GO-Term
 @router.get("/api/go/{id}/hierarchy",
             tags=["ontology"],
             description="Returns parent and children relationships for a given GO ID, e.g. GO:0005885")
-async def get_go_hierarchy_go_id(id: str = Path(..., description="A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)")):
+async def get_go_hierarchy_go_id(id: str = Path(..., description="A GO-Term ID, e.g. GO:0097136")):
     """
     Returns parent and children relationships for a given GO ID.
 
