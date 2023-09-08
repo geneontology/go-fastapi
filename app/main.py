@@ -74,13 +74,13 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         # Log request headers
         print(f"Headers: {dict(request.headers)}")
 
-        # If you need the request body, handle with care:
-        body = await request.body()
-        print(f"Body: {body.decode()}")
-
-        # Since the body is read and can't be read again,
-        # you need to make it available for the actual route again
-        request._body = body
+        # # If you need the request body, handle with care:
+        # body = await request.body()
+        # print(f"Body: {body.decode()}")
+        #
+        # # Since the body is read and can't be read again,
+        # # you need to make it available for the actual route again
+        # request._body = body
 
         response = await call_next(request)
         return response

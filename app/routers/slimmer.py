@@ -37,7 +37,8 @@ async def slimmer_function(
                                example="ZFIN:ZDB-GENE-980526-388, MGI:3588192"),
     slim: List[str] = Query(
         ...,
-        description="example: GO:0008150, GO:0003674, GO:0005575",
+        description="a set of GO term ids to use as the slim, example: GO:0008150, GO:0003674, GO:0005575",
+        example="GO:0008150, GO:0003674, GO:0005575",
     ),
     exclude_automatic_assertions: bool = False,
     rows: int = Query(default=-1, description="Number of rows to return, -1 for all"),
