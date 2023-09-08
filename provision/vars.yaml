@@ -1,11 +1,11 @@
 ---
 ###############
-# Point stage_dir to a different locatiom. By default it will reside in the current directory.
+# Point stage_dir to a different locatiom. By default, it will reside in the current directory.
 ##############
 stage_dir: "{{ lookup('env', 'PWD') }}/stage_dir"
 
-solr_url: http://golr-aux.geneontology.io/solr/
-sparql_url: http://rdf.geneontology.org/sparql
+solr_url: https://golr-aux.geneontology.io/solr/
+sparql_url: https://rdf.geneontology.org/sparql
 fastapi_host: REPLACE_ME
 fastapi_host_alias: '{{ fastapi_host }}'
 
