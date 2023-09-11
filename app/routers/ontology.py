@@ -2,7 +2,7 @@
 import json
 import logging
 from enum import Enum
-from pprint import pprint
+
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -13,7 +13,6 @@ from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform, transform_array
-
 
 log = logging.getLogger(__name__)
 
@@ -30,16 +29,16 @@ class GraphType(str, Enum):
 
 @router.get("/api/ontology/term/{id}", tags=["ontology"])
 async def get_term_metadata_by_id(
-    id: str = Path(...,
-                   description="The ID of the term to extract the metadata from, e.g. GO:0003677",
-                   example="GO:0003677"),
+    id: str = Path(
+        ..., description="The ID of the term to extract the metadata from, e.g. GO:0003677", example="GO:0003677"
+    ),
 ):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
-    transformed_result =  transform(
+    transformed_result = transform(
         results[0],
         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
     )
@@ -47,11 +46,13 @@ async def get_term_metadata_by_id(
     converter = Converter.from_prefix_map(cmaps, strict=False)
     transformed_result["goid"] = converter.compress(transformed_result["goid"])
     return transformed_result
+
+
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
 async def get_term_graph_by_id(
-    id: str = Path(...,
-                   description="The ID of the term to extract the graph from,  e.g. GO:0003677",
-                   example="GO:0003677"),
+    id: str = Path(
+        ..., description="The ID of the term to extract the graph from,  e.g. GO:0003677", example="GO:0003677"
+    ),
     graph_type: GraphType = Query(GraphType.topology_graph),
 ):
     """Returns graph of an ontology term, e.g. GO:0003677."""
@@ -68,12 +69,12 @@ async def get_term_graph_by_id(
 @router.get(
     "/api/ontology/term/{id}/subgraph",
     tags=["ontology"],
-    description="Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships is_a and part_of."
+    description="Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships is_a and part_of.",
 )
 async def get_subgraph_by_term_id(
-    id: str = Path(...,
-                   description="The ID of the term to extract the subgraph from,  e.g. GO:0003677",
-                   example="GO:0003677"),
+    id: str = Path(
+        ..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677", example="GO:0003677"
+    ),
     start: int = Query(0, description="The start index of the results to return"),
     rows: int = Query(100, description="The number of results to return"),
 ):
@@ -122,12 +123,8 @@ async def get_subgraph_by_term_id(
     description="Returns the ancestor ontology terms shared by two ontology terms. ",
 )
 async def get_ancestors_shared_by_two_terms(
-    subject: str = Path(...,
-                        description="Identifier of a GO term, e.g. GO:0006259",
-                        example="GO:0006259"),
-    object: str = Path(...,
-                       description="Identifier of a GO term, e.g. GO:0046483",
-                       example="GO:0046483"),
+    subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259", example="GO:0006259"),
+    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483", example="GO:0046483"),
 ):
     """
     Returns the ancestor ontology terms shared by two ontology terms.
@@ -161,10 +158,9 @@ async def get_ancestors_shared_by_two_terms(
     tags=["ontology"],
     description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150",
 )
-async def get_go_term_detail_by_go_id(id: str = Path(...,
-                                                     description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)",
-                                                     example="GO:0008150"
-                                                     )):
+async def get_go_term_detail_by_go_id(
+    id: str = Path(..., description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)", example="GO:0008150")
+):
     """
     Returns models for a given GO term ID.
 
@@ -187,9 +183,9 @@ async def get_go_term_detail_by_go_id(id: str = Path(...,
     tags=["ontology"],
     description="Returns parent and children relationships for a given GO ID, e.g. GO:0005885",
 )
-async def get_go_hierarchy_go_id(id: str = Path(...,
-                                                description="A GO-Term ID, e.g. GO:0097136",
-                                                example="GO:0008150")):
+async def get_go_hierarchy_go_id(
+    id: str = Path(..., description="A GO-Term ID, e.g. GO:0097136", example="GO:0008150")
+):
     """
     Returns parent and children relationships for a given GO ID.
 
@@ -243,9 +239,9 @@ async def get_go_hierarchy_go_id(id: str = Path(...,
     tags=["ontology"],
     description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150",
 )
-async def get_gocam_models_by_go_id(id: str = Path(...,
-                                                   description="A GO-Term ID(e.g. GO:0097136 ...)",
-                                                   example="GO:0097136")):
+async def get_gocam_models_by_go_id(
+    id: str = Path(..., description="A GO-Term ID(e.g. GO:0097136 ...)", example="GO:0097136")
+):
     """
     Returns GO-CAM model identifiers for a given GO term ID.
 
