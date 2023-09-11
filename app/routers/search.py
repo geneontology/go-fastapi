@@ -4,7 +4,7 @@ from enum import Enum
 
 from fastapi import APIRouter, Path, Query
 
-from app.utils.golr_utils import run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ async def autocomplete_term(
         category = ESOLRDoc.ANNOTATION
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
-    data = run_solr_text_on(ESOLR.GOLR, category, term + "*", query_fields, fields, optionals)
+    data = gu_run_solr_text_on(ESOLR.GOLR, category, term + "*", query_fields, fields, optionals, True)
     docs = []
 
     for item in data:

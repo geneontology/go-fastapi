@@ -9,7 +9,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
-from app.utils.golr_utils import run_solr_on, run_solr_text_on
+from app.utils.golr_utils import run_solr_on, gu_run_solr_text_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform, transform_array
@@ -83,7 +83,8 @@ async def get_subgraph_by_term_id(
     fields = "id,annotation_class_label,isa_partof_closure,isa_partof_closure_label"
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
 
-    descendent_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals)
+    descendent_data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals,
+                                       False)
 
     descendents = []
     for child in descendent_data:
@@ -95,7 +96,8 @@ async def get_subgraph_by_term_id(
 
     golr_field_to_search = "id"
     where_statement = "*:*&fq=" + golr_field_to_search + ":" + '"' + id + '"'
-    ancestor_data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals)
+    ancestor_data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals,
+                                     False)
     ancestors = []
     for parent in ancestor_data[0]["isa_partof_closure"]:
         ancestors.append({"id": parent})

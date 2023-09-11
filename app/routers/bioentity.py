@@ -7,7 +7,7 @@ from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 
-from app.utils.golr_utils import run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -89,7 +89,7 @@ async def get_bioentity_by_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
-    bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
+    bioentity = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals, False)
     return bioentity
 
 
@@ -157,7 +157,7 @@ async def get_annotations_by_goterm_id(
         evidence += ")"
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
 
     return data
 
@@ -322,7 +322,7 @@ async def get_taxon_by_goterm_id(
         taxon_restrictions += ")"
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
 
     return data
 

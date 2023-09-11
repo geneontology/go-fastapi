@@ -9,7 +9,7 @@ from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
-from app.utils.golr_utils import run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()
@@ -83,7 +83,7 @@ def get_ontology_subsets_by_id(id: str):
         fq = '&fq=annotation_class:("' + goslim_agr_ids + '")'
 
     fq = fq + "&rows=1000"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
 
     tr = {}
     for term in data:
@@ -99,7 +99,7 @@ def get_ontology_subsets_by_id(id: str):
         cats.append(category)
 
     fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq)
+    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
 
     for category in tr:
         for temp in data:
