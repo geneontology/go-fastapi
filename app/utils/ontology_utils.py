@@ -83,7 +83,7 @@ def get_ontology_subsets_by_id(id: str):
         fq = '&fq=annotation_class:("' + goslim_agr_ids + '")'
 
     fq = fq + "&rows=1000"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
 
     tr = {}
     for term in data:
@@ -99,7 +99,7 @@ def get_ontology_subsets_by_id(id: str):
         cats.append(category)
 
     fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
 
     for category in tr:
         for temp in data:
