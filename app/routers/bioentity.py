@@ -48,7 +48,7 @@ router = APIRouter()
 
 @router.get("/api/bioentity/{id}", tags=["bioentity"], description="Get bio-entities (genes) by their identifiers.")
 async def get_bioentity_by_id(
-    id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-1)"),
+    id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-44)"),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
@@ -68,8 +68,8 @@ async def get_bioentity_by_id(
     :raises HTTPException: If the bioentity with the provided identifier is not found in the database.
 
     :note:
-        - For example, to get a gene with the identifier 'ZFIN:ZDB-GENE-990415-1', the URL should be:
-          '/api/bioentity/ZFIN:ZDB-GENE-990415-1'.
+        - For example, to get a gene with the identifier 'ZFIN:ZDB-GENE-990415-44', the URL should be:
+          '/api/bioentity/ZFIN:ZDB-GENE-990415-44'.
         - The 'start' and 'rows' parameters can be used for pagination of results.
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
