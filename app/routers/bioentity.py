@@ -48,7 +48,9 @@ router = APIRouter()
 
 @router.get("/api/bioentity/{id}", tags=["bioentity"], description="Get bio-entities (genes) by their identifiers.")
 async def get_bioentity_by_id(
-    id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-44)"),
+    id: str = Path(...,
+                   description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-44)",
+                   example="ZFIN:ZDB-GENE-990415-44"),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
@@ -99,7 +101,9 @@ async def get_bioentity_by_id(
     description="Get gene or gene product information via a GO term id, e.g. GO:0044598.",
 )
 async def get_annotations_by_goterm_id(
-    id: str = Path(..., description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)"),
+    id: str = Path(...,
+                   description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)",
+                   example="GO:0044598"),
     evidence: List[str] = Query(None),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
@@ -168,10 +172,13 @@ async def get_annotations_by_goterm_id(
     description="Returns genes annotated to the provided GO Term. e.g. GO:0044598",
 )
 async def get_genes_by_goterm_id(
-    id: str = Path(..., description="The CURIE of the GO term to be used for gene retrieval. (e.g. GO:0044598)"),
+    id: str = Path(...,
+                   description="The CURIE of the GO term to be used for gene retrieval. (e.g. GO:0044598)",
+                   example="GO:0044598"),
     taxon: List[str] = Query(
         default=None,
         description="One or more taxon CURIE to filter associations by subject taxon",
+        example=["NCBITaxon:7955", "NCBITaxon:9606"]
     ),
     relationship_type: RelationshipType = Query(
         default=RelationshipType.INVOLVED_IN,
@@ -267,7 +274,9 @@ async def get_genes_by_goterm_id(
     description="Returns taxon information for genes annotated to the provided GO term, e.g. GO:0044598",
 )
 async def get_taxon_by_goterm_id(
-    id: str = Path(..., description="The CURIE of the GO term to be used for taxon retrieval. (e.g. GO:0044598)"),
+    id: str = Path(...,
+                   description="The CURIE of the GO term to be used for taxon retrieval. (e.g. GO:0044598)",
+                   example="GO:0044598"),
     evidence: List[str] = Query(
         default=None,
         description="Object id, e.g. ECO:0000501 (for IEA; "
@@ -337,6 +346,7 @@ async def get_annotations_by_gene_id(
         ...,
         description="The CURIE identifier of the gene for which GO term associations are retrieved."
         "(e.g., ZFIN:ZDB-GENE-050417-357)",
+        example="ZFIN:ZDB-GENE-050417-357",
     ),
     slim: List[str] = Query(
         default=None,

@@ -35,13 +35,9 @@ def run_solr_on(solr_instance, category, id, fields):
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
-def gu_run_solr_text_on(solr_instance,
-                     category: str,
-                     q: str,
-                     qf: str,
-                     fields: str,
-                     optionals: str,
-                     highlight: bool = False):
+def gu_run_solr_text_on(
+    solr_instance, category: str, q: str, qf: str, fields: str, optionals: str, highlight: bool = False
+):
     """
     Return the result of a solr query on the given solrInstance, for a certain document_category and id.
 
