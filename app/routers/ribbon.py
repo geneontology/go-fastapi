@@ -14,7 +14,10 @@ from app.utils.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
 
-log = logging.getLogger(__name__)
+logging.basicConfig(filename='combined_access_error.log',
+                    level=logging.INFO,
+                    format='%(asctime)s - %(message)s')
+logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()
 router = APIRouter()
@@ -136,7 +139,7 @@ async def get_ribbon_results(
         else:
             slimmer_subjects.append(s)
 
-    log.info("SLIMMER SUBS: ", slimmer_subjects)
+    logger.info("SLIMMER SUBS: ", slimmer_subjects)
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject

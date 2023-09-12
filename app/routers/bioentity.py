@@ -1,5 +1,4 @@
 """bioentity router."""
-import logging
 from enum import Enum
 from typing import List
 
@@ -12,7 +11,6 @@ from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
 
-log = logging.getLogger(__name__)
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"

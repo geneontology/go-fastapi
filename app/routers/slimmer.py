@@ -18,7 +18,10 @@ USER_AGENT = get_user_agent()
 router = APIRouter()
 
 
-log = logging.getLogger(__name__)
+logging.basicConfig(filename='combined_access_error.log',
+                    level=logging.INFO,
+                    format='%(asctime)s - %(message)s')
+logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
@@ -106,7 +109,7 @@ def gene_to_uniprot_from_mygene(id: str):
         id = id.replace("NCBIGene", "entrezgene")
     try:
         results = mg.query(id, fields="uniprot")
-        log.info("results from mygene for %s", id, ": ", results["hits"])
+        logger.info("results from mygene for %s", id, ": ", results["hits"])
         if results["hits"]:
             for hit in results["hits"]:
                 if "uniprot" not in hit:

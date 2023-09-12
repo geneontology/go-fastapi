@@ -1,9 +1,7 @@
 """golr utils."""
-import logging
 
 import requests
 
-logger = logging.getLogger(__name__)
 
 
 # Respect the method name for run_sparql_on with enums

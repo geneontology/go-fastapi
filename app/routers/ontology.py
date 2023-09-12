@@ -1,8 +1,7 @@
 """Ontology-related endpoints."""
 import json
-import logging
 from enum import Enum
-
+import logging
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -14,7 +13,8 @@ from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform, transform_array
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger()
+
 
 USER_AGENT = get_user_agent()
 router = APIRouter()
@@ -57,7 +57,6 @@ async def get_term_graph_by_id(
 ):
     """Returns graph of an ontology term, e.g. GO:0003677."""
     graph_type = graph_type + "_json"  # GOLR field names
-    log.info(graph_type)
 
     data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are made into strings in the json
@@ -137,8 +136,8 @@ async def get_ancestors_shared_by_two_terms(
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
     objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
 
-    log.info("SUBJECT: ", subres)
-    log.info("OBJECT: ", objres)
+    logger.info("SUBJECT: ", subres)
+    logger.info("OBJECT: ", objres)
 
     shared = []
     shared_labels = []
