@@ -30,6 +30,8 @@ def batch_fetch_labels(ids):
     """
     m = {}
     for id in ids:
+        if id.startswith("MGI:"):
+            id = "MGI:" + id
         label = goont_fetch_label(id)
         if label is not None:
             m[id] = label
@@ -51,7 +53,6 @@ def goont_fetch_label(id):
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
-    logger.info(query.query_str())
     bindings = si._sparql_query(query.query_str())
     rows = [r["label"]["value"] for r in bindings]
     return rows[0]

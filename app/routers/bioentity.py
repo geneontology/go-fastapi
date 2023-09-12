@@ -224,15 +224,16 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    association_return = {}
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
-        return search_associations(
+        association_return = search_associations(
             subject_category="gene",
+            use_compact_associations=True,
             object_category="function",
             fq={
                 "regulates_closure": id,
             },
             subject_taxon=taxon,
-            invert_subject_object=True,
             user_agent=USER_AGENT,
             slim=slim,
             taxon=taxon,
@@ -244,7 +245,7 @@ async def get_genes_by_goterm_id(
     elif relationship_type == INVOLVED_IN_REGULATION_OF:
         # Temporary fix until https://github.com/geneontology/amigo/pull/469
         # and https://github.com/owlcollab/owltools/issues/241 are resolved
-        return search_associations(
+        association_return = search_associations(
             subject_category="gene",
             object_category="function",
             fq={
@@ -262,7 +263,7 @@ async def get_genes_by_goterm_id(
             rows=rows,
         )
     elif relationship_type == INVOLVED_IN:
-        return search_associations(
+        association_return = search_associations(
             subject_category="gene",
             object_category="function",
             subject=id,
@@ -272,6 +273,7 @@ async def get_genes_by_goterm_id(
             user_agent=USER_AGENT,
             url=ESOLR.GOLR,
         )
+    return {"associations": association_return.get("associations")}
 
 
 @router.get(
@@ -433,4 +435,4 @@ async def get_annotations_by_gene_id(
             for asc in pr_assocs["associations"]:
                 log.info(asc)
                 assocs["associations"].append(asc)
-    return assocs
+    return {"associations": assocs.get("associations")}
