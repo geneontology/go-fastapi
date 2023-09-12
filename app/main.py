@@ -16,15 +16,6 @@ from app.routers import (
     slimmer,
     users_and_groups,
 )
-import logging
-from fastapi.logger import logger as fastapi_logger
-
-fastapi_logger.setLevel(logging.INFO)
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 app = FastAPI(
     title="GO API",

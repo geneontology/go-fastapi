@@ -49,6 +49,120 @@ class TestOntologyAPI(unittest.TestCase):
 
     # Add other test cases following a similar pattern
 
+    def test_human_ribbon(self):
+        data = {"subset": "goslim_agr", "subject": ["HGNC:10848"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        for subject in response.json().get("subjects"):
+            self.assertTrue(subject.get("label") == "SHH")
+            self.assertTrue(subject.get("taxon_label") == "Homo sapiens")
+            self.assertTrue(subject.get("groups").get("GO:0003674"))
+            self.assertTrue(
+                    subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
+                    >= 165
+            )
+            self.assertTrue (
+                    subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations")
+                    >= 38
+            )
+        self.assertTrue(response.status_code == 200)
+
+    def test_sars_cov2_ribbon(self):
+        data = {"subset": "goslim_agr", "subject": ["RefSeq:P0DTD3"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        self.assertTrue(len(response.json().get("subjects")) == 0)
+
+    def test_sgd_ribbon_term_not_available(self):
+        data = {"subset": "goslim_agr", "subject": ["SGD:S000002812"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+
+        for subject in response.json().get("subjects"):
+            self.assertTrue(subject.get("groups").get("GO:0008219") is None)
+
+    def test_fly_ribbon(self):
+        data = {"subset": "goslim_agr", "subject": ["FB:FBgn0051155"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        for subject in response.json().get("subjects"):
+            self.assertTrue(subject.get("label") == "Polr2G")
+            self.assertTrue( subject.get("taxon_label") == "Drosophila melanogaster")
+            self.assertTrue(subject.get("groups").get("GO:0003674"))
+            self.assertTrue (
+                    subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
+                    >= 4
+            )
+            self.assertTrue (
+                subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
+                >= 5
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
+                >= 5
+            )
+        self.assertTrue(response.status_code == 200)
+
+    def test_mgi_ribbon(self):
+        data = {"subset": "goslim_agr", "subject": ["MGI:1917258"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        for subject in response.json().get("subjects"):
+            self.assertTrue(subject.get("label") == "Ace2")
+            self.assertTrue(subject.get("taxon_label") == "Mus musculus")
+            self.assertTrue(subject.get("groups").get("GO:0003674"))
+            self.assertTrue(
+                subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
+                >= 14
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
+                >= 16
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
+                >= 14
+            )
+        self.assertTrue(response.status_code == 200)
+
+    def test_wb_ribbon(self):
+        data = {"subset": "goslim_agr", "subject": ["WB:WBGene00000898"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        for subject in response.json().get("subjects"):
+            self.assertTrue(subject.get("label") == "daf-2")
+            self.assertTrue(subject.get("taxon_label") == "Caenorhabditis elegans")
+            self.assertTrue(subject.get("groups").get("GO:0003674"))
+            self.assertTrue(
+                subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
+                >= 19
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
+                >= 72
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
+                >= 10
+            )
+        assert response.status_code == 200
+
+    def test_rgd_ribbon(self):
+        data = {"subset": "goslim_agr", "subject": ["RGD:70971"]}
+        response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        for subject in response.json().get("subjects"):
+            self.assertTrue(subject.get("label") == "Hamp")
+            self.assertTrue(subject.get("taxon_label") == "Rattus norvegicus")
+            self.assertTrue(subject.get("groups").get("GO:0003674"))
+            self.assertTrue(
+                subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
+                >= 5
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
+                >= 52
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
+                >= 9
+            )
+        self.assertTrue(response.status_code == 200)
+
+
     def test_term_subsets_endpoint(self):
         """Test the endpoint to get the subsets of a Gene Ontology term by its identifier."""
         for id in go_ids:

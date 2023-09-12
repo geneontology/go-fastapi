@@ -2,9 +2,14 @@
 import logging
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.logger import logger as fastapi_logger
 
+fastapi_logger.setLevel(logging.INFO)
+logging.basicConfig(filename='combined_access_error.log',
+                    level=logging.INFO,
+                    format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
-logger.info("Starting FastAPI application...")
+logger.setLevel(logging.INFO)
 
 class LoggingMiddleware(BaseHTTPMiddleware):
     """Middleware to log requests."""

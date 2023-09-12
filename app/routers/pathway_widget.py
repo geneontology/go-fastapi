@@ -10,9 +10,6 @@ from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()

@@ -6,9 +6,6 @@ from fastapi import APIRouter, Path, Query
 
 from app.utils.prefix_utils import get_prefixes
 
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
 router = APIRouter()

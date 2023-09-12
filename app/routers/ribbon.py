@@ -14,9 +14,6 @@ from app.utils.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
 
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()

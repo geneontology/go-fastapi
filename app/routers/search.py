@@ -7,9 +7,6 @@ from fastapi import APIRouter, Path, Query
 from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()

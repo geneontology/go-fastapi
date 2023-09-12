@@ -16,11 +16,6 @@ ANATOMY_CATEGORY = "anatomy"
 USER_AGENT = get_user_agent()
 
 router = APIRouter()
-
-
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
 
