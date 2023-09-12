@@ -7,7 +7,7 @@ from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 
-from app.utils.golr_utils import run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -48,7 +48,11 @@ router = APIRouter()
 
 @router.get("/api/bioentity/{id}", tags=["bioentity"], description="Get bio-entities (genes) by their identifiers.")
 async def get_bioentity_by_id(
-    id: str = Path(..., description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-1)"),
+    id: str = Path(
+        ...,
+        description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-44)",
+        example="ZFIN:ZDB-GENE-990415-44",
+    ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
 ):
@@ -68,8 +72,8 @@ async def get_bioentity_by_id(
     :raises HTTPException: If the bioentity with the provided identifier is not found in the database.
 
     :note:
-        - For example, to get a gene with the identifier 'ZFIN:ZDB-GENE-990415-1', the URL should be:
-          '/api/bioentity/ZFIN:ZDB-GENE-990415-1'.
+        - For example, to get a gene with the identifier 'ZFIN:ZDB-GENE-990415-44', the URL should be:
+          '/api/bioentity/ZFIN:ZDB-GENE-990415-44'.
         - The 'start' and 'rows' parameters can be used for pagination of results.
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
@@ -89,7 +93,7 @@ async def get_bioentity_by_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
-    bioentity = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals)
+    bioentity = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals, False)
     return bioentity
 
 
@@ -99,7 +103,11 @@ async def get_bioentity_by_id(
     description="Get gene or gene product information via a GO term id, e.g. GO:0044598.",
 )
 async def get_annotations_by_goterm_id(
-    id: str = Path(..., description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)"),
+    id: str = Path(
+        ...,
+        description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)",
+        example="GO:0044598",
+    ),
     evidence: List[str] = Query(None),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
     rows: int = Query(100, description="The number of results per page. Default is 100."),
@@ -157,7 +165,7 @@ async def get_annotations_by_goterm_id(
         evidence += ")"
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
 
     return data
 
@@ -168,10 +176,15 @@ async def get_annotations_by_goterm_id(
     description="Returns genes annotated to the provided GO Term. e.g. GO:0044598",
 )
 async def get_genes_by_goterm_id(
-    id: str = Path(..., description="The CURIE of the GO term to be used for gene retrieval. (e.g. GO:0044598)"),
+    id: str = Path(
+        ...,
+        description="The CURIE of the GO term to be used for gene retrieval. (e.g. GO:0044598)",
+        example="GO:0044598",
+    ),
     taxon: List[str] = Query(
         default=None,
         description="One or more taxon CURIE to filter associations by subject taxon",
+        example=["NCBITaxon:7955", "NCBITaxon:9606"],
     ),
     relationship_type: RelationshipType = Query(
         default=RelationshipType.INVOLVED_IN,
@@ -211,15 +224,16 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    association_return = {}
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
-        return search_associations(
+        association_return = search_associations(
             subject_category="gene",
+            use_compact_associations=True,
             object_category="function",
             fq={
                 "regulates_closure": id,
             },
             subject_taxon=taxon,
-            invert_subject_object=True,
             user_agent=USER_AGENT,
             slim=slim,
             taxon=taxon,
@@ -231,7 +245,7 @@ async def get_genes_by_goterm_id(
     elif relationship_type == INVOLVED_IN_REGULATION_OF:
         # Temporary fix until https://github.com/geneontology/amigo/pull/469
         # and https://github.com/owlcollab/owltools/issues/241 are resolved
-        return search_associations(
+        association_return = search_associations(
             subject_category="gene",
             object_category="function",
             fq={
@@ -249,7 +263,7 @@ async def get_genes_by_goterm_id(
             rows=rows,
         )
     elif relationship_type == INVOLVED_IN:
-        return search_associations(
+        association_return = search_associations(
             subject_category="gene",
             object_category="function",
             subject=id,
@@ -259,6 +273,7 @@ async def get_genes_by_goterm_id(
             user_agent=USER_AGENT,
             url=ESOLR.GOLR,
         )
+    return {"associations": association_return.get("associations")}
 
 
 @router.get(
@@ -267,7 +282,11 @@ async def get_genes_by_goterm_id(
     description="Returns taxon information for genes annotated to the provided GO term, e.g. GO:0044598",
 )
 async def get_taxon_by_goterm_id(
-    id: str = Path(..., description="The CURIE of the GO term to be used for taxon retrieval. (e.g. GO:0044598)"),
+    id: str = Path(
+        ...,
+        description="The CURIE of the GO term to be used for taxon retrieval. (e.g. GO:0044598)",
+        example="GO:0044598",
+    ),
     evidence: List[str] = Query(
         default=None,
         description="Object id, e.g. ECO:0000501 (for IEA; "
@@ -322,7 +341,7 @@ async def get_taxon_by_goterm_id(
         taxon_restrictions += ")"
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
 
     return data
 
@@ -337,6 +356,7 @@ async def get_annotations_by_gene_id(
         ...,
         description="The CURIE identifier of the gene for which GO term associations are retrieved."
         "(e.g., ZFIN:ZDB-GENE-050417-357)",
+        example="ZFIN:ZDB-GENE-050417-357",
     ),
     slim: List[str] = Query(
         default=None,
@@ -415,4 +435,4 @@ async def get_annotations_by_gene_id(
             for asc in pr_assocs["associations"]:
                 log.info(asc)
                 assocs["associations"].append(asc)
-    return assocs
+    return {"associations": assocs.get("associations")}

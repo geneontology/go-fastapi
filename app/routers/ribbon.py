@@ -8,7 +8,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
-from app.utils.golr_utils import run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
@@ -24,7 +24,9 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 @router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
 async def get_subsets_by_term(
-    id: str = Path(..., description="The ID of the term to extract the subsets from, e.g. GO:0003677")
+    id: str = Path(
+        ..., description="The ID of the term to extract the subsets from, e.g. GO:0003677", example="GO:0003677"
+    )
 ):
     """Returns subsets (slims) associated to an ontology term."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
@@ -32,12 +34,13 @@ async def get_subsets_by_term(
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
     results = transform_array(results, [])
-    results = (results, "subset", "OBO:go#", "")
     return results
 
 
 @router.get("/api/ontology/subset/{id}", tags=["ontology"])
-async def get_subset_by_id(id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)")):
+async def get_subset_by_id(
+    id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr")
+):
     """Returns a subset (slim) by its id which is usually a name."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
@@ -166,7 +169,7 @@ async def get_ribbon_results(
             fq += "&fq=!evidence_type:IBA"
         if exclude_PB:
             fq += '&fq=!annotation_class:"GO:0005515"'
-        data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq)
+        data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
         # compute number of terms and annotations
         for annot in data:
             aspect = ontology_utils.aspect_map[annot["aspect"]]
@@ -275,7 +278,7 @@ async def get_ribbon_results(
     qf = ""
     fq = '&fq=bioentity:("' + '" or "'.join(mod_ids) + '")&rows=100000'
     fields = "bioentity,bioentity_label,taxon,taxon_label"
-    data = run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, q, qf, fields, fq)
+    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, q, qf, fields, fq, False)
 
     for entity in subjects:
         for entity_detail in data:
