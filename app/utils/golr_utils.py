@@ -68,7 +68,7 @@ def gu_run_solr_text_on(
         + "&wt=json&indent=on"
         + optionals
     )
-
+    print(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 
     try:

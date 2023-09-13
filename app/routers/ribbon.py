@@ -68,10 +68,12 @@ async def get_ribbon_results(
     ),
 ):
     """Fetch the summary of annotations for a given gene or set of genes."""
-    for s in subject:
-        if "MGI:MGI" in s:
-            subject.remove(s)
-            subject.append(s.replace("MGI:MGI", "MGI:"))
+    for sub in subject:
+        if sub.startswith("MGI:"):
+            subject.remove(sub)
+            sub = "MGI:" + sub
+            subject.append(sub)
+
 
     # Step 1: create the categories
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
@@ -169,6 +171,7 @@ async def get_ribbon_results(
         if exclude_PB:
             fq += '&fq=!annotation_class:"GO:0005515"'
         data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
+
         # compute number of terms and annotations
         for annot in data:
             aspect = ontology_utils.aspect_map[annot["aspect"]]
@@ -281,12 +284,18 @@ async def get_ribbon_results(
 
     for entity in subjects:
         for entity_detail in data:
-            subject_id = entity_detail["bioentity"].replace("MGI:MGI:", "MGI:")
-
+            subject_id = entity_detail["bioentity"]
             if entity["id"] == subject_id:
                 entity["label"] = entity_detail["bioentity_label"]
                 entity["taxon_id"] = entity_detail["taxon"]
                 entity["taxon_label"] = entity_detail["taxon_label"]
+        if entity.get("id").startswith("MGI:MGI:"):
+            entity_new = entity
+            subjects.remove(entity)
+            old_id = entity_new.get("id")
+            new_id = old_id.replace("MGI:MGI:", "MGI:")
+            entity_new["id"] = new_id
+            subjects.append(entity_new)
 
     # map the entity back to their original IDs
     for entity in subjects:

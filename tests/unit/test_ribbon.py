@@ -38,6 +38,7 @@ class TestOntologyAPI(unittest.TestCase):
         """
         data = {"subset": "goslim_agr", "subject": ["ZFIN:ZDB-GENE-980526-166"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertEqual(subject.get("label"), "shha")
             self.assertEqual(subject.get("taxon_label"), "Danio rerio")
@@ -54,6 +55,7 @@ class TestOntologyAPI(unittest.TestCase):
         """Test the ontology ribbon for human."""
         data = {"subset": "goslim_agr", "subject": ["HGNC:10848"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "SHH")
             self.assertTrue(subject.get("taxon_label") == "Homo sapiens")
@@ -73,6 +75,7 @@ class TestOntologyAPI(unittest.TestCase):
         data = {"subset": "goslim_agr", "subject": ["SGD:S000002812"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
         pprint(response.json())
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("groups").get("GO:0008219") is None)
             self.assertTrue(subject.get("groups").get("GO:0032991").get("ALL").get("nb_annotations") >= 5)
@@ -98,6 +101,8 @@ class TestOntologyAPI(unittest.TestCase):
         """Test fly ribbon returns."""
         data = {"subset": "goslim_agr", "subject": ["FB:FBgn0051155"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        pprint(response.json())
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Polr2G")
             self.assertTrue(subject.get("taxon_label") == "Drosophila melanogaster")
@@ -112,6 +117,7 @@ class TestOntologyAPI(unittest.TestCase):
         data = {"subset": "goslim_agr", "subject": ["MGI:1917258"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
         pprint(response.json())
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Ace2")
             self.assertTrue(subject.get("taxon_label") == "Mus musculus")
@@ -125,6 +131,7 @@ class TestOntologyAPI(unittest.TestCase):
         """Test WB ribbon annotations."""
         data = {"subset": "goslim_agr", "subject": ["WB:WBGene00000898"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "daf-2")
             self.assertTrue(subject.get("taxon_label") == "Caenorhabditis elegans")
@@ -139,6 +146,7 @@ class TestOntologyAPI(unittest.TestCase):
         data = {"subset": "goslim_agr", "subject": ["RGD:70971"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
         pprint(response.json())
+        self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Hamp")
             self.assertTrue(subject.get("taxon_label") == "Rattus norvegicus")
