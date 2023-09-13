@@ -4,7 +4,8 @@ import logging
 from curies import Converter
 from prefixmaps import load_context
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logger = logging.getLogger()
 
 
 # have to remap prefixes from prefixmaps in order to match the prefixes in Minerva

@@ -10,7 +10,7 @@ from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()
 SPARQL_ENDPOINT = get_sparql_endpoint()
@@ -46,10 +46,7 @@ async def get_gocams_by_geneproduct_id(
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
-    logger.info(
-        "reformatted curie into IRI using identifiers.org from api/gp/{id}/models endpoint",
-        id,
-    )
+    logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id)
     query = (
         """
             PREFIX metago: <http://model.geneontology.org/>

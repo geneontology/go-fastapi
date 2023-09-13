@@ -1,9 +1,6 @@
 """golr utils."""
-import logging
 
 import requests
-
-logger = logging.getLogger(__name__)
 
 
 # Respect the method name for run_sparql_on with enums
@@ -71,7 +68,7 @@ def gu_run_solr_text_on(
         + "&wt=json&indent=on"
         + optionals
     )
-
+    print(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 
     try:

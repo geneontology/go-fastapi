@@ -1,10 +1,14 @@
 """Unit tests for the endpoints in the models module."""
 
+import logging
 import unittest
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logger = logging.getLogger()
 
 test_client = TestClient(app)
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]

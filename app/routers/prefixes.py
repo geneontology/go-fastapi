@@ -6,7 +6,7 @@ from fastapi import APIRouter, Path, Query
 
 from app.utils.prefix_utils import get_prefixes
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 router = APIRouter()
 

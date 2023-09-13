@@ -1,14 +1,10 @@
 """Publication-related endpoints."""
 
-import logging
-
 from fastapi import APIRouter, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
 from app.utils.settings import get_sparql_endpoint, get_user_agent
-
-logger = logging.getLogger(__name__)
 
 USER_AGENT = get_user_agent()
 router = APIRouter()

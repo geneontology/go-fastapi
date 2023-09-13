@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 test_client = TestClient(app)
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logger = logging.getLogger()
 
 gene_ids = [
     "ZFIN:ZDB-GENE-980526-388",

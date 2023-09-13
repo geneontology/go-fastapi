@@ -8,7 +8,7 @@ from oaklib.resource import OntologyResource
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()
 router = APIRouter()

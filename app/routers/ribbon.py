@@ -14,7 +14,7 @@ from app.utils.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()
 router = APIRouter()
@@ -50,7 +50,9 @@ async def get_subset_by_id(
 async def get_ribbon_results(
     subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr"),
     subject: List[str] = Query(
-        None, description="List of Gene ids (e.g. MGI:98214, RGD:620474)", example=["MGI:98214", "RGD:620474"]
+        None,
+        description="List of Gene ids (e.g. MGI:98214, RGD:620474)",
+        example=["ZFIN:ZDB-GENE-990415-44", "RGD:620474"],
     ),
     ecodes: List[str] = Query(
         None,
@@ -61,18 +63,16 @@ async def get_ribbon_results(
     exclude_PB: bool = Query(False, description="If true, excludes direct annotations to protein binding"),
     cross_aspect: bool = Query(
         False,
-        description="If true, can retrieve terms from "
-        "other aspects if using a "
-        "cross-aspect"
-        " relationship such as "
-        "regulates_closure",
+        description="If true, can retrieve terms from other aspects if using a cross-aspect relationship "
+        "such as regulates_closure",
     ),
 ):
     """Fetch the summary of annotations for a given gene or set of genes."""
-    for s in subject:
-        if "MGI:MGI" in s:
-            subject.remove(s)
-            subject.append(s.replace("MGI:MGI", "MGI:"))
+    for sub in subject:
+        if sub.startswith("MGI:"):
+            subject.remove(sub)
+            sub = "MGI:" + sub
+            subject.append(sub)
 
     # Step 1: create the categories
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
@@ -136,7 +136,7 @@ async def get_ribbon_results(
         else:
             slimmer_subjects.append(s)
 
-    log.info("SLIMMER SUBS: ", slimmer_subjects)
+    logger.info("SLIMMER SUBS: %s", slimmer_subjects)
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject
@@ -170,6 +170,7 @@ async def get_ribbon_results(
         if exclude_PB:
             fq += '&fq=!annotation_class:"GO:0005515"'
         data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
+
         # compute number of terms and annotations
         for annot in data:
             aspect = ontology_utils.aspect_map[annot["aspect"]]
@@ -282,12 +283,18 @@ async def get_ribbon_results(
 
     for entity in subjects:
         for entity_detail in data:
-            subject_id = entity_detail["bioentity"].replace("MGI:MGI:", "MGI:")
-
+            subject_id = entity_detail["bioentity"]
             if entity["id"] == subject_id:
                 entity["label"] = entity_detail["bioentity_label"]
                 entity["taxon_id"] = entity_detail["taxon"]
                 entity["taxon_label"] = entity_detail["taxon_label"]
+        if entity.get("id").startswith("MGI:MGI:"):
+            entity_new = entity
+            subjects.remove(entity)
+            old_id = entity_new.get("id")
+            new_id = old_id.replace("MGI:MGI:", "MGI:")
+            entity_new["id"] = new_id
+            subjects.append(entity_new)
 
     # map the entity back to their original IDs
     for entity in subjects:
