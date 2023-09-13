@@ -51,7 +51,8 @@ class TestApp(unittest.TestCase):
         data = {"relation": "shared"}
         response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
         self.assertIn("GO:0008150", response.json().get("shared"))
-        print(response.json())
+        print(response.json().get("shared"))
+        print(response.json().get("shared_labels"))
         self.assertIsNotNone(response.json().get("shared_labels"))
         self.assertEqual(response.status_code, 200)
 

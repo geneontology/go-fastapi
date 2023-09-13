@@ -191,7 +191,11 @@ async def get_ancestors_shared_by_two_terms(
                 shared.append(sub)
                 shared_labels.append(subres["isa_partof_closure_label"][i])
 
-        return {"shared": shared, "shared_labels:": shared_labels}
+        result = {
+            "shared": shared,
+            "shared_labels": shared_labels
+        }
+        return result
 
     else:
         logger.info("got here")
