@@ -1,7 +1,7 @@
 """Model API router."""
 
 from typing import List
-
+import logging
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
@@ -13,6 +13,7 @@ USER_AGENT = get_user_agent()
 SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
+logger = logging.getLogger()
 
 @router.get("/api/models", tags=["models"], deprecated=True)
 async def get_gocam_models(
@@ -52,10 +53,10 @@ async def get_gocam_models(
         PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
 
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames)
+        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
+                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
+                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
+                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
         WHERE
         {
             {
@@ -97,10 +98,10 @@ async def get_gocam_models(
         PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
         
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames)
+        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
+                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
+                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
+                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
         
         WHERE 
         {
@@ -175,10 +176,10 @@ async def get_gocam_models(
         PREFIX immediately_causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002412>
         PREFIX directly_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002413>
         
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames)
+        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
+                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
+                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
+                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
         
         WHERE 
         {
@@ -217,10 +218,10 @@ async def get_gocam_models(
             PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
             PREFIX providedBy: <http://purl.org/pav/providedBy>
 
-            SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid;separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name;separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy;separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel;separator="@|@") AS ?groupnames)
+            SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
+                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
+                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
+                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
             WHERE
             {
                 {
@@ -394,8 +395,8 @@ async def get_geneproducts_by_model_id(
             PREFIX metago: <http://model.geneontology.org/>
             PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
             PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
-            SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier;separator="@|@") as ?gpids)
-                            (GROUP_CONCAT(distinct ?name;separator="@|@") as ?gpnames)
+            SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier; separator="@|@") as ?gpids)
+                            (GROUP_CONCAT(distinct ?name; separator="@|@") as ?gpnames)
             WHERE
             {
                 VALUES ?gocam { %s }
@@ -421,8 +422,8 @@ async def get_geneproducts_by_model_id(
         PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
         PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
 
-        SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier;separator="@|@") as ?gpids)
-			        	(GROUP_CONCAT(distinct ?name;separator="@|@") as ?gpnames)
+        SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier; separator="@|@") as ?gpids)
+			        	(GROUP_CONCAT(distinct ?name; separator="@|@") as ?gpnames)
 
         WHERE 
         {
@@ -531,6 +532,69 @@ async def get_term_details_by_model_id(
         }
     """
         % id
+    )
+    results = si._sparql_query(query)
+    collated_results = []
+    for result in results:
+        collated = {
+            "subject": result["subject"].get("value"),
+            "predicate": result["predicate"].get("value"),
+            "object": result["object"].get("value"),
+        }
+        collated_results.append(collated)
+    return collated_results
+
+
+@router.get("/api/taxon/{taxon}/models", tags=["models"])
+async def get_term_details_by_model_id(
+    taxon: str = Path(
+        ...,
+        description="A taxon identifier (e.g. NCBITaxon:9606, NCBITaxon:10090, NCBITaxon:10116)"
+    )
+):
+    """
+    Returns model details based on a NCBI Taxon ID.
+
+    """
+    ont_r = OntologyResource(url=get_sparql_endpoint())
+    si = SparqlImplementation(ont_r)
+
+    if not taxon.startsWith("NCBITaxon_"):
+        taxon = "NCBITaxon_" + taxon
+
+    if not taxon.startsWith("http://"):
+        taxon = "http://purl.obolibrary.org/obo/" + taxon
+
+    logger.info("using: %s", taxon)
+
+    taxon =  "<" + taxon + ">"
+
+    query = (
+        """
+        PREFIX metago: <http://model.geneontology.org/>
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+        PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
+
+        SELECT distinct ?gocam
+
+        WHERE 
+        {
+            GRAPH ?gocam {
+                ?gocam metago:graphType metago:noctuaCam .
+                ?s enabled_by: ?gpnode .    
+                ?gpnode rdf:type ?identifier .
+                FILTER(?identifier != owl:NamedIndividual) .         
+            }
+
+            ?identifier rdfs:subClassOf ?v0 . 
+            ?identifier rdfs:label ?name .
+            
+            ?v0 owl:onProperty in_taxon: . 
+            ?v0 owl:someValuesFrom %s
+        }
+    """ % taxon
     )
     results = si._sparql_query(query)
     collated_results = []
