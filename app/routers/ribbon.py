@@ -48,24 +48,27 @@ async def get_subset_by_id(
 
 @router.get("/api/ontology/ribbon/", tags=["ontology"])
 async def get_ribbon_results(
-    subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr"),
+    subset: str = Query(None,
+                        description="Name of the subset to map GO terms (e.g. goslim_agr)",
+                        example="goslim_agr"),
     subject: List[str] = Query(
-        None, description="List of Gene ids (e.g. MGI:98214, RGD:620474)", example=["MGI:98214", "RGD:620474"]
+        None,
+        description="List of Gene ids (e.g. MGI:98214, RGD:620474)",
+        example=["ZFIN:ZDB-GENE-990415-44", "RGD:620474"]
     ),
     ecodes: List[str] = Query(
         None,
         description="List of Evidence Codes to include (e.g. EXP, IDA). Has priority over exclude_IBA",
         example=["EXP", "IDA"],
     ),
-    exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
-    exclude_PB: bool = Query(False, description="If true, excludes direct annotations to protein binding"),
+    exclude_IBA: bool = Query(False,
+                              description="If true, excludes IBA annotations"),
+    exclude_PB: bool = Query(False,
+                             description="If true, excludes direct annotations to protein binding"),
     cross_aspect: bool = Query(
         False,
-        description="If true, can retrieve terms from "
-        "other aspects if using a "
-        "cross-aspect"
-        " relationship such as "
-        "regulates_closure",
+        description="If true, can retrieve terms from other aspects if using a cross-aspect relationship "
+                    "such as regulates_closure",
     ),
 ):
     """Fetch the summary of annotations for a given gene or set of genes."""
@@ -136,7 +139,7 @@ async def get_ribbon_results(
         else:
             slimmer_subjects.append(s)
 
-    logger.info("SLIMMER SUBS: ", slimmer_subjects)
+    logger.info("SLIMMER SUBS: %s", slimmer_subjects)
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject

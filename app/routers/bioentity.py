@@ -10,7 +10,7 @@ from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
-
+import logging
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -25,7 +25,7 @@ TYPE_PUBLICATION = "publication"
 categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent()
 
-
+logger = logging.getLogger()
 class RelationshipType(str, Enum):
 
     """
@@ -87,7 +87,7 @@ async def get_bioentity_by_id(
     # query_filters is translated to the qf solr parameter
     # boost fields %5E2 -> ^2, %5E1 -> ^1
     query_filters = "bioentity%5E2"
-    log.info(id)
+    logger.info(id)
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
@@ -406,8 +406,8 @@ async def get_annotations_by_gene_id(
         rows=rows,
         slim=slim,
     )
-    log.info("should be null assocs")
-    log.info(assocs)
+    logger.info("should be null assocs")
+    logger.info(assocs)
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs["associations"]) == 0:
@@ -431,6 +431,6 @@ async def get_annotations_by_gene_id(
                 num_found = num_found + pr_assocs.get("numFound")
             assocs["numFound"] = num_found
             for asc in pr_assocs["associations"]:
-                log.info(asc)
+                logger.info(asc)
                 assocs["associations"].append(asc)
     return {"associations": assocs.get("associations")}
