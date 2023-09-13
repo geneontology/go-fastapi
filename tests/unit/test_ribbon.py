@@ -68,13 +68,31 @@ class TestOntologyAPI(unittest.TestCase):
         response = test_client.get("/api/ontology/ribbon/", params=data)
         self.assertTrue(len(response.json().get("subjects")) == 0)
 
-    def test_sgd_ribbon_term_not_available(self):
+    def test_sgd_ribbon_term(self):
         """Test sgd ribbon with not available annotations."""
         data = {"subset": "goslim_agr", "subject": ["SGD:S000002812"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
         pprint(response.json())
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("groups").get("GO:0008219") is None)
+            self.assertTrue(subject.get("groups").get("GO:0032991").get("ALL").get("nb_annotations") >= 5)
+            self.assertTrue(subject.get("groups").get("GO:0032991").get("ALL").get("nb_classes") >= 2)
+            self.assertTrue(subject.get("groups").get("GO:0032991").get("IDA").get("nb_annotations") >= 3)
+            self.assertTrue(subject.get("groups").get("GO:0032991").get("IEA").get("nb_annotations") >= 1)
+            self.assertTrue(subject.get("groups").get("GO:0032991").get("IBA").get("nb_annotations") >= 1)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("ALL").get("nb_annotations") >= 10)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("ALL").get("nb_classes") >= 7)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("IGI").get("nb_annotations") >= 2)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("IGI").get("nb_classes") >= 2)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("IMP").get("nb_annotations") >= 1)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("IMP").get("nb_classes") >= 1)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("IEA").get("nb_annotations") >= 3)
+            self.assertTrue(subject.get("groups").get("GO:0016070").get("IEA").get("nb_classes") >= 3)
+            self.assertTrue(len(subject.get("groups")) == 14)
+            self.assertTrue(subject.get("nb_classes") >= 19)
+            self.assertTrue(subject.get("nb_annotations") >= 37)
+        self.assertTrue(len(response.json().get("subjects")) == 1)
+
 
     def test_fly_ribbon(self):
         """Test fly ribbon returns."""
@@ -93,6 +111,7 @@ class TestOntologyAPI(unittest.TestCase):
         """Test MGI ribbon annotation returns."""
         data = {"subset": "goslim_agr", "subject": ["MGI:1917258"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        pprint(response.json())
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Ace2")
             self.assertTrue(subject.get("taxon_label") == "Mus musculus")
