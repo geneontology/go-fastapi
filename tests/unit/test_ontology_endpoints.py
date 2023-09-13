@@ -41,7 +41,6 @@ class TestApp(unittest.TestCase):
         """Test the endpoint to get shared ancestors between two Gene Ontology terms."""
         subject = "GO:0033627"
         object = "GO:0098609"
-        relation = "closest"
         data = {"relation": "closest"}
         response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
         self.assertIsNotNone(response.json().get("sharedIsA"))
@@ -49,7 +48,15 @@ class TestApp(unittest.TestCase):
         self.assertIn("GO:0033631", response.json().get("sharedIsA"))
         self.assertIn("GO:0098632", response.json().get("sharedPartOf"))
 
-        # self.assertEqual(response.status_code, 200)
+        data = {"relation": "shared"}
+        response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
+        self.assertIn("GO:0008150", response.json().get("shared"))
+        print(response.json())
+        self.assertIsNotNone(response.json().get("shared_labels"))
+        self.assertEqual(response.status_code, 200)
+
+        response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
+        self.assertIn("GO:0008150", response.json().get("shared"))
 
     def test_ontology_subset(self):
         """Test the endpoint to get the details of a Gene Ontology subset by its identifier."""
