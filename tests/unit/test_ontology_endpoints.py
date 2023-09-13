@@ -39,12 +39,16 @@ class TestApp(unittest.TestCase):
 
     def test_ontology_ancestors_association_between_sub_obj(self):
         """Test the endpoint to get shared ancestors between two Gene Ontology terms."""
-        subject = "GO:0006259"
-        object = "GO:0046483"
+        subject = "GO:0033627"
+        object = "GO:0098609"
         relation = "closest"
         data = {"relation": "closest"}
-        response = test_client.get(f"/api/bioentity/function/{subject}/{object}", params=data)
-        print(response.json())
+        response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
+        self.assertIsNotNone(response.json().get("sharedIsA"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("GO:0033631", response.json().get("sharedIsA"))
+        self.assertIn("GO:0098632", response.json().get("sharedPartOf"))
+
         # self.assertEqual(response.status_code, 200)
 
     def test_ontology_subset(self):

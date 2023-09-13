@@ -203,12 +203,11 @@ async def get_ancestors_shared_by_two_terms(
         logger.info("SUBJECT: ", subres)
         logger.info("OBJECT: ", objres)
         data = json.loads(subres["neighborhood_graph_json"])
-        pprint(data)
         data2 = json.loads(objres["neighborhood_graph_json"])
 
         is_a_set = set()
         part_of_set = set()
-        for edge in data["edges"]:
+        for edge in  data["edges"]:
             if edge.get("sub") == subject:
                 if edge.get("pred") == "is_a":
                     is_a_set.add(edge.get("obj"))
@@ -220,7 +219,6 @@ async def get_ancestors_shared_by_two_terms(
                 elif edge.get("pred") == "BFO:0000050":
                     part_of_set.add(edge.get("sub"))
 
-        pprint(is_a_set)
         is_a_set2 = set()
         part_of_set2 = set()
 
@@ -236,10 +234,10 @@ async def get_ancestors_shared_by_two_terms(
                 elif edge.get("pred") == "BFO:0000050":
                     part_of_set2.add(edge.get("sub"))
 
-        pprint(is_a_set2)
         shared_is_a = []
         for isa in is_a_set:
             if isa in is_a_set2:
+                print("found one", isa)
                 shared_is_a.append(isa)
 
         shared_part_of = []
