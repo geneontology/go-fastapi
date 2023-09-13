@@ -104,7 +104,7 @@ def gene_to_uniprot_from_mygene(id: str):
         id = id.replace("NCBIGene", "entrezgene")
     try:
         results = mg.query(id, fields="uniprot")
-        logger.info("results from mygene for %s", id, ": ", results["hits"])
+        logger.info("results from mygene for %s: %s", id, results["hits"])
         if results["hits"]:
             for hit in results["hits"]:
                 if "uniprot" not in hit:
