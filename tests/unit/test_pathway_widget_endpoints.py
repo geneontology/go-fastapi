@@ -9,9 +9,7 @@ from app.main import app
 
 test_client = TestClient(app)
 gene_ids = ["WB:WBGene00002147", "MGI:3588192", "FB:FBgn0003731"]
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
 

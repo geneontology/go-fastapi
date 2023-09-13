@@ -1,19 +1,19 @@
 """Middleware to log requests."""
 import logging
+
 from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.logger import logger as fastapi_logger
+from starlette.middleware.base import BaseHTTPMiddleware
 
 fastapi_logger.setLevel(logging.INFO)
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-class LoggingMiddleware(BaseHTTPMiddleware):
-    """Middleware to log requests."""
 
+class LoggingMiddleware(BaseHTTPMiddleware):
+
+    """Middleware to log requests."""
 
     async def dispatch(self, request: Request, call_next):
         """

@@ -1,4 +1,5 @@
 """bioentity router."""
+import logging
 from enum import Enum
 from typing import List
 
@@ -10,7 +11,6 @@ from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
-import logging
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -26,6 +26,8 @@ categories = [TYPE_GENE, TYPE_PUBLICATION, TYPE_PATHWAY, TYPE_GOTERM]
 USER_AGENT = get_user_agent()
 
 logger = logging.getLogger()
+
+
 class RelationshipType(str, Enum):
 
     """

@@ -1,12 +1,12 @@
 """Unit tests for the endpoints in the ontology module."""
-import unittest
 import logging
+import unittest
+
 from fastapi.testclient import TestClient
 
 from app.main import app
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
+
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
 test_client = TestClient(app)

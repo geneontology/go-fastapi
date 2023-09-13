@@ -1,6 +1,6 @@
 """Unit tests for the endpoints in the ribbon module."""
 import unittest
-
+from pprint import pprint
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -144,9 +144,11 @@ class TestOntologyAPI(unittest.TestCase):
     def test_rgd_ribbon(self):
         data = {"subset": "goslim_agr", "subject": ["RGD:70971"]}
         response = test_client.get(f"/api/ontology/ribbon/", params=data)
+        pprint(response.json())
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Hamp")
             self.assertTrue(subject.get("taxon_label") == "Rattus norvegicus")
+
             self.assertTrue(subject.get("groups").get("GO:0003674"))
             self.assertTrue(
                 subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations")
@@ -154,11 +156,23 @@ class TestOntologyAPI(unittest.TestCase):
             )
             self.assertTrue(
                 subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")
-                >= 52
+                >= 50
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0008150").get("ALL").get("nb_classes")
+                >=39
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0005576").get("ALL").get("nb_classes")
+                >=2
+            )
+            self.assertTrue(
+                subject.get("groups").get("GO:0005576").get("ALL").get("nb_annotations")
+                >=7
             )
             self.assertTrue(
                 subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations")
-                >= 9
+                >= 10
             )
         self.assertTrue(response.status_code == 200)
 

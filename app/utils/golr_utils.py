@@ -3,7 +3,6 @@
 import requests
 
 
-
 # Respect the method name for run_sparql_on with enums
 def run_solr_on(solr_instance, category, id, fields):
     """Return the result of a solr query on the given solrInstance, for a certain document_category and id."""

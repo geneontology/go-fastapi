@@ -10,9 +10,7 @@ CONFIG = path.join(path.dirname(path.abspath(__file__)), "../conf/config.yaml")
 golr_config = None
 sparql_config = None
 route_mapping = None
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
 

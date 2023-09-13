@@ -2,6 +2,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.routers import (
     bioentity,

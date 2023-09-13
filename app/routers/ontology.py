@@ -1,7 +1,8 @@
 """Ontology-related endpoints."""
 import json
-from enum import Enum
 import logging
+from enum import Enum
+
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation

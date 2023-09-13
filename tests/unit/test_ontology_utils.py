@@ -10,9 +10,7 @@ from app.main import app
 from app.utils.settings import get_golr_config
 
 test_client = TestClient(app)
-logging.basicConfig(filename='combined_access_error.log',
-                    level=logging.INFO,
-                    format='%(asctime)s - %(message)s')
+logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 go_ids = ["GO:0008150"]
 

@@ -1,4 +1,5 @@
 """Provides a route for fetching labels for CURIEs/IDs."""
+import logging
 from typing import List
 
 from fastapi import APIRouter, Query
@@ -6,11 +7,11 @@ from fastapi import APIRouter, Query
 from app.utils.ontology_utils import batch_fetch_labels
 from app.utils.settings import get_user_agent
 
-import logging
 USER_AGENT = get_user_agent()
 router = APIRouter()
 
 logger = logging.getLogger()
+
 
 @router.get("/api/ontol/labeler", tags=["ontol/labeler"])
 async def expand_curie(
