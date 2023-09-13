@@ -96,7 +96,6 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("nb_annotations") >= 37)
         self.assertTrue(len(response.json().get("subjects")) == 1)
 
-
     def test_fly_ribbon(self):
         """Test fly ribbon returns."""
         data = {"subset": "goslim_agr", "subject": ["FB:FBgn0051155"]}
