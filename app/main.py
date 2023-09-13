@@ -23,7 +23,7 @@ app = FastAPI(
     description="The Gene Ontology API.\n\n __Source:__ 'https://github.com/geneontology/go-fastapi'",
     version="1.0.0",
     contact={
-        "name": "Gene Ontology Consortium Team",
+        "name": "Gene Ontology Consortium",
         "url": "https://help.geneontology.org",
         "email": "help@geneontology.org",
     },
@@ -41,7 +41,7 @@ app.include_router(search.router)
 app.include_router(publications.router)
 app.include_router(users_and_groups.router)
 
-
+# Logging
 app.add_middleware(LoggingMiddleware)
 # CORS
 app.add_middleware(
@@ -53,4 +53,4 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="info", reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8080, log_level="info", reload=True)
