@@ -313,11 +313,32 @@ The dictionary will contain fields such as ‘taxon’ and ‘taxon_label’ ass
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="app.routers.ontology.get_ancestors_shared_between_two_terms">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_ancestors_shared_between_two_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Query(None)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_ancestors_shared_between_two_terms" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the ancestor ontology terms shared by two ontology terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subject</strong> – ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0006259">GO:0006259</a>’</p></li>
+<li><p><strong>object</strong> – ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0046483">GO:0046483</a>’</p></li>
+<li><p><strong>relation</strong> – ‘relation between two terms’ can only be one of two values: shared or closest</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="app.routers.ontology.get_ancestors_shared_by_two_terms">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_ancestors_shared_by_two_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(Ellipsis)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_ancestors_shared_by_two_terms" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the ancestor ontology terms shared by two ontology terms.</p>
-<p>subject: ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0006259">GO:0006259</a>’
-object: ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0046483">GO:0046483</a>’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subject</strong> – ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0006259">GO:0006259</a>’</p></li>
+<li><p><strong>object</strong> – ‘CURIE identifier of a GO term, e.g. <a class="reference external" href="GO:0046483">GO:0046483</a>’</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
