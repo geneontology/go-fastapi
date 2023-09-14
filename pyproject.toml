@@ -14,7 +14,7 @@ vcs = "git"
 style = "pep440"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10.1"
 fastapi = ">=0.92.0"
 uvicorn = ">=0.23.2"
 python-multipart = "^0.0.6"
