@@ -449,7 +449,7 @@ async def get_geneproducts_by_model_id(
     return results
 
 
-@router.get("/api/models/pmid", tags=["models"], description="Returns pubmed details based on a PMID ID.")
+@router.get("/api/models/pmid", tags=["models"], description="Returns PMID details based on a GO CAM ID.")
 async def get_model_details_by_pmid_id(
     gocams: List[str] = Query(
         None,
@@ -457,7 +457,7 @@ async def get_model_details_by_pmid_id(
         example=["581e072c00000295", "SYNGO_369"],
     )
 ):
-    """Returns pubmed details based on a PMID ID."""
+    """Returns pubmed details based on a GO CAM id."""
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -505,6 +505,14 @@ async def get_model_details_by_pmid_id(
         GROUP BY ?gocam
         """
     results = si._sparql_query(query)
+    collated_results = []
+    for result in results:
+        collated = {
+            "gocam": result["gocam"].get("value"),
+            "source": result["source"].get("value")
+        }
+        collated_results.append(collated)
+    return collated_results
     return results
 
 
@@ -590,8 +598,6 @@ async def get_term_details_by_taxon_id(
     results = si._sparql_query(query)
     collated_results = []
     for result in results:
-        collated = {
-            "gocam": result["gocam"].get("value")
-        }
+        collated = {"gocam": result["gocam"].get("value")}
         collated_results.append(collated)
     return collated_results
