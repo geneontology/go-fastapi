@@ -105,6 +105,18 @@ class TestApp(unittest.TestCase):
         self.assertGreater(len(response.json()), 100)
         self.assertEqual(response.status_code, 200)
 
+    def test_get_term_details_by_taxon_id(self):
+        """
+        Test the endpoint to retrieve term details by taxon ID.
+
+        """
+        id = "NCBITaxon:9606"
+        response = test_client.get(f"/api/taxon/{id}/models")
+        for item in response.json():
+            print(item)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.json()), 20)
+
 
 if __name__ == "__main__":
     unittest.main()

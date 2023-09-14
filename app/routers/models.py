@@ -594,7 +594,7 @@ async def get_term_details_by_taxon_id(
     collated_results = []
     for result in results:
         collated = {
-            "gocam": result["gocam"].get("value"),
+            "gocam": result["gocam"].get("value")
         }
         collated_results.append(collated)
     return collated_results
