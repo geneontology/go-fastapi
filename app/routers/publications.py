@@ -10,7 +10,11 @@ USER_AGENT = get_user_agent()
 router = APIRouter()
 
 
-@router.get("/api/pmid/{id}/models", tags=["publications"])
+@router.get(
+    "/api/pmid/{id}/models",
+    tags=["publications"],
+    description="Returns models for a given publication identifier (PMID).",
+)
 async def get_model_details_by_pmid(
     id: str = Path(..., description="A publication identifier (PMID)" " (e.g. 15314168 or 26954676)")
 ):

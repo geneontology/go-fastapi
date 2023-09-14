@@ -129,8 +129,8 @@ async def get_ancestors_shared_by_two_terms(
     """
     Returns the ancestor ontology terms shared by two ontology terms.
 
-    subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
-    object: 'CURIE identifier of a GO term, e.g. GO:0046483'
+    :param subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
+    :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
     fields = "isa_partof_closure,isa_partof_closure_label"
 
@@ -151,6 +151,104 @@ async def get_ancestors_shared_by_two_terms(
             shared.append(sub)
             shared_labels.append(subres["isa_partof_closure_label"][i])
     return {"goids": shared, "gonames: ": shared_labels}
+
+
+@router.get(
+    "/api/association/between/{subject}/{object}",
+    tags=["ontology"],
+    description="Returns the ancestor ontology terms shared by two ontology terms. ",
+)
+async def get_ancestors_shared_between_two_terms(
+    subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259", example="GO:0006259"),
+    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483", example="GO:0046483"),
+    relation: str = Query(None, description="relation between two terms", example="closest"),
+):
+    """
+    Returns the ancestor ontology terms shared by two ontology terms.
+
+    :param subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
+    :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
+    :param relation: 'relation between two terms' can only be one of two values: shared or closest
+    """
+    fields = "isa_partof_closure,isa_partof_closure_label"
+    logger.info(relation)
+    if relation == "shared" or relation is None:
+        subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+        objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+
+        logger.info("SUBJECT: ", subres)
+        logger.info("OBJECT: ", objres)
+
+        shared = []
+        shared_labels = []
+
+        for i in range(0, len(subres["isa_partof_closure"])):
+            sub = subres["isa_partof_closure"][i]
+            found = False
+            if sub in objres["isa_partof_closure"]:
+                found = True
+            if found:
+                shared.append(sub)
+                shared_labels.append(subres["isa_partof_closure_label"][i])
+
+        result = {"shared": shared, "shared_labels": shared_labels}
+        return result
+
+    else:
+        logger.info("got here")
+        fields = "neighborhood_graph_json"
+        # https://golr-aux.geneontology.io/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
+        subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+        objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+
+        logger.info("SUBJECT: ", subres)
+        logger.info("OBJECT: ", objres)
+        data = json.loads(subres["neighborhood_graph_json"])
+        data2 = json.loads(objres["neighborhood_graph_json"])
+
+        is_a_set = set()
+        part_of_set = set()
+        for edge in data["edges"]:
+            if edge.get("sub") == subject:
+                if edge.get("pred") == "is_a":
+                    is_a_set.add(edge.get("obj"))
+                elif edge.get("pred") == "BFO:0000050":
+                    part_of_set.add(edge.get("obj"))
+            elif edge.get("obj") == subject:
+                if edge.get("pred") == "is_a":
+                    is_a_set.add(edge.get("sub"))
+                elif edge.get("pred") == "BFO:0000050":
+                    part_of_set.add(edge.get("sub"))
+
+        is_a_set2 = set()
+        part_of_set2 = set()
+
+        for edge in data2["edges"]:
+            if edge.get("sub") == object:
+                if edge.get("pred") == "is_a":
+                    is_a_set2.add(edge.get("obj"))
+                elif edge.get("pred") == "BFO:0000050":
+                    part_of_set2.add(edge.get("obj"))
+            elif edge.get("obj") == object:
+                if edge.get("pred") == "is_a":
+                    is_a_set2.add(edge.get("sub"))
+                elif edge.get("pred") == "BFO:0000050":
+                    part_of_set2.add(edge.get("sub"))
+
+        shared_is_a = []
+        for isa in is_a_set:
+            if isa in is_a_set2:
+                shared_is_a.append(isa)
+
+        shared_part_of = []
+        combined_set = part_of_set | part_of_set2
+        for part_of in combined_set:
+            if part_of in part_of_set2:
+                shared_part_of.append(part_of)
+
+        result = {"sharedIsA": shared_is_a, "sharedPartOf": shared_part_of}
+
+        return result
 
 
 @router.get(

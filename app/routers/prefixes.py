@@ -11,7 +11,11 @@ logger = logging.getLogger()
 router = APIRouter()
 
 
-@router.get("/api/identifier/prefixes", tags=["identifier/prefixes"])
+@router.get(
+    "/api/identifier/prefixes",
+    tags=["identifier/prefixes"],
+    description="Returns a list of all prefixes in the GO namespace.",
+)
 async def get_all_prefixes():
     """Returns a list of all prefixes in the GO namespace."""
     all_prefixes = []

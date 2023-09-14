@@ -37,6 +37,28 @@ class TestApp(unittest.TestCase):
         response = test_client.get(f"/api/ontology/shared/{subject}/{object}")
         self.assertEqual(response.status_code, 200)
 
+    def test_ontology_ancestors_association_between_sub_obj(self):
+        """Test the endpoint to get shared ancestors between two Gene Ontology terms."""
+        subject = "GO:0033627"
+        object = "GO:0098609"
+        data = {"relation": "closest"}
+        response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
+        self.assertIsNotNone(response.json().get("sharedIsA"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("GO:0033631", response.json().get("sharedIsA"))
+        self.assertIn("GO:0098632", response.json().get("sharedPartOf"))
+
+        data = {"relation": "shared"}
+        response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
+        self.assertIn("GO:0008150", response.json().get("shared"))
+        print(response.json().get("shared"))
+        print(response.json().get("shared_labels"))
+        self.assertIsNotNone(response.json().get("shared_labels"))
+        self.assertEqual(response.status_code, 200)
+
+        response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
+        self.assertIn("GO:0008150", response.json().get("shared"))
+
     def test_ontology_subset(self):
         """Test the endpoint to get the details of a Gene Ontology subset by its identifier."""
         for id in subsets:

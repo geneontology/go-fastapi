@@ -2,6 +2,7 @@
 
 import logging
 import unittest
+from unittest import skip
 
 from fastapi.testclient import TestClient
 
@@ -71,6 +72,8 @@ class TestApp(unittest.TestCase):
     def test_grouplist(self):
         """Test the endpoint to retrieve the list of groups."""
         response = test_client.get("/api/groups")
+
+        print(response.json())
         self.assertGreater(len(response.json()), 15)
         self.assertEqual(response.status_code, 200)
 
@@ -102,6 +105,22 @@ class TestApp(unittest.TestCase):
         response = test_client.get(f"/api/go/{id}/models")
         self.assertGreater(len(response.json()), 100)
         self.assertEqual(response.status_code, 200)
+
+    @skip("This test is skipped because it takes too long to run.")
+    def test_get_term_details_by_taxon_id(self):
+        """Test the endpoint to retrieve term details by taxon ID."""
+        taxon_id = "NCBITaxon:9606"
+        response = test_client.get(f"/api/taxon/{taxon_id}/models")
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.json()), 20)
+
+    def test_get_pmid_by_model_id(self):
+        """Test the endpoint to retrieve PubMed IDs by model ID."""
+        response = test_client.get("/api/models/pmid", params={"gocams": ["59a6110e00000067"]})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        self.assertIn("gocam", response.json()[0])
+        self.assertIn("sources", response.json()[0])
 
 
 if __name__ == "__main__":

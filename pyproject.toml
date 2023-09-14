@@ -64,6 +64,7 @@ extend-ignore = [
     "D401",  # `First line of docstring should be in imperative mood`
     "S101",  # `Use of assert detected. It would be nice to keep this check for everything but the BDD tests.`
     "B008",  # `Do not perform function calls in argument defaults.`
+    "E101",  # `Indentation contains mixed spaces and tabs` - because we have a lot of messy SPARQL
 ]
 line-length = 120
 

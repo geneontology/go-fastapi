@@ -12,10 +12,10 @@ dev: install start-dev
 # note: using root path below means we need a proxy server out front to strip the prefix else, teh docs don't work.
 # https://fastapi.tiangolo.com/advanced/behind-a-proxy/
 start:
-	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --log-level info --access-logfile combined_access_error.log --error-logfile combined_access_error.log --capture-output
+	poetry run gunicorn app.main:app --workers 4 --timeout 120 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --log-level info --access-logfile combined_access_error.log --error-logfile combined_access_error.log --capture-output
 
 start-dev:
-	poetry run gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8081 --log-level info --access-logfile combined_access_error.log --error-logfile combined_access_error.log --capture-output
+	poetry run gunicorn app.main:app --workers 4 --timeout 120 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8081 --log-level info --access-logfile combined_access_error.log --error-logfile combined_access_error.log --capture-output
 
 test: unit-tests integration-tests lint spell
 
