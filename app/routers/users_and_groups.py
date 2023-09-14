@@ -14,7 +14,10 @@ USER_AGENT = get_user_agent()
 router = APIRouter()
 
 
-@router.get("/api/users", tags=["users and groups"], deprecated=True)
+@router.get("/api/users",
+            tags=["users and groups"],
+            deprecated=True,
+            description="Get GO users.")
 async def get_users():
     """
     DEPRECATED.
@@ -235,7 +238,10 @@ async def get_models_by_orcid(
     return collated_results
 
 
-@router.get("/api/users/{orcid}/gp", tags=["models"])
+@router.get("/api/users/{orcid}/gp",
+            tags=["models"],
+            description = "Get GPs by orcid"
+)
 async def get_gp_models_by_orcid(
     orcid: str = Path(
         ...,
@@ -307,7 +313,11 @@ async def get_gp_models_by_orcid(
     return collated_results
 
 
-@router.get("/api/groups", tags=["users and groups"], deprecated=True)
+@router.get("/api/groups",
+            tags=["users and groups"],
+            deprecated=True,
+            description = "Get GO groups"
+)
 async def get_groups():
     """
     DEPRECATED.
@@ -339,7 +349,10 @@ async def get_groups():
     return results
 
 
-@router.get("/api/groups/{name}", tags=["users and groups"], deprecated=True)
+@router.get("/api/groups/{name}",
+            tags=["users and groups"],
+            deprecated=True,
+            description = "Get GO group metadata by name")
 async def get_group_metadata_by_name(
     name: str = Path(None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")
 ):

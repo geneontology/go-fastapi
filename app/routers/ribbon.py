@@ -22,10 +22,14 @@ router = APIRouter()
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 
 
-@router.get("/api/ontology/term/{id}/subsets", tags=["ontology"])
+@router.get("/api/ontology/term/{id}/subsets",
+            tags=["ontology"],
+            description="Returns subsets (slims) associated to an ontology term. (e.g. GO:0003677)")
 async def get_subsets_by_term(
     id: str = Path(
-        ..., description="The ID of the term to extract the subsets from, e.g. GO:0003677", example="GO:0003677"
+        ...,
+        description="The ID of the term to extract the subsets from, e.g. GO:0003677",
+        example="GO:0003677"
     )
 ):
     """Returns subsets (slims) associated to an ontology term."""
@@ -37,18 +41,26 @@ async def get_subsets_by_term(
     return results
 
 
-@router.get("/api/ontology/subset/{id}", tags=["ontology"])
+@router.get("/api/ontology/subset/{id}",
+            tags=["ontology"],
+            description="Returns a subset (slim) by its id which is usually a name. (e.g. goslim_agr)")
 async def get_subset_by_id(
-    id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr")
+    id: str = Path(...,
+                   description="Name of the subset to map GO terms (e.g. goslim_agr)",
+                   example="goslim_agr")
 ):
     """Returns a subset (slim) by its id which is usually a name."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
     return result
 
 
-@router.get("/api/ontology/ribbon/", tags=["ontology"])
+@router.get("/api/ontology/ribbon/",
+            tags=["ontology"],
+            description="Fetch the summary of annotations for a given gene or set of genes.")
 async def get_ribbon_results(
-    subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr"),
+    subset: str = Query(None,
+                        description="Name of the subset to map GO terms (e.g. goslim_agr)",
+                        example="goslim_agr"),
     subject: List[str] = Query(
         None,
         description="List of Gene ids (e.g. MGI:98214, RGD:620474)",

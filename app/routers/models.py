@@ -17,7 +17,10 @@ router = APIRouter()
 logger = logging.getLogger()
 
 
-@router.get("/api/models", tags=["models"], deprecated=True)
+@router.get("/api/models",
+            tags=["models"],
+            deprecated=True,
+            description="Returns metadata of GO-CAM models, e.g. 59a6110e00000067.")
 async def get_gocam_models(
     start: int = Query(None, description="start"),
     size: int = Query(None, description="Number of models to look for"),
@@ -255,7 +258,9 @@ async def get_gocam_models(
     return results
 
 
-@router.get("/api/models/go", tags=["models"])
+@router.get("/api/models/go",
+            tags=["models"],
+            description="Returns go term details based on a GO-CAM model ID.")
 async def get_goterms_by_model_id(
     gocams: List[str] = Query(
         None,
@@ -364,7 +369,9 @@ async def get_goterms_by_model_id(
     return collated_results
 
 
-@router.get("/api/models/gp", tags=["models"])
+@router.get("/api/models/gp",
+            tags=["models"],
+            description="Returns gene product details based on a GO-CAM model ID.")
 async def get_geneproducts_by_model_id(
     gocams: List[str] = Query(
         None,
@@ -444,7 +451,9 @@ async def get_geneproducts_by_model_id(
     return results
 
 
-@router.get("/api/models/pmid", tags=["models"])
+@router.get("/api/models/pmid",
+            tags=["models"],
+            description="Returns pubmed details based on a PMID ID.")
 async def get_model_details_by_pmid_id(
     gocams: List[str] = Query(
         None,
@@ -503,7 +512,9 @@ async def get_model_details_by_pmid_id(
     return results
 
 
-@router.get("/api/models/{id}", tags=["models"])
+@router.get("/api/models/{id}",
+            tags=["models"],
+            description="Returns model details based on a GO-CAM model ID.")
 async def get_term_details_by_model_id(
     id: str = Path(
         ...,
@@ -540,9 +551,13 @@ async def get_term_details_by_model_id(
     return collated_results
 
 
-@router.get("/api/taxon/{taxon}/models", tags=["models"])
+@router.get("/api/taxon/{taxon}/models",
+            tags=["models"],
+            description="Returns model details based on a NCBI Taxon ID.")
 async def get_term_details_by_taxon_id(
-    taxon: str = Path(..., description="A taxon identifier (e.g. NCBITaxon:9606, NCBITaxon:10090, NCBITaxon:10116)")
+    taxon: str = Path(...,
+                      description="A taxon identifier (e.g. NCBITaxon:9606, NCBITaxon:10090, NCBITaxon:10116)",
+                      example="NCBITaxon:9606")
 ):
     """Returns model details based on a NCBI Taxon ID."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
