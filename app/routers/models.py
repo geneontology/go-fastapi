@@ -450,7 +450,7 @@ async def get_geneproducts_by_model_id(
 
 
 @router.get("/api/models/pmid", tags=["models"], description="Returns PMID details based on a GO CAM ID.")
-async def get_model_details_by_pmid_id(
+async def get_pmid_by_model_id(
     gocams: List[str] = Query(
         None,
         description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
@@ -507,13 +507,9 @@ async def get_model_details_by_pmid_id(
     results = si._sparql_query(query)
     collated_results = []
     for result in results:
-        collated = {
-            "gocam": result["gocam"].get("value"),
-            "source": result["source"].get("value")
-        }
+        collated = {"gocam": result["gocam"].get("value"), "sources": result["sources"].get("value")}
         collated_results.append(collated)
     return collated_results
-    return results
 
 
 @router.get("/api/models/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID.")

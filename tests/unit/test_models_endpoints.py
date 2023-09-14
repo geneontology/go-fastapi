@@ -112,6 +112,14 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.json()), 20)
 
+    def test_get_pmid_by_model_id(self):
+        """Test the endpoint to retrieve PubMed IDs by model ID."""
+        response = test_client.get("/api/models/pmid", params={"gocams": ["59a6110e00000067"]})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        self.assertIn("gocam", response.json()[0])
+        self.assertIn("sources", response.json()[0])
+
 
 if __name__ == "__main__":
     unittest.main()
