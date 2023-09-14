@@ -1,7 +1,8 @@
 """Model API router."""
 
-from typing import List
 import logging
+from typing import List
+
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
@@ -15,26 +16,27 @@ router = APIRouter()
 
 logger = logging.getLogger()
 
+
 @router.get("/api/models", tags=["models"], deprecated=True)
 async def get_gocam_models(
-        start: int = Query(None, description="start"),
-        size: int = Query(None, description="Number of models to look for"),
-        last: int = Query(None, description="last"),
-        group: str = Query(None, description="group"),
-        user: str = Query(None, description="user"),
-        pmid: str = Query(None, description="pmid"),
-        causalmf: bool = Query(
+    start: int = Query(None, description="start"),
+    size: int = Query(None, description="Number of models to look for"),
+    last: int = Query(None, description="last"),
+    group: str = Query(None, description="group"),
+    user: str = Query(None, description="user"),
+    pmid: str = Query(None, description="pmid"),
+    causalmf: bool = Query(
         False,
         description="The model has a chain of at least three functions connected "
         "by at least two consecutive causal relation edges.  One of these functions is enabled_by "
         "this input gene",
-    )
+    ),
 ):
+    """Returns metadata of an ontology term, e.g. GO:0003677."""
     if last:
         start = 0
         size = last
 
-    """Returns metadata of an ontology term, e.g. GO:0003677."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
 
@@ -47,7 +49,8 @@ async def get_gocam_models(
         by_param = user
 
     if by_param is not None:
-        query = """
+        query = (
+            """
             PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
         PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
@@ -75,7 +78,7 @@ async def get_gocam_models(
                 optional {
                     ?providedByIRI rdfs:label ?providedByLabel .
                 }
-                
+
                 filter(?providedByLabel = ?groupName )
                 optional { ?orcidIRI rdfs:label ?name }
                 BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
@@ -84,109 +87,114 @@ async def get_gocam_models(
         }
         GROUP BY ?gocam ?date ?title
         ORDER BY DESC(?date)
-        
-        """ % by_param
+
+        """
+            % by_param
+        )
 
     elif pmid is not None:
         if not pmid.startswith("PMID:"):
             pmid = "PMID:" + pmid
-        query = """
-        
+        query = (
+            """
+
             PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
-        
+
         SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
                                     (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
                                     (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
                                     (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-        
-        WHERE 
+
+        WHERE
         {
-          GRAPH ?gocam {            
+          GRAPH ?gocam {
             ?gocam metago:graphType metago:noctuaCam .
-        
+
             ?gocam dc:title ?title ;
                    dc:date ?date ;
                    dc:contributor ?orcid ;
                    providedBy: ?providedBy .
-        
+
             BIND( IRI(?orcid) AS ?orcidIRI ).
             BIND( IRI(?providedBy) AS ?providedByIRI ).
-            
+
             ?s dc:source ?source .
             BIND(REPLACE(?source, " ", "") AS ?source) .
             FILTER(SAMETERM(?source, "%s"^^xsd:string))
           }
-          
+
           optional {
             ?providedByIRI rdfs:label ?providedByLabel .
           }
-        
-          optional { 
-            ?orcidIRI rdfs:label ?name 
+
+          optional {
+            ?orcidIRI rdfs:label ?name
           }
           BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-        
+
         }
-        GROUP BY ?gocam ?date ?title 
+        GROUP BY ?gocam ?date ?title
         ORDER BY DESC(?date)
-        
-        """ % pmid
+
+        """
+            % pmid
+        )
 
     elif causalmf is not None:
         query = """
-    
+
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX pr: <http://purl.org/ontology/prv/core#>
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
-        
+
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-        
+
         PREFIX causally_upstream_of_or_within: <http://purl.obolibrary.org/obo/RO_0002418>
         PREFIX causally_upstream_of_or_within_negative_effect: <http://purl.obolibrary.org/obo/RO_0004046>
         PREFIX causally_upstream_of_or_within_positive_effect: <http://purl.obolibrary.org/obo/RO_0004047>
-        
+
         PREFIX causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002411>
         PREFIX causally_upstream_of_negative_effect: <http://purl.obolibrary.org/obo/RO_0002305>
         PREFIX causally_upstream_of_positive_effect: <http://purl.obolibrary.org/obo/RO_0002304>
-        
+
         PREFIX regulates: <http://purl.obolibrary.org/obo/RO_0002211>
         PREFIX negatively_regulates: <http://purl.obolibrary.org/obo/RO_0002212>
         PREFIX positively_regulates: <http://purl.obolibrary.org/obo/RO_0002213>
-        
+
         PREFIX directly_regulates: <http://purl.obolibrary.org/obo/RO_0002578>
         PREFIX directly_positively_regulates: <http://purl.obolibrary.org/obo/RO_0002629>
         PREFIX directly_negatively_regulates: <http://purl.obolibrary.org/obo/RO_0002630>
-        
+
         PREFIX directly_activates: <http://purl.obolibrary.org/obo/RO_0002406>
         PREFIX indirectly_activates: <http://purl.obolibrary.org/obo/RO_0002407>
-        
+
         PREFIX directly_inhibits: <http://purl.obolibrary.org/obo/RO_0002408>
         PREFIX indirectly_inhibits: <http://purl.obolibrary.org/obo/RO_0002409>
-        
+
         PREFIX transitively_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002414>
         PREFIX immediately_causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002412>
         PREFIX directly_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002413>
-        
+
         SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
                                     (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
                                     (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
                                     (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-        
-        WHERE 
+
+        WHERE
         {
           ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
           ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
           {
-            GRAPH ?gocam {                 
+            GRAPH ?gocam {
               ?gocam metago:graphType metago:noctuaCam .
               ?gocam dc:date ?date .
               ?gocam dc:title ?title .
@@ -194,9 +202,9 @@ async def get_gocam_models(
               ?gocam providedBy: ?providedBy .
               BIND( IRI(?orcid) AS ?orcidIRI ).
               BIND( IRI(?providedBy) AS ?providedByIRI ).
-              ?ind1 ?causal1 ?ind2 .     
+              ?ind1 ?causal1 ?ind2 .
               ?ind2 ?causal2 ?ind3
-            }         
+            }
             ?ind1 rdf:type MF: .
             ?ind2 rdf:type MF: .
             ?ind3 rdf:type MF: .
@@ -207,8 +215,8 @@ async def get_gocam_models(
             optional { ?orcidIRI rdfs:label ?name }
             BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
           }
-        }        
-        GROUP BY ?gocam ?date ?title 
+        }
+        GROUP BY ?gocam ?date ?title
         ORDER BY ?gocam
         """
     else:
@@ -264,10 +272,7 @@ async def get_goterms_by_model_id(
         example=["581e072c00000295", "SYNGO_369"],
     )
 ):
-    """
-    Returns go term details based on a GO-CAM model ID.
-
-    """
+    """Returns go term details based on a GO-CAM model ID."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     gocam = ""
@@ -299,11 +304,12 @@ async def get_goterms_by_model_id(
                 ?goids definition: ?definitions .
             }
             ORDER BY DESC(?gocam)
-        """ % gocam
+        """
+            % gocam
         )
     else:
         query = """
-        
+
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
         PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
@@ -311,25 +317,25 @@ async def get_goterms_by_model_id(
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
 
 		SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
-        WHERE 
+        WHERE
         {
-  
+
   		    GRAPH ?gocam {
     			?gocam metago:graphType metago:noctuaCam  .
                 ?entity rdf:type owl:NamedIndividual .
     			?entity rdf:type ?goids
             }
-  
-            VALUES ?goclasses { BP: MF: CC:  } . 
-            # rdf:type faster then subClassOf+ but require filter 			
+
+            VALUES ?goclasses { BP: MF: CC:  } .
+            # rdf:type faster then subClassOf+ but require filter
             # ?goids rdfs:subClassOf+ ?goclasses .
     		?entity rdf:type ?goclasses .
-  			
+
   			# Filtering out the root BP, MF & CC terms
 			filter(?goids != MF: )
   			filter(?goids != BP: )
 		  	filter(?goids != CC: )
-  
+
   			# then getting their definitions
     		?goids rdfs:label ?gonames .
   		    ?goids definition: ?definitions .
@@ -391,7 +397,7 @@ async def get_geneproducts_by_model_id(
             else:
                 gocam = gocam + "<http://model.geneontology.org/" + model + "> "
         query = (
-        """
+            """
             PREFIX metago: <http://model.geneontology.org/>
             PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
             PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
@@ -413,7 +419,8 @@ async def get_geneproducts_by_model_id(
                 }
             }
             GROUP BY ?gocam
-        """ % gocam
+        """
+            % gocam
         )
     else:
         query = """
@@ -425,11 +432,11 @@ async def get_geneproducts_by_model_id(
         SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier; separator="@|@") as ?gpids)
 			        	(GROUP_CONCAT(distinct ?name; separator="@|@") as ?gpnames)
 
-        WHERE 
+        WHERE
         {
             GRAPH ?gocam {
                 ?gocam metago:graphType metago:noctuaCam .
-                ?s enabled_by: ?gpnode .    
+                ?s enabled_by: ?gpnode .
                 ?gpnode rdf:type ?identifier .
                 FILTER(?identifier != owl:NamedIndividual) .
                 FILTER(!contains(str(?gocam), "_inferred"))
@@ -447,29 +454,25 @@ async def get_geneproducts_by_model_id(
 
 
 @router.get("/api/models/pmid", tags=["models"])
-async def get_publication_details_by_model_id(
+async def get_model_details_by_pmid_id(
     gocams: List[str] = Query(
         None,
         description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
         example=["581e072c00000295", "SYNGO_369"],
     )
 ):
-    """
-    Returns pubmed details based on a GO-CAM model ID.
-
-    """
+    """Returns pubmed details based on a PMID ID."""
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     if gocams:
-
         for model in gocams:
             if gocam == "":
                 gocam = "<http://model.geneontology.org/" + model + "> "
             else:
                 gocam = gocam + "<http://model.geneontology.org/" + model + "> "
         query = (
-        """
+            """
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
@@ -485,22 +488,23 @@ async def get_publication_details_by_model_id(
         }
         GROUP BY ?gocam
 
-        """ % gocam
+        """
+            % gocam
         )
     else:
         query = """
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-  
-        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="` + separator + `") as ?sources)              
-        WHERE 
-        {    
+
+        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="` + separator + `") as ?sources)
+        WHERE
+        {
             GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .    	
+                ?gocam metago:graphType metago:noctuaCam .
                 ?s dc:source ?source .
                 BIND(REPLACE(?source, " ", "") AS ?source) .
                 FILTER((CONTAINS(?source, "PMID")))
-            }           
+            }
         }
         GROUP BY ?gocam
         """
@@ -546,16 +550,10 @@ async def get_term_details_by_model_id(
 
 
 @router.get("/api/taxon/{taxon}/models", tags=["models"])
-async def get_term_details_by_model_id(
-    taxon: str = Path(
-        ...,
-        description="A taxon identifier (e.g. NCBITaxon:9606, NCBITaxon:10090, NCBITaxon:10116)"
-    )
+async def get_term_details_by_taxon_id(
+    taxon: str = Path(..., description="A taxon identifier (e.g. NCBITaxon:9606, NCBITaxon:10090, NCBITaxon:10116)")
 ):
-    """
-    Returns model details based on a NCBI Taxon ID.
-
-    """
+    """Returns model details based on a NCBI Taxon ID."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
 
@@ -567,7 +565,7 @@ async def get_term_details_by_model_id(
 
     logger.info("using: %s", taxon)
 
-    taxon =  "<" + taxon + ">"
+    taxon = "<" + taxon + ">"
 
     query = (
         """
@@ -579,22 +577,23 @@ async def get_term_details_by_model_id(
 
         SELECT distinct ?gocam
 
-        WHERE 
+        WHERE
         {
             GRAPH ?gocam {
                 ?gocam metago:graphType metago:noctuaCam .
-                ?s enabled_by: ?gpnode .    
+                ?s enabled_by: ?gpnode .
                 ?gpnode rdf:type ?identifier .
-                FILTER(?identifier != owl:NamedIndividual) .         
+                FILTER(?identifier != owl:NamedIndividual) .
             }
 
-            ?identifier rdfs:subClassOf ?v0 . 
+            ?identifier rdfs:subClassOf ?v0 .
             ?identifier rdfs:label ?name .
-            
-            ?v0 owl:onProperty in_taxon: . 
+
+            ?v0 owl:onProperty in_taxon: .
             ?v0 owl:someValuesFrom %s
         }
-    """ % taxon
+    """
+        % taxon
     )
     results = si._sparql_query(query)
     collated_results = []

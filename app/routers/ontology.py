@@ -7,7 +7,7 @@ from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-from pprint import pprint
+
 import app.utils.ontology_utils as ontology_utils
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
@@ -158,10 +158,10 @@ async def get_ancestors_shared_by_two_terms(
     tags=["ontology"],
     description="Returns the ancestor ontology terms shared by two ontology terms. ",
 )
-async def get_ancestors_shared_by_two_terms(
-        subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259", example="GO:0006259"),
-        object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483", example="GO:0046483"),
-        relation: str = Query(None, description="relation between two terms", example="closest")
+async def get_ancestors_shared_between_two_terms(
+    subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259", example="GO:0006259"),
+    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483", example="GO:0046483"),
+    relation: str = Query(None, description="relation between two terms", example="closest"),
 ):
     """
     Returns the ancestor ontology terms shared by two ontology terms.
@@ -191,10 +191,7 @@ async def get_ancestors_shared_by_two_terms(
                 shared.append(sub)
                 shared_labels.append(subres["isa_partof_closure_label"][i])
 
-        result = {
-            "shared": shared,
-            "shared_labels": shared_labels
-        }
+        result = {"shared": shared, "shared_labels": shared_labels}
         return result
 
     else:
@@ -211,7 +208,7 @@ async def get_ancestors_shared_by_two_terms(
 
         is_a_set = set()
         part_of_set = set()
-        for edge in  data["edges"]:
+        for edge in data["edges"]:
             if edge.get("sub") == subject:
                 if edge.get("pred") == "is_a":
                     is_a_set.add(edge.get("obj"))
@@ -241,7 +238,6 @@ async def get_ancestors_shared_by_two_terms(
         shared_is_a = []
         for isa in is_a_set:
             if isa in is_a_set2:
-                print("found one", isa)
                 shared_is_a.append(isa)
 
         shared_part_of = []
@@ -250,13 +246,9 @@ async def get_ancestors_shared_by_two_terms(
             if part_of in part_of_set2:
                 shared_part_of.append(part_of)
 
-        result = {
-            "sharedIsA": shared_is_a,
-            "sharedPartOf": shared_part_of
-        }
+        result = {"sharedIsA": shared_is_a, "sharedPartOf": shared_part_of}
 
         return result
-
 
 
 @router.get(

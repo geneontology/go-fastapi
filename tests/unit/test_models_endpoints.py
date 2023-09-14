@@ -71,6 +71,8 @@ class TestApp(unittest.TestCase):
     def test_grouplist(self):
         """Test the endpoint to retrieve the list of groups."""
         response = test_client.get("/api/groups")
+
+        print(response.json())
         self.assertGreater(len(response.json()), 15)
         self.assertEqual(response.status_code, 200)
 
