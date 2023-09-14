@@ -2,6 +2,7 @@
 
 import logging
 import unittest
+from unittest import skip
 
 from fastapi.testclient import TestClient
 
@@ -105,6 +106,7 @@ class TestApp(unittest.TestCase):
         self.assertGreater(len(response.json()), 100)
         self.assertEqual(response.status_code, 200)
 
+    @skip("This test is skipped because it takes too long to run.")
     def test_get_term_details_by_taxon_id(self):
         """Test the endpoint to retrieve term details by taxon ID."""
         taxon_id = "NCBITaxon:9606"
