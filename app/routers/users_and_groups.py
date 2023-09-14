@@ -68,13 +68,11 @@ async def get_user_by_orcid(
     query = (
         """
 
-    PREFIX metago: <http://model.geneontology.org/>
+        PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-    PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+        PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
         PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
         PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
@@ -183,8 +181,6 @@ async def get_models_by_orcid(
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
         PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
         PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
@@ -257,8 +253,6 @@ async def get_gp_models_by_orcid(
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
         PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
         PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
@@ -365,7 +359,6 @@ async def get_group_metadata_by_name(
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
             PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-            PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
             PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
             PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
             PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>

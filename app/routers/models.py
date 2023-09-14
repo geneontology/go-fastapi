@@ -52,21 +52,20 @@ async def get_gocam_models(
         query = (
             """
             PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        PREFIX providedBy: <http://purl.org/pav/providedBy>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX providedBy: <http://purl.org/pav/providedBy>
 
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
+            SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
                                     (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
                                     (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
                                     (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-        WHERE
-        {
+            WHERE
             {
-                BIND(" %s " as ?groupName) .
-                GRAPH ?gocam {
-                    ?gocam metago:graphType metago:noctuaCam .
-                    ?gocam dc:title ?title ;
+                {
+                    BIND(" %s " as ?groupName) .
+                    GRAPH ?gocam {
+                        ?gocam metago:graphType metago:noctuaCam .
+                        ?gocam dc:title ?title ;
                         dc:date ?date ;
                         dc:contributor ?orcid ;
                         providedBy: ?providedBy .
@@ -100,8 +99,6 @@ async def get_gocam_models(
 
             PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
 
         SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
@@ -146,14 +143,9 @@ async def get_gocam_models(
 
     elif causalmf is not None:
         query = """
-
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX pr: <http://purl.org/ontology/prv/core#>
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX providedBy: <http://purl.org/pav/providedBy>
 
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
@@ -223,7 +215,6 @@ async def get_gocam_models(
         query = """
             PREFIX metago: <http://model.geneontology.org/>
             PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
             PREFIX providedBy: <http://purl.org/pav/providedBy>
 
             SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
