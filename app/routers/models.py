@@ -557,12 +557,9 @@ async def get_term_details_by_taxon_id(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     final_taxon = "http://purl.obolibrary.org/obo/"
-    print("taxon: ", taxon)
     if taxon.startswith("NCBITaxon:"):
         new_taxon = taxon.replace("NCBITaxon:", "NCBITaxon_")
         final_taxon = final_taxon + new_taxon
-
-    print("taxon: ", final_taxon)
     query = (
         """
         PREFIX metago: <http://model.geneontology.org/>
