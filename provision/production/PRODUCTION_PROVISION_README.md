@@ -155,7 +155,7 @@ These commands continue to be run in the dockerized development environment.
 
 ```bash
 cp ./production/config-stack.yaml.sample ./config-stack.yaml
-emacs ./config-stack.yaml    # Verify contents and modify if needed.
+emacs ./config-stack.yaml    # MAKE SURE TO CHANGE THE GO-FASTAPI TAG (strip the v), also replace all the REPLACE_MEs
 export ANSIBLE_HOST_KEY_CHECKING=False
 ````
 
