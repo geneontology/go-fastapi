@@ -46,9 +46,7 @@ class RelationshipType(str, Enum):
 router = APIRouter()
 
 
-@router.get("/api/bioentity/{id}",
-            tags=["bioentity"],
-            description="Get bio-entities (genes) by their identifiers.")
+@router.get("/api/bioentity/{id}", tags=["bioentity"], description="Get bio-entities (genes) by their identifiers.")
 async def get_bioentity_by_id(
     id: str = Path(
         ...,
