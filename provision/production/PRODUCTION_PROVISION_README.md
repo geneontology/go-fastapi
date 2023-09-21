@@ -67,7 +67,7 @@ emacs /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_
 
 3. Prepare and initialize the S3 Terraform backend:
 
-"Initializing" a Terraform backend means that you are getting ready to save a bundle of EC2 and networking states to S#, so that you and other developers in the future can discover and manipulate these states in the future, bringing servers and services up and down in a coordinated way. These terraform backends are an arbitrary bundle and can be grouped as needed. In general, the production systems should all use a coordinated set, but you may create new ones for experimentation, etc. If you are trying to work with an already set state, jump to `4`; if you are experimenting, continue here with `3`.
+"Initializing" a Terraform backend means that you are getting ready to save a bundle of EC2 and networking states to S3, so that you and other developers in the future can discover and manipulate these states in the future, bringing servers and services up and down in a coordinated way. These terraform backends are an arbitrary bundle and can be grouped as needed. In general, the production systems should all use a coordinated set, but you may create new ones for experimentation, etc. If you are trying to work with an already set state, jump to `4`; if you are experimenting, continue here with `3`.
 
 ```bash
 
