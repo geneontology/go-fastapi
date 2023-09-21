@@ -11,7 +11,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 - Terraform: v1.1.4
 - Ansible: 2.10.7
 - aws cli
-- go-deploy: `poetry install go-deploy==0.4.2` # requires python >=3.8
+- go-deploy; multple install methods: poetry `poetry install go-deploy==0.4.2` (requires python >=3.8), can also be installed incidentally from go-fastapi repo with `poetry install`
 
 #### configuration files:
 
