@@ -108,7 +108,7 @@ docker tag geneontology/go-fastapi:latest geneontology/go-fastapi:[tag_name]
 docker push geneontology/go-fastapi:[tag_name]
 ```
 
-### Deploying to AWS/production
+### Updating on already running AWS/production
 
 1) create a go-fastapi release using the GitHub UI and semantic versioning.
 2) wait for the GitHub action to build and push the docker image to Dockerhub.
