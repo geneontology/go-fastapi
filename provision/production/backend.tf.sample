@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket  = "REPLACE_ME_GOAPI_S3_BACKEND"
+    bucket  = "REPLACE_ME_GOAPI_S3_STATE_STORE"
     profile = "default"
     key     = "goapi/terraform.tfstate"
     region  = "us-east-1"
