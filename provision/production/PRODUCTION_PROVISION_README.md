@@ -23,7 +23,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
   - stage.yaml
   - start_services.yaml
 
-#### artifacts deployed to a staging directory on AWS:
+#### artifacts that will created/deployed to a staging directory on AWS later on:
 
   - s3 credentials files (used to push Apache logs and pull ssl credentials from the associated s3 bucket)
   - qos.conf and robots.txt (used for Apache mitigation)
