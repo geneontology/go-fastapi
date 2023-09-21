@@ -73,14 +73,14 @@ emacs /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_
 # The S3 backend is used to store the terraform state.
 cp ./production/backend.tf.sample ./aws/backend.tf
 
-# replace the REPLACE_ME_GOAPI_S3_BACKEND with the appropriate backend
+# replace the REPLACE_ME_GOAPI_S3_STATE_STORE with the appropriate backend
 emacs ./aws/backend.tf
 
 # Use the AWS cli to make sure you have access to the terraform s3 backend bucket
 export AWS_SHARED_CREDENTIALS_FILE=/tmp/go-aws-credentials
 
 # S3 bucket
-aws s3 ls s3://REPLACE_ME_GOAPI_S3_BACKEND
+aws s3 ls s3://REPLACE_ME_GOAPI_S3_STATE_STORE
 
 # initialize (if it doesn't work, we fail):
 go-deploy -init --working-directory aws -verbose
