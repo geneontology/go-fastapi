@@ -120,3 +120,7 @@ sudo docker stop geneontology/go-fastapi
 sudo docker rm geneontology/go-fastapi
 sudo docker run -d -p 8080:8080 geneontology/go-fastapi
 ```
+
+### Making production release/update
+
+See https://github.com/geneontology/go-fastapi/blob/main/provision/production/PRODUCTION_PROVISION_README.md
