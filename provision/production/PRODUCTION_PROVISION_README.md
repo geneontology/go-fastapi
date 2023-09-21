@@ -32,10 +32,9 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 
 #### DNS: 
 
-DNS record is used for `go-fastapi` and the go-deploy tool allows for creating a DNS record of type A that would be populated by the public ip address of the aws instance. If
-you don't use this option, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org`
+DNS records are used for `go-fastapi`; they are typically the "production" record and the dev/testing record. Yhe go-deploy tool allows for creating DNS records (type A) that would be populated by the public ip addresses of the aws instance. If you don't use this option, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org` or any other record that you create in Route 53.
 
-**NOTE**: if using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
+**NOTE**: If using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
 
 #### SSH Keys:
 
