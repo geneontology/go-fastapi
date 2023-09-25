@@ -87,7 +87,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json().get("associations")), 4)
 
-    def test_bioentity_gene_function_taxon_endpoint(self):
+    def test_bioentity_gene_function_id_genes_endpoint(self):
         """
         Test bioentity gene function taxon endpoint.
 
