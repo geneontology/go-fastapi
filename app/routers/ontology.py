@@ -76,7 +76,7 @@ async def get_subgraph_by_term_id(
         ..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677", example="GO:0003677"
     ),
     start: int = Query(0, description="The start index of the results to return"),
-    rows: int = Query(100, description="The number of results to return"),
+    rows: int = Query(None, description="The number of results to return"),
 ):
     """
     Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships "is_a" and "part_of".
@@ -86,12 +86,13 @@ async def get_subgraph_by_term_id(
     :param rows: The number of results to return
     :return: A is_a/part_of subgraph of the ontology term including the term's ancestors and descendants, label and ID.
     """
+    if rows is None:
+        rows = 100000
     query_filters = ""
     golr_field_to_search = "isa_partof_closure"
     where_statement = "*:*&fq=" + golr_field_to_search + ":" + '"' + id + '"'
     fields = "id,annotation_class_label,isa_partof_closure,isa_partof_closure_label"
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
-
     descendent_data = gu_run_solr_text_on(
         ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields, optionals, False
     )
