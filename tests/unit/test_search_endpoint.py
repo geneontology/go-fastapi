@@ -1,7 +1,6 @@
 """Unit tests for the endpoints in the search module."""
 import logging
 import unittest
-from pprint import pprint
 
 from fastapi.testclient import TestClient
 
@@ -40,6 +39,7 @@ class TestSearchAPI(unittest.TestCase):
         """
         data = {"category": "gene"}
         response = test_client.get("/api/search/entity/autocomplete/shh", params=data)
+        self.assertLessEqual(len(response.json().get("docs")), 100)
         self.assertEqual(response.status_code, 200)
 
     def test_autocomplete_shh(self):
@@ -50,7 +50,6 @@ class TestSearchAPI(unittest.TestCase):
         """
         data = {"category": "gene"}
         response = test_client.get("/api/search/entity/autocomplete/shh", params=data)
-        print(response.json())
         self.assertIn("id", response.json().get("docs")[0])
         self.assertEqual(response.status_code, 200)
 
@@ -62,7 +61,7 @@ class TestSearchAPI(unittest.TestCase):
         """
         response = test_client.get("/api/search/entity/autocomplete/biological")
         self.assertIn("id", response.json().get("docs")[0])
-        pprint(response.json())
+        self.assertLessEqual(len(response.json().get("docs")), 100)
         self.assertEqual(response.status_code, 200)
 
     def test_autocomplete_go(self):
