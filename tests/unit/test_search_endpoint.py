@@ -39,7 +39,7 @@ class TestSearchAPI(unittest.TestCase):
         :return: None
         """
         data = {"category": "gene"}
-        response = test_client.get("/api/search/entity/autocomplete/ssh", params=data)
+        response = test_client.get("/api/search/entity/autocomplete/shh", params=data)
         self.assertEqual(response.status_code, 200)
 
     def test_autocomplete_shh(self):

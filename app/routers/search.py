@@ -29,7 +29,7 @@ class AutocompleteCategory(str, Enum):
 async def autocomplete_term(
     term: str = Path(..., description="e.g., biological"),
     start: int = Query(0, description="The starting index of the search results."),
-    rows: int = Query(None, description="The maximum number of rows to return in the search results."),
+    rows: int = Query(100, description="The maximum number of rows to return in the search results."),
     category: AutocompleteCategory = Query(
         None,
         description="The category of items to retrieve, can be 'gene' or 'term'",
