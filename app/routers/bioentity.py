@@ -228,7 +228,6 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
-
     if rows is None:
         rows = 100000
     association_return = {}
@@ -276,7 +275,7 @@ async def get_genes_by_goterm_id(
             invert_subject_object=True,
             user_agent=USER_AGENT,
             url=ESOLR.GOLR,
-            rows=rows
+            rows=rows,
         )
     return {"associations": association_return.get("associations")}
 
