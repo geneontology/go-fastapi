@@ -1,0 +1,29 @@
+ssh_keys:
+     public: /tmp/go-ssh.pub
+     private: /tmp/go-ssh
+
+stack:
+   vars:
+      PROD_MODE: 1
+      stage_dir: /home/ubuntu/stage_dir
+      apache_proxy_image: geneontology/apache-proxy:v6
+      S3_CRED_FILE: /tmp/go-aws-credentials
+      S3_BUCKET: NOT_NEEDED_FOR_THIS_TEST  # apache logs
+
+      # APACHE PROXY WILL ALLOW FOR HTTPS. Recommended for PRODUCTION
+      USE_SSL: 1
+      S3_SSL_CERTS_LOCATION: REPLACE_ME_WITH_URI
+
+      # APACHE PROXY USE QOS module. Recommended for PRODUCTION
+      USE_QOS: 1
+      QS_ClientEventBlockCount: 350
+      QS_ClientEventBlockCountSeconds: 100
+      QS_ClientEventBlockExcludeIP: "9.9.9.9"
+
+      fastapi_host: REPLACE_ME_WITH_RECORD_NAME
+      fastapi_host_alias: REPLACE_ME_WITH_PRODUCTION_FQDN
+      fastapi_tag: 0.2
+
+      REDIRECT_HTTP: 1
+      USE_CLOUDFLARE: 0 
+   scripts: [ "stage.yaml", "start_services.yaml" ]
