@@ -50,6 +50,8 @@ async def autocomplete_term(
     :return: A dictionary containing the list of matching concepts or entities.
     :rtype: dict
     """
+    if rows is None:
+        rows = 100000
     # dictates the fields to return
     fields = "id,bioentity_label,bioentity_name,taxon,taxon_label,document_category"
 

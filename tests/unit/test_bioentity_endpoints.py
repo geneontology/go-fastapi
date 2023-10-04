@@ -10,7 +10,7 @@ from app.utils.settings import ESOLR, ESOLRDoc
 test_client = TestClient(app)
 
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-go_ids = ["GO:0008150"]
+go_ids = ["GO:0008150", "GO:0046330"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
@@ -85,9 +85,10 @@ class TestBioentityEndpoints(unittest.TestCase):
         for go_id in go_ids:
             response = test_client.get(f"/api/bioentity/function/{go_id}/genes")
             self.assertEqual(response.status_code, 200)
-            self.assertGreaterEqual(len(response.json().get("associations")), 4)
+            print(len(response.json().get("associations")))
+            self.assertGreaterEqual(len(response.json().get("associations")), 92)
 
-    def test_bioentity_gene_function_taxon_endpoint(self):
+    def test_bioentity_gene_function_id_genes_endpoint(self):
         """
         Test bioentity gene function taxon endpoint.
 
@@ -97,7 +98,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             data = {"taxon": "NCBITaxon:9606"}
             response = test_client.get(f"/api/bioentity/function/{go_id}/genes", params=data)
             self.assertEqual(response.status_code, 200)
-            self.assertGreaterEqual(len(response.json().get("associations")), 4)
+            self.assertGreaterEqual(len(response.json().get("associations")), 101)
 
     def test_bioentity_gene_function_endpoints_taxons(self):
         """

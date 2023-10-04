@@ -54,7 +54,7 @@ async def get_bioentity_by_id(
         example="ZFIN:ZDB-GENE-990415-44",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100."),
+    rows: int = Query(None, description="The number of results per page. Default is 100."),
 ):
     """
     Get bio-entities (genes) by their identifiers.
@@ -78,6 +78,8 @@ async def get_bioentity_by_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    if rows is None:
+        rows = 100000
     # special case MGI, sigh
     if id.startswith("MGI:"):
         id = id.replace("MGI:", "MGI:MGI:")
@@ -110,7 +112,7 @@ async def get_annotations_by_goterm_id(
     ),
     evidence: List[str] = Query(None),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100."),
+    rows: int = Query(None, description="The number of results per page. Default is 100."),
 ):
     """
     Returns annotations using the provided GO term.
@@ -139,6 +141,8 @@ async def get_annotations_by_goterm_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    if rows is None:
+        rows = 100000
     # dictates the fields to return, annotation_class,aspect
     fields = (
         "date,assigned_by,bioentity_label,bioentity_name,synonym,taxon,"
@@ -198,7 +202,7 @@ async def get_genes_by_goterm_id(
         description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100."),
+    rows: int = Query(None, description="The number of results per page. Default is 100."),
 ):
     """
     Returns genes annotated to the provided GO Term.
@@ -224,6 +228,8 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    if rows is None:
+        rows = 100000
     association_return = {}
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         association_return = search_associations(
@@ -236,7 +242,6 @@ async def get_genes_by_goterm_id(
             subject_taxon=taxon,
             user_agent=USER_AGENT,
             slim=slim,
-            taxon=taxon,
             relation=relation,
             url=ESOLR.GOLR,
             start=start,
@@ -255,7 +260,6 @@ async def get_genes_by_goterm_id(
             subject_taxon=taxon,
             invert_subject_object=True,
             user_agent=USER_AGENT,
-            taxon=taxon,
             slim=slim,
             relation=relation,
             url=ESOLR.GOLR,
@@ -269,9 +273,9 @@ async def get_genes_by_goterm_id(
             subject=id,
             subject_taxon=taxon,
             invert_subject_object=True,
-            taxon=taxon,
             user_agent=USER_AGENT,
             url=ESOLR.GOLR,
+            rows=rows,
         )
     return {"associations": association_return.get("associations")}
 
@@ -295,7 +299,7 @@ async def get_taxon_by_goterm_id(
         "object, e.g. ZFIN:ZDB-PUB-060503-2",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100."),
+    rows: int = Query(None, description="The number of results per page. Default is 100."),
 ):
     """
     Returns taxon information for genes annotated to the provided GO term.
@@ -312,6 +316,8 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
+    if rows is None:
+        rows = 100000
     fields = "taxon,taxon_label"
     query_filters = (
         "annotation_class%5E2&qf=annotation_class_label_searchable%5E1&qf="
@@ -363,7 +369,7 @@ async def get_annotations_by_gene_id(
         description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
     start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(100, description="The number of results per page. Default is 100."),
+    rows: int = Query(None, description="The number of results per page. Default is 100."),
 ):
     """
     Returns GO terms associated with a gene.
@@ -395,6 +401,9 @@ async def get_annotations_by_gene_id(
     scenes for querying.
 
     """
+    if rows is None:
+        rows = 100000
+
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 
