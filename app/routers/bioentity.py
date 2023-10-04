@@ -192,17 +192,15 @@ async def get_genes_by_goterm_id(
     ),
     relationship_type: RelationshipType = Query(
         default=RelationshipType.INVOLVED_IN,
-        description="relationship type ('involved_in’,"
-        "‘involved_in_regulation_of’ or "
-        "‘acts_upstream_of_or_within’),",
+        description="relationship type ('involved_in’,‘involved_in_regulation_of’ or ‘acts_upstream_of_or_within’)",
     ),
     relation: str = Query(None, description="A relation CURIE to filter associations"),
     slim: List[str] = Query(
         default=None,
         description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(None, description="The number of results per page."),
 ):
     """
     Returns genes annotated to the provided GO Term.
@@ -293,13 +291,11 @@ async def get_taxon_by_goterm_id(
     ),
     evidence: List[str] = Query(
         default=None,
-        description="Object id, e.g. ECO:0000501 (for IEA; "
-        "Includes inferred by default) or a "
-        "specific publication or other supporting "
-        "object, e.g. ZFIN:ZDB-PUB-060503-2",
+        description="Object id, e.g. ECO:0000501 (for IEA; Includes inferred by default) or a "
+                    "specific publication or other supporting object, e.g. ZFIN:ZDB-PUB-060503-2",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(None, description="The number of results per page."),
 ):
     """
     Returns taxon information for genes annotated to the provided GO term.
@@ -368,8 +364,8 @@ async def get_annotations_by_gene_id(
         default=None,
         description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(None, description="The number of results per page."),
 ):
     """
     Returns GO terms associated with a gene.
