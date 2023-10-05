@@ -40,11 +40,11 @@ async def autocomplete_term(
 
     :param term: The search term for autocomplete.
     :type term: str
-    :param start: The starting index of the search results, defaults to 0.
+    :param start: The starting index of the search results
     :type start: int, optional
-    :param rows: The maximum number of rows to return in the search results, defaults to 100.
+    :param rows: The maximum number of rows to return in the search results.
     :type rows: int, optional
-    :param category: The category of items to retrieve, can be 'gene' or 'term', defaults to None.
+    :param category: The category of items to retrieve, can be 'gene' or 'term'.
     :type category: AutocompleteCategory, optional
 
     :return: A dictionary containing the list of matching concepts or entities.
