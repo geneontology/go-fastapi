@@ -290,7 +290,7 @@ async def get_taxon_by_goterm_id(
     evidence: List[str] = Query(
         default=None,
         description="Object id, e.g. ECO:0000501 (for IEA; Includes inferred by default) or a "
-                    "specific publication or other supporting object, e.g. ZFIN:ZDB-PUB-060503-2",
+        "specific publication or other supporting object, e.g. ZFIN:ZDB-PUB-060503-2",
     ),
     start: int = Query(0, description="The starting index for pagination."),
     rows: int = Query(100, description="The number of results per page."),
