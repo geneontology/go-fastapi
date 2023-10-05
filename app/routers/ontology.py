@@ -76,7 +76,7 @@ async def get_subgraph_by_term_id(
         ..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677", example="GO:0003677"
     ),
     start: int = Query(0, description="The start index of the results to return"),
-    rows: int = Query(None, description="The number of results to return"),
+    rows: int = Query(100, description="The number of results to return"),
 ):
     """
     Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships "is_a" and "part_of".

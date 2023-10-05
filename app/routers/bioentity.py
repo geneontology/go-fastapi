@@ -53,8 +53,8 @@ async def get_bioentity_by_id(
         description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-44)",
         example="ZFIN:ZDB-GENE-990415-44",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(100, description="The number of results per page."),
 ):
     """
     Get bio-entities (genes) by their identifiers.
@@ -62,8 +62,8 @@ async def get_bioentity_by_id(
     Retrieves bio-entities (genes) based on their identifiers in CURIE format.
 
     :param id: The CURIE identifier of the bioentity to be retrieved. (required)
-    :param start: The starting index for pagination. Default is 0. (optional)
-    :param rows: The number of results per page. Default is 100. (optional)
+    :param start: The starting index for pagination.
+    :param rows: The number of results per page.
 
     :return: A dictionary containing the bioentity information retrieved from the database.
              The dictionary will contain fields such as 'id', 'bioentity_name', 'synonym', 'taxon',
@@ -111,8 +111,8 @@ async def get_annotations_by_goterm_id(
         example="GO:0044598",
     ),
     evidence: List[str] = Query(None),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(100, description="The number of results per page."),
 ):
     """
     Returns annotations using the provided GO term.
@@ -121,9 +121,9 @@ async def get_annotations_by_goterm_id(
     The GO term identifier should be represented in CURIE format (e.g., GO:0044598).
 
     :param id: The CURIE identifier of the GO term to be used for annotation retrieval. (required)
-    :param evidence: List of evidence codes to filter the results. Default is None. (optional)
-    :param start: The starting index for pagination. Default is 0. (optional)
-    :param rows: The number of results per page. Default is 100. (optional)
+    :param evidence: List of evidence codes to filter the results.
+    :param start: The starting index for pagination.
+    :param rows: The number of results per page.
 
     :return: A dictionary containing the annotation information retrieved from the database.
              The dictionary will contain fields such as 'date', 'assigned_by', 'bioentity_label',
@@ -192,17 +192,15 @@ async def get_genes_by_goterm_id(
     ),
     relationship_type: RelationshipType = Query(
         default=RelationshipType.INVOLVED_IN,
-        description="relationship type ('involved_in’,"
-        "‘involved_in_regulation_of’ or "
-        "‘acts_upstream_of_or_within’),",
+        description="relationship type ('involved_in’,‘involved_in_regulation_of’ or ‘acts_upstream_of_or_within’)",
     ),
     relation: str = Query(None, description="A relation CURIE to filter associations"),
     slim: List[str] = Query(
         default=None,
         description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(100, description="The number of results per page."),
 ):
     """
     Returns genes annotated to the provided GO Term.
@@ -211,15 +209,13 @@ async def get_genes_by_goterm_id(
     represented in CURIE format (e.g., GO:0044598).
 
     :param id: The CURIE identifier of the GO term to be used for gene retrieval. (required)
-    :param taxon: One or more taxon CURIEs to filter associations by subject taxon. Default is None. (optional)
+    :param taxon: One or more taxon CURIEs to filter associations by subject taxon.
     :param relationship_type: Relationship type for filtering associations.
                               Options: 'involved_in', 'involved_in_regulation_of', or 'acts_upstream_of_or_within'.
-                              Default is 'involved_in'. (optional)
-    :param relation: A relation CURIE to filter associations. Default is None. (optional)
+    :param relation: A relation CURIE to filter associations.
     :param slim: Map objects up slim to a higher-level category. Value can be an ontology class ID or subset ID.
-                 Default is None. (optional)
-    :param start: The starting index for pagination. Default is 0. (optional)
-    :param rows: The number of results per page. Default is 100. (optional)
+    :param start: The starting index for pagination.
+    :param rows: The number of results per page.
 
     :return: A dictionary containing the gene annotation information retrieved from the database.
              The dictionary will contain fields such as 'date', 'assigned_by', 'bioentity_label',
@@ -293,13 +289,11 @@ async def get_taxon_by_goterm_id(
     ),
     evidence: List[str] = Query(
         default=None,
-        description="Object id, e.g. ECO:0000501 (for IEA; "
-        "Includes inferred by default) or a "
-        "specific publication or other supporting "
-        "object, e.g. ZFIN:ZDB-PUB-060503-2",
+        description="Object id, e.g. ECO:0000501 (for IEA; Includes inferred by default) or a "
+        "specific publication or other supporting object, e.g. ZFIN:ZDB-PUB-060503-2",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(100, description="The number of results per page."),
 ):
     """
     Returns taxon information for genes annotated to the provided GO term.
@@ -309,9 +303,9 @@ async def get_taxon_by_goterm_id(
 
     :param id: The CURIE identifier of the GO term to be used for taxon retrieval. (required)
     :param evidence: List of object ids used for evidence filtering.
-                     Example: ['ECO:0000501', 'ZFIN:ZDB-PUB-060503-2']. Default is None. (optional)
-    :param start: The starting index for pagination. Default is 0. (optional)
-    :param rows: The number of results per page. Default is 100. (optional)
+                     Example: ['ECO:0000501', 'ZFIN:ZDB-PUB-060503-2'].
+    :param start: The starting index for pagination.
+    :param rows: The number of results per page.
 
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
@@ -368,8 +362,8 @@ async def get_annotations_by_gene_id(
         default=None,
         description="Map objects up slim to a higher level category. Value can be ontology class ID or subset ID",
     ),
-    start: int = Query(0, description="The starting index for pagination. Default is 0."),
-    rows: int = Query(None, description="The number of results per page. Default is 100."),
+    start: int = Query(0, description="The starting index for pagination."),
+    rows: int = Query(100, description="The number of results per page."),
 ):
     """
     Returns GO terms associated with a gene.
@@ -379,9 +373,8 @@ async def get_annotations_by_gene_id(
 
     :param id: The CURIE identifier of the gene for which GO term associations are retrieved. (required)
     :param slim: Map objects up slim to a higher-level category. Value can be an ontology class ID or subset ID.
-                 Default is None. (optional)
-    :param start: The starting index for pagination. Default is 0. (optional)
-    :param rows: The number of results per page. Default is 100. (optional)
+    :param start: The starting index for pagination.
+    :param rows: The number of results per page.
 
     :return: A dictionary containing the GO term associations for the provided gene.
              The dictionary will contain fields such as 'numFound' and 'associations' associated with the gene.
