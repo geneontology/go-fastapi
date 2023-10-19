@@ -5,6 +5,7 @@ import unittest
 from unittest import skip
 from pprint import pprint
 from fastapi.testclient import TestClient
+from requests import HTTPError
 
 from app.main import app
 
@@ -130,6 +131,10 @@ class TestApp(unittest.TestCase):
             self.assertEqual(response.json().get("id"), "gomodel:"+id)
             self.assertGreater(len(response.json().get("individuals")), 0)
             self.assertGreater(len(response.json().get("facts")), 0)
+
+    def test_get_model_details_by_model_id_json_failure(self):
+        with self.assertRaises(HTTPError):
+            test_client.get("/api/go-cam/notatallrelevant")
 
 
 if __name__ == "__main__":
