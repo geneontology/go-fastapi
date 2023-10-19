@@ -530,7 +530,7 @@ async def get_model_details_by_model_id_json(
     :return: model details based on a GO-CAM model ID in JSON format from the S3 bucket.
     """
     path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % id
-    response = requests.get(path_to_s3)
+    response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
     response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
     return response.json()
 
