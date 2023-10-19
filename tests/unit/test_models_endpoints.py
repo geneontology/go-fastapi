@@ -3,7 +3,7 @@
 import logging
 import unittest
 from unittest import skip
-
+from pprint import pprint
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -121,6 +121,14 @@ class TestApp(unittest.TestCase):
         self.assertEqual(len(response.json()), 1)
         self.assertIn("gocam", response.json()[0])
         self.assertIn("sources", response.json()[0])
+
+    def test_get_model_details_by_model_id_json(self):
+        response = test_client.get("/api/go-cam/59a6110e00000067")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json().get("id") == 'gomodel:59a6110e00000067')
+        self.assertGreater(len(response.json().get("indviduals")), 0)
+        pprint(response.json())
+
 
 
 if __name__ == "__main__":
