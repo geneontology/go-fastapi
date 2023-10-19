@@ -13,7 +13,7 @@ logger = logging.getLogger()
 
 test_client = TestClient(app)
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-
+go_cam_ids = ["59a6110e00000067", "SYNGO_369", "581e072c00000820", ]
 
 class TestApp(unittest.TestCase):
 
@@ -123,12 +123,13 @@ class TestApp(unittest.TestCase):
         self.assertIn("sources", response.json()[0])
 
     def test_get_model_details_by_model_id_json(self):
-        response = test_client.get("/api/go-cam/59a6110e00000067")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get("id"), 'gomodel:59a6110e00000067')
-        self.assertGreater(len(response.json().get("indviduals")), 0)
-        pprint(response.json())
-
+        for id in go_cam_ids:
+            response = test_client.get(f"/api/go-cam/{id}")
+            pprint(response.json())
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json().get("id"), "gomodel:"+id)
+            self.assertGreater(len(response.json().get("individuals")), 0)
+            self.assertGreater(len(response.json().get("facts")), 0)
 
 
 if __name__ == "__main__":
