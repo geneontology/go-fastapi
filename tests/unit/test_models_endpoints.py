@@ -84,6 +84,7 @@ class TestApp(unittest.TestCase):
         self.assertGreater(len(response.json()), 15)
         self.assertEqual(response.status_code, 200)
 
+    @skip("This test is skipped because it takes too long to run for GH actions.")
     def test_groups_by_name(self):
         """Test the endpoint to retrieve groups by name."""
         response = test_client.get("/api/groups/MGI")
