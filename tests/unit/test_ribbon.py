@@ -55,7 +55,6 @@ class TestOntologyAPI(unittest.TestCase):
         """Test the ontology ribbon for human."""
         data = {"subset": "goslim_agr", "subject": ["HGNC:10848"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
-        print(response.json())
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "SHH")
