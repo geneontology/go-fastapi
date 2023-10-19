@@ -125,7 +125,7 @@ class TestApp(unittest.TestCase):
     def test_get_model_details_by_model_id_json(self):
         response = test_client.get("/api/go-cam/59a6110e00000067")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get("id") == 'gomodel:59a6110e00000067')
+        self.assertEqual(response.json().get("id"), 'gomodel:59a6110e00000067')
         self.assertGreater(len(response.json().get("indviduals")), 0)
         pprint(response.json())
 
