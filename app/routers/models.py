@@ -1,9 +1,9 @@
 """Model API router."""
 
 import logging
-import requests
 from typing import List
 
+import requests
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
@@ -513,9 +513,9 @@ async def get_pmid_by_model_id(
     return collated_results
 
 
-@router.get("/api/go-cam/{id}",
-            tags=["models"],
-            description="Returns model details based on a GO-CAM model ID in JSON format.")
+@router.get(
+    "/api/go-cam/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID in JSON format."
+)
 async def get_model_details_by_model_id_json(
     id: str = Path(
         ...,
@@ -523,12 +523,16 @@ async def get_model_details_by_model_id_json(
         example="581e072c00000295",
     )
 ):
+    """
+    Returns model details based on a GO-CAM model ID in JSON format.
+
+    :param id: A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)
+    :return: model details based on a GO-CAM model ID in JSON format from the S3 bucket.
+    """
     path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % id
     response = requests.get(path_to_s3)
     response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
     return response.json()
-
-
 
 
 @router.get("/api/models/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID.")

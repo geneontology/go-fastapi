@@ -2,8 +2,9 @@
 
 import logging
 import unittest
-from unittest import skip
 from pprint import pprint
+from unittest import skip
+
 from fastapi.testclient import TestClient
 from requests import HTTPError
 
@@ -14,7 +15,12 @@ logger = logging.getLogger()
 
 test_client = TestClient(app)
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-go_cam_ids = ["59a6110e00000067", "SYNGO_369", "581e072c00000820", ]
+go_cam_ids = [
+    "59a6110e00000067",
+    "SYNGO_369",
+    "581e072c00000820",
+]
+
 
 class TestApp(unittest.TestCase):
 
@@ -124,15 +130,25 @@ class TestApp(unittest.TestCase):
         self.assertIn("sources", response.json()[0])
 
     def test_get_model_details_by_model_id_json(self):
+        """
+        Test the endpoint to retrieve model details by model ID in JSON format from the S3 bucket, check for success.
+
+        :return: None
+        """
         for id in go_cam_ids:
             response = test_client.get(f"/api/go-cam/{id}")
             pprint(response.json())
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json().get("id"), "gomodel:"+id)
+            self.assertEqual(response.json().get("id"), "gomodel:" + id)
             self.assertGreater(len(response.json().get("individuals")), 0)
             self.assertGreater(len(response.json().get("facts")), 0)
 
     def test_get_model_details_by_model_id_json_failure(self):
+        """
+        Test the endpoint to retrieve model details by model ID that does not exist, check for failure.
+
+        :return: None
+        """
         with self.assertRaises(HTTPError):
             test_client.get("/api/go-cam/notatallrelevant")
 
