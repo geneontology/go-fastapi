@@ -551,9 +551,14 @@ async def get_model_details_by_model_id_json(
     :return: model details based on a GO-CAM model ID in JSON format from the S3 bucket.
     """
     if id.startswith("gomodel:"):
-        id = id.replace("gomodel:", "")
+        replaced_id = id.replace("gomodel:", "")
+    else:
+        replaced_id = id
 
-    path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % id
+    print("id is replaced id:", replaced_id)
+    print("id is:", id)
+
+    path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
     response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
     response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
     return response.json()
@@ -568,7 +573,6 @@ async def get_term_details_by_model_id(
     )
 ):
     """Returns model details based on a GO-CAM model ID."""
-
     if id.startswith("gomodel:"):
         id = id.replace("gomodel:", "")
 
