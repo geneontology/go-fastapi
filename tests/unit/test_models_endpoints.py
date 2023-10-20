@@ -19,6 +19,8 @@ go_cam_ids = [
     "59a6110e00000067",
     "SYNGO_369",
     "581e072c00000820",
+    "gomodel:59a6110e00000067",
+    "gomodel:SYNGO_369"
 ]
 
 
