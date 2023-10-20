@@ -6,5 +6,5 @@ ontologies:
     handle: go
     pre_load: false
 sparql_url:
-  url: "http://rdf.geneontology.org/sparql"
+  url: "https://rdf.geneontology.org/sparql"
   timeout: 60
