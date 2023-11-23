@@ -2,7 +2,7 @@
 import logging
 
 from curies import Converter
-from prefixmaps import load_context
+from prefixmaps import load_converter
 
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
@@ -18,11 +18,11 @@ def remap_prefixes(cmap):
 
 def get_prefixes(context: str = "go"):
     """Returns a dictionary of all prefixes in the GO namespace."""
-    context = load_context(context)
-    extended_prefix_map = context.as_extended_prefix_map()
-    converter = Converter.from_extended_prefix_map(extended_prefix_map)
+    converter = load_converter(context)
     cmaps = converter.prefix_map
     # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    # TODO consider using curies' rewiring functionality
+    #  https://curies.readthedocs.io/en/latest/reconciliation.html#rewiring
     cmap_remapped = remap_prefixes(cmaps)
 
     return cmap_remapped
