@@ -1,28 +1,33 @@
 """prefix utility functions."""
 import logging
 
-from curies import Converter
+from curies import Converter, rewire
 from prefixmaps import load_converter
 
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
+REWIRING = {
+    "MGI": "http://identifiers.org/mgi/MGI:",
+    "WB": "http://identifiers.org/wormbase/",
+}
 
 # have to remap prefixes from prefixmaps in order to match the prefixes in Minerva
 def remap_prefixes(cmap):
     """Remaps prefixes from prefixmaps in order to match the prefixes in Minerva."""
-    cmap["MGI"] = "http://identifiers.org/mgi/MGI:"
-    cmap["WB"] = "http://identifiers.org/wormbase/"
+    cmap.update(REWIRING)
     return cmap
+
+
+def get_converter(context: str = "go") -> curies.Converter:
+    converter = load_converter(context)
+    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
+    converter = rewire(converter, REWIRING)
+    return converter
 
 
 def get_prefixes(context: str = "go"):
     """Returns a dictionary of all prefixes in the GO namespace."""
-    converter = load_converter(context)
+    converter = get_converter(context)
     cmaps = converter.prefix_map
-    # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-    # TODO consider using curies' rewiring functionality
-    #  https://curies.readthedocs.io/en/latest/reconciliation.html#rewiring
-    cmap_remapped = remap_prefixes(cmaps)
-
-    return cmap_remapped
+    return cmaps
