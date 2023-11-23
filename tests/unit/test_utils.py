@@ -4,10 +4,9 @@ import unittest
 
 from curies import Converter
 from fastapi.testclient import TestClient
-from prefixmaps import load_context
 
 from app.main import app
-from app.utils.prefix_utils import remap_prefixes
+from app.utils.prefix_utils import get_converter
 
 test_client = TestClient(app)
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
@@ -29,12 +28,8 @@ class TestPrefixUtils(unittest.TestCase):
 
         :return: None
         """
-        context = load_context("go")
-        extended_prefix_map = context.as_extended_prefix_map()
-        converter = Converter.from_extended_prefix_map(extended_prefix_map)
+        converter = get_converter("go")
         cmaps = converter.prefix_map
-        # hacky solution to: https://github.com/geneontology/go-site/issues/2000
-        cmaps = remap_prefixes(cmaps)
         self.assertEqual(cmaps["MGI"], "http://identifiers.org/mgi/MGI:")
 
 
