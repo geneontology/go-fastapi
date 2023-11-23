@@ -4,16 +4,12 @@ import logging
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 
-from app.utils.prefix_utils import get_prefixes
+from app.utils.prefix_utils import get_converter
 
 logger = logging.getLogger()
 
 router = APIRouter()
-
-cmaps = get_prefixes("go")
-# have to set strict to "False" to allow for WB and WormBase as prefixes that
-# map to the same expanded URI prefix
-converter = Converter.from_prefix_map(cmaps, strict=False)
+converter = get_converter("go")
 
 
 @router.get(
@@ -23,7 +19,7 @@ converter = Converter.from_prefix_map(cmaps, strict=False)
 )
 async def get_all_prefixes():
     """Returns a list of all prefixes in the GO namespace."""
-    return list(cmaps)
+    return list(converter.prefix_map)
 
 
 @router.get(
