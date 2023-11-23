@@ -10,6 +10,11 @@ logger = logging.getLogger()
 
 router = APIRouter()
 
+cmaps = get_prefixes("go")
+# have to set strict to "False" to allow for WB and WormBase as prefixes that
+# map to the same expanded URI prefix
+converter = Converter.from_prefix_map(cmaps, strict=False)
+
 
 @router.get(
     "/api/identifier/prefixes",
@@ -18,10 +23,7 @@ router = APIRouter()
 )
 async def get_all_prefixes():
     """Returns a list of all prefixes in the GO namespace."""
-    all_prefixes = []
-    for k, _v in get_prefixes("go").items():
-        all_prefixes.append(k)
-    return all_prefixes
+    return list(cmaps)
 
 
 @router.get(
@@ -38,11 +40,6 @@ async def get_expand_curie(id: str = Path(..., description="identifier in CURIE 
     """
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
-
-    cmaps = get_prefixes("go")
-    # have to set strict to "False" to allow for WB and WormBase as prefixes that
-    # map to the same expanded URI prefix
-    converter = Converter.from_prefix_map(cmaps, strict=False)
     return converter.expand(id)
 
 
@@ -58,6 +55,4 @@ async def get_contract_uri(uri: str = Query(..., description="URI of the resourc
 
     e.g. http://purl.obolibrary.org/obo/GO_0008150.
     """
-    cmaps = get_prefixes("go")
-    converter = Converter.from_prefix_map(cmaps, strict=False)
     return converter.compress(uri)
