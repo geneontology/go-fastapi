@@ -1,7 +1,8 @@
 """prefix utility functions."""
 import logging
 
-from curies import Converter, rewire
+import curies
+from curies import rewire
 from prefixmaps import load_converter
 
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
@@ -12,6 +13,7 @@ REWIRING = {
     "WB": "http://identifiers.org/wormbase/",
 }
 
+
 # have to remap prefixes from prefixmaps in order to match the prefixes in Minerva
 def remap_prefixes(cmap):
     """Remaps prefixes from prefixmaps in order to match the prefixes in Minerva."""
@@ -20,6 +22,7 @@ def remap_prefixes(cmap):
 
 
 def get_converter(context: str = "go") -> curies.Converter:
+    """Get a converter for the given contex."""
     converter = load_converter(context)
     # hacky solution to: https://github.com/geneontology/go-site/issues/2000
     converter = rewire(converter, REWIRING)

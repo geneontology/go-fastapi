@@ -1,7 +1,6 @@
 """Module contains the API endpoints for handling prefixes and expansions."""
 import logging
 
-from curies import Converter
 from fastapi import APIRouter, Path, Query
 
 from app.utils.prefix_utils import get_converter
