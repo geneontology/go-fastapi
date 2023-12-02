@@ -22,7 +22,7 @@ def remap_prefixes(cmap):
 
 
 def get_converter(context: str = "go") -> curies.Converter:
-    """Get a converter for the given contex."""
+    """Get a converter for the given context."""
     converter = load_converter(context)
     # hacky solution to: https://github.com/geneontology/go-site/issues/2000
     converter = rewire(converter, REWIRING)
