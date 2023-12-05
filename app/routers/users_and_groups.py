@@ -343,7 +343,7 @@ async def get_groups():
     "/api/groups/{name}", tags=["users and groups"], deprecated=True, description="Get GO group metadata by name"
 )
 async def get_group_metadata_by_name(
-    name: str = Path(None, description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")
+    name: str = Path(..., description="The name of the Group (e.g. SynGO, GO Central, MGI, ...)")
 ):
     """
     DEPRECATED.
