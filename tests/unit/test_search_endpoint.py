@@ -28,7 +28,7 @@ class TestSearchAPI(unittest.TestCase):
 
         :return: None
         """
-        self.assertEqual(ESOLR.GOLR.value, "https://golr.geneontology.io/solr/")
+        self.assertEqual(ESOLR.GOLR.value, "https://golr.geneontology.org/solr/")
         self.assertEqual(ESOLRDoc.ONTOLOGY.value, "ontology_class")
 
     def test_search_entity_ssh(self):
