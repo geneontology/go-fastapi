@@ -272,6 +272,23 @@ webencodings = "*"
 css = ["tinycss2 (>=1.1.0,<1.2)"]
 
 [[package]]
+name = "bmt"
+version = "1.1.2"
+description = "Biolink Model Toolkit: A Python API for working with the Biolink Model"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "bmt-1.1.2-py3-none-any.whl", hash = "sha256:16c2a1b5dafe585d93540189e97b0687a1c41ad936856033818ab174749ef30d"},
+    {file = "bmt-1.1.2.tar.gz", hash = "sha256:51a80ab5035cf8ebe11ab130cff6171e2d745c6a6a4752de633be76b5f12aad6"},
+]
+
+[package.dependencies]
+deprecation = ">=2.1.0,<3.0.0"
+linkml-runtime = ">=1.5.0,<2.0.0"
+stringcase = ">=1.2.0,<2.0.0"
+
+[[package]]
 name = "cachetools"
 version = "5.3.1"
 description = "Extensible memoizing collections and decorators"
@@ -729,18 +746,6 @@ files = [
 
 [package.extras]
 dev = ["black", "coveralls", "mypy", "pre-commit", "pylint", "pytest (>=5)", "pytest-benchmark", "pytest-cov"]
-
-[[package]]
-name = "dataclasses"
-version = "0.6"
-description = "A backport of the dataclasses module for Python 3.6"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "dataclasses-0.6-py3-none-any.whl", hash = "sha256:454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f"},
-    {file = "dataclasses-0.6.tar.gz", hash = "sha256:6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84"},
-]
 
 [[package]]
 name = "decorator"
@@ -2535,14 +2540,14 @@ tests = ["coverage", "pytest"]
 
 [[package]]
 name = "ontobio"
-version = "2.8.8"
+version = "2.8.21"
 description = "Library for working with OBO Library Ontologies and associations"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "ontobio-2.8.8-py3-none-any.whl", hash = "sha256:1adc44b80d644108a6278153aee2c5b11729c4f03b1c017d9c6415df2c6c094d"},
-    {file = "ontobio-2.8.8.tar.gz", hash = "sha256:47f2a542f6397363df07583ae3a301489efc9f539f8498e3b909357ef8cc7a81"},
+    {file = "ontobio-2.8.21-py3-none-any.whl", hash = "sha256:45b97560711b2ff9ba66185d40d35568abcfe0d577ccc9ce1d9556b95cfa17d4"},
+    {file = "ontobio-2.8.21.tar.gz", hash = "sha256:970b40dd5238e7c7bcb0220e3753bd360a91f65b1de1c3ace8871f909f0c6c95"},
 ]
 
 [package.dependencies]
@@ -2550,7 +2555,6 @@ bidict = ">=0.20.0"
 chardet = "*"
 click = "*"
 dacite = ">=1.6.0"
-dataclasses = "*"
 diskcache = ">=4.0.0"
 jsobject = ">=0.0"
 jsonpath-rw = ">=0.0"
@@ -2570,6 +2574,7 @@ pytest = ">=0.0"
 pytest-logging = ">=0.0"
 python-dateutil = "*"
 pyyaml = "*"
+rdflib = ">=6.0.0"
 requests = ">=0.0"
 scipy = ">=1.2.0"
 SPARQLWrapper = ">=1.8.0"
@@ -4435,6 +4440,17 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
+name = "stringcase"
+version = "1.2.0"
+description = "String case converter."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "stringcase-1.2.0.tar.gz", hash = "sha256:48a06980661908efe8d9d34eab2b6c13aefa2163b3ced26972902e3bdfd87008"},
+]
+
+[[package]]
 name = "tenacity"
 version = "8.2.2"
 description = "Retry code until it succeeds"
@@ -4855,4 +4871,4 @@ docs = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.1"
-content-hash = "9dbd7267dcb65f2c5eaf7c7ebca864624adcd5766c993eb39d99cb5523092d4d"
+content-hash = "29d176e09eac558b1f4fa38ecb2de0894b0bb873034c63cd6359ca15a4ffb968"
