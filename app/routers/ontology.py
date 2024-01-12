@@ -198,7 +198,7 @@ async def get_ancestors_shared_between_two_terms(
     else:
         logger.info("got here")
         fields = "neighborhood_graph_json"
-        # https://golr-aux.geneontology.io/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
+        # https://golr.geneontology.io/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
         subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
         objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
 

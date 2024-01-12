@@ -272,6 +272,23 @@ webencodings = "*"
 css = ["tinycss2 (>=1.1.0,<1.2)"]
 
 [[package]]
+name = "bmt"
+version = "1.1.2"
+description = "Biolink Model Toolkit: A Python API for working with the Biolink Model"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "bmt-1.1.2-py3-none-any.whl", hash = "sha256:16c2a1b5dafe585d93540189e97b0687a1c41ad936856033818ab174749ef30d"},
+    {file = "bmt-1.1.2.tar.gz", hash = "sha256:51a80ab5035cf8ebe11ab130cff6171e2d745c6a6a4752de633be76b5f12aad6"},
+]
+
+[package.dependencies]
+deprecation = ">=2.1.0,<3.0.0"
+linkml-runtime = ">=1.5.0,<2.0.0"
+stringcase = ">=1.2.0,<2.0.0"
+
+[[package]]
 name = "cachetools"
 version = "5.3.1"
 description = "Extensible memoizing collections and decorators"
@@ -4435,6 +4452,17 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
+name = "stringcase"
+version = "1.2.0"
+description = "String case converter."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "stringcase-1.2.0.tar.gz", hash = "sha256:48a06980661908efe8d9d34eab2b6c13aefa2163b3ced26972902e3bdfd87008"},
+]
+
+[[package]]
 name = "tenacity"
 version = "8.2.2"
 description = "Retry code until it succeeds"
@@ -4855,4 +4883,4 @@ docs = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.1"
-content-hash = "9dbd7267dcb65f2c5eaf7c7ebca864624adcd5766c993eb39d99cb5523092d4d"
+content-hash = "29d176e09eac558b1f4fa38ecb2de0894b0bb873034c63cd6359ca15a4ffb968"

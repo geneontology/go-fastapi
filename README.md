@@ -127,7 +127,7 @@ See https://github.com/geneontology/go-fastapi/blob/main/provision/production/PR
 
 
 ### API sources
-1) Golr: "https://golr-aux.geneontology.io/solr/"
+1) Golr: "https://golr.geneontology.io/solr/"
 2) GO RDF endpoint: "https://rdf.geneontology.org/sparql"
 3) precomputed JSON files for GO-CAM models: "https://go-public.s3.amazonaws.com/files/go-cam/[model_id].json"
 
