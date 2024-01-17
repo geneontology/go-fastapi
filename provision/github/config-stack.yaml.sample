@@ -26,4 +26,4 @@ stack:
 
       REDIRECT_HTTP: 1
       USE_CLOUDFLARE: 0 
-   scripts: [ "stage.yaml", "start_services.yaml" ]
+   scripts: [ "stage.yaml", "start_services_using_docker_compose.yaml" ]
