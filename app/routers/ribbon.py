@@ -322,7 +322,7 @@ async def get_ribbon_results(
     for entity in to_remove:
         subjects.remove(entity)
 
-    # http://golr-aux.geneontology.io/solr/select/?q=*:*&fq=document_category:%22bioentity%22&rows=10&wt=json&fl=
+    # http://golr.geneontology.org/solr/select/?q=*:*&fq=document_category:%22bioentity%22&rows=10&wt=json&fl=
     # bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
 
     result = {"categories": categories, "subjects": subjects}

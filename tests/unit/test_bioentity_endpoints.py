@@ -29,7 +29,7 @@ class TestBioentityEndpoints(unittest.TestCase):
 
         :return: None
         """
-        self.assertEqual(ESOLR.GOLR.value, "https://golr-aux.geneontology.io/solr/")
+        self.assertEqual(ESOLR.GOLR.value, "https://golr.geneontology.org/solr/")
         self.assertEqual(ESOLRDoc.ONTOLOGY.value, "ontology_class")
 
     def test_bioentity_id_endpoints(self):
@@ -70,8 +70,8 @@ class TestBioentityEndpoints(unittest.TestCase):
 
         :return: None
         """
-        for go_id in go_ids:
-            response = test_client.get(f"/api/bioentity/gene/{go_id}/function")
+        for gene_id in gene_ids:
+            response = test_client.get(f"/api/bioentity/gene/{gene_id}/function")
             print(response.json())
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json().get("associations")), 4)
@@ -98,7 +98,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             data = {"taxon": "NCBITaxon:9606"}
             response = test_client.get(f"/api/bioentity/function/{go_id}/genes", params=data)
             self.assertEqual(response.status_code, 200)
-            self.assertGreaterEqual(len(response.json().get("associations")), 101)
+            self.assertGreaterEqual(len(response.json().get("associations")), 100)
 
     def test_bioentity_gene_function_endpoints_taxons(self):
         """

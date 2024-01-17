@@ -76,7 +76,7 @@ async def get_subgraph_by_term_id(
         ..., description="The ID of the term to extract the subgraph from,  e.g. GO:0003677", example="GO:0003677"
     ),
     start: int = Query(0, description="The start index of the results to return"),
-    rows: int = Query(None, description="The number of results to return"),
+    rows: int = Query(100, description="The number of results to return"),
 ):
     """
     Extract a subgraph from an ontology term. e.g. GO:0003677 using the relationships "is_a" and "part_of".
@@ -198,7 +198,7 @@ async def get_ancestors_shared_between_two_terms(
     else:
         logger.info("got here")
         fields = "neighborhood_graph_json"
-        # https://golr-aux.geneontology.io/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
+        # https://golr.geneontology.org/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
         subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
         objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
 
