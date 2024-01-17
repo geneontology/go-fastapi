@@ -13,6 +13,17 @@ sed "s/REPLACE_ME_GOAPI_S3_STATE_STORE/$s3_terraform_backend/g" ./github/backend
 zone_id=`aws route53 list-hosted-zones-by-name --dns-name geneontology.io. --max-items 1  --query "HostedZones[].Id" --output text  | tr "/" " " | awk '{ print $2 }'`
 record_name=cicd-test-go-fastapi.geneontology.io
 
+aws route53 list-resource-record-sets --hosted-zone-id $zone_id  --max-items 1000 --query "ResourceRecordSets[].Name" | grep $record_name
+ret=$?
+
+if [ "${ret}" == 0 ]
+then
+   echo "$record_name exists. Cannot proceed. Tray again"
+   exit 1
+fi
+
+echo "Great. $record_name not found ... Proceeeding"
+
 sed "s/REPLACE_ME_WITH_ZONE_ID/$zone_id/g" ./github/config-instance.yaml.sample > ./github/config-instance.yaml
 sed -i "s/REPLACE_ME_WITH_RECORD_NAME/$record_name/g" ./github/config-instance.yaml
 
@@ -32,13 +43,13 @@ go-deploy --working-directory aws -w test-go-deploy-api -output -verbose
 go-deploy --working-directory aws -w test-go-deploy-api -c ./github/config-stack.yaml -verbose
 
 ret=1
-total=${NUM_OF_RETRIES:=12}
+total=${NUM_OF_RETRIES:=100}
 
 
 for (( c=1; c<=$total; c++ ))
 do
-   echo wget http://$record_name/openapi.json
-   wget  --no-dns-cache http://$record_name/openapi.json
+   echo wget --https-only --no-dns-cache http://$record_name/openapi.json
+   wget --https-only --no-dns-cache http://$record_name/openapi.json
    ret=$?
    if [ "${ret}" == 0 ]
    then
@@ -55,7 +66,6 @@ then
    python3 -c "import json;fp=open('openapi.json');json.load(fp)"
    ret=$?
 fi
-
 
 # Destroy
 go-deploy --working-directory aws -w test-go-deploy-api -destroy -verbose

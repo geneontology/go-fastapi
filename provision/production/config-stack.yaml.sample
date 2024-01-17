@@ -6,7 +6,7 @@ stack:
    vars:
       PROD_MODE: 1
       stage_dir: /home/ubuntu/stage_dir
-      apache_proxy_image: geneontology/apache-proxy:v6
+      apache_proxy_image: geneontology/apache-proxy:v7
       S3_CRED_FILE: /tmp/go-aws-credentials
       S3_BUCKET: REPLACE_ME_APACHE_LOG_BUCKET
 
