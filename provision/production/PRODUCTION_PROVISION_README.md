@@ -72,25 +72,26 @@ Add your personal dev keys into the file; update the `aws_access_key_id` and `aw
 emacs /tmp/go-aws-credentials
 ```
 
-3. Prepare and initialize the S3 Terraform backend:
+3. Initialize the S3 Terraform backend:
 
-"Initializing" a Terraform backend means that you are getting ready to save a bundle of EC2 and networking states to S3, so that you and other developers in the future can discover and manipulate these states in the future, bringing servers and services up and down in a coordinated way. These terraform backends are an arbitrary bundle and can be grouped as needed. In general, the production systems should all use a coordinated set, but you may create new ones for experimentation, etc. If you are trying to work with an already set state, jump to `4`; if you are experimenting, continue here with `3`.
+"Initializing" a Terraform backend connects your local Terraform instantiation to a workspace; we are using S3 as the shared workspace medium (Terraform has others as well). This workspace will contain information on EC2 instances, network info, etc.; you (and other developers in the future) can discover and manipulate these states, bringing servers and services up and down in a shared and coordinated way. These Terraform backends are an arbitrary bundle and can be grouped as needed. In general, the production systems should all use the same pre-coordinated workspace, but you may create new ones for experimentation, etc.
+
+Typically, the name of the workspace is `go-workspace-` + the name of the service; i.e. `go-workspace-api`.
 
 ```bash
 
-# The S3 backend is used to store the terraform state.
 cp ./production/backend.tf.sample ./aws/backend.tf
 
-# replace the REPLACE_ME_GOAPI_S3_STATE_STORE with the appropriate backend
+# Replace the REPLACE_ME_GOAPI_S3_STATE_STORE with the appropriate workspace (state store ~= workspace); so `go-workspace-api`.
 emacs ./aws/backend.tf
 
-# Use the AWS cli to make sure you have access to the terraform s3 backend bucket
+# Use the AWS CLI to make sure you have access to the terraform s3 backend bucket
 export AWS_SHARED_CREDENTIALS_FILE=/tmp/go-aws-credentials
 
-# S3 bucket
-aws s3 ls s3://REPLACE_ME_GOAPI_S3_STATE_STORE
+# Check connection to S3 bucket.
+aws s3 ls s3://go-workspace-api
 
-# initialize (if it doesn't work, we fail):
+# Initialize (if it doesn't work, we fail):
 go-deploy -init --working-directory aws -verbose
 
 # Use these commands to figure out the name of an existing workspace if any. The name should have a pattern `production-YYYY-MM-DD`
