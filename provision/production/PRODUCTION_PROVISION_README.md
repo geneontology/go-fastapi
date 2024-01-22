@@ -46,7 +46,13 @@ For testing purposes you can you your own ssh keys. But for production please as
 
 This is all completed in a dockerized development environment (all commands take place inside the docker container).
 
-1. Spin up the provided dockerized development environment:
+1. Prepare _your_ AWS credentials:
+
+Your (personal developer) AWS credentials are used by Terraform to provision the AWS instance and by the provisioned instance to access the certificate store and the S3 buckets used to store Apache logs. These are your personal AWS credentials and should have been appropriately created to give you these permissions.
+
+**NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file farther down.
+
+2. Spin up the provided dockerized development environment:
 
 ```bash
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
@@ -54,15 +60,16 @@ git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
 ```
 
-2. Prepare AWS credentials:
+2_5. Establish the AWS credential files
 
-The credentials are used by Terraform to provision the AWS instance and by the provisioned instance to access the certificate store and the s3 buckets used to store Apache logs.  Copy and modify the aws credential file to the default location `/tmp/go-aws-credentials` 
-
-**NOTE**: you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file.
+Copy and modify the AWS credential file to the default location `/tmp/go-aws-credentials`.
 
 ```bash
 cp production/go-aws-credentials.sample /tmp/go-aws-credentials
-emacs /tmp/go-aws-credentials  # update the `aws_access_key_id` and `aws_secret_access_key`
+```
+Add your personal dev keys into the file; update the `aws_access_key_id` and `aws_secret_access_key`:
+```
+emacs /tmp/go-aws-credentials
 ```
 
 3. Prepare and initialize the S3 Terraform backend:
