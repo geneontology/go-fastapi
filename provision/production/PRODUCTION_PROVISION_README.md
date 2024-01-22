@@ -7,7 +7,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 
 #### software:
 
-- go-fastapi checkout 
+- go-fastapi checkout
 - Terraform: v1.1.4
 - Ansible: 2.10.7
 - aws cli
