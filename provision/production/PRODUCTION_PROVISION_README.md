@@ -36,11 +36,7 @@ DNS records are used for `go-fastapi`; they are typically the "production" recor
 
 **NOTE**: If using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
 
-#### SSH Keys:
-
-For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
-/tmp/go-ssh.pub
-/tmp/go-ssh
+# BREAK FOR NEW DOC #
 
 ## Configuring and deploying EC2 _instances_: 
 
@@ -52,12 +48,43 @@ Your (personal developer) AWS credentials are used by Terraform to provision the
 
 **NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file farther down.
 
+1_5. SSH Keys
+
+The keys we'll be using can be found in the shared SpderOak store. If you don't know what this is, ask @kltm.
+
+For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
+
+The names will be:
+
+```
+go-ssh.pub
+go-ssh
+```
+
 2. Spin up the provided dockerized development environment:
 
 ```bash
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
 git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
+```
+
+2_25. Copy in SSH keys
+
+Copy the ssh keys from your docker host into the running docker image, in `/tmp`:
+
+```
+docker cp go-ssh go-dev:/tmp
+docker cp go-ssh.pub go-dev:/tmp
+```
+You should now have the following in your image:
+```
+/tmp/go-ssh
+/tmp/go-ssh.pub
+```
+Make sure they have the right perms to be used:
+```
+chmod 600 /tmp/go-ssh*
 ```
 
 2_5. Establish the AWS credential files
@@ -98,18 +125,14 @@ go-deploy -init --working-directory aws -verbose
 go-deploy --working-directory aws -list-workspaces -verbose 
 ```
 
-4. Provision instance on AWS:
+4. Provision new instance on AWS, for potential production use:
 
-If a workspace exists above, then you can skip the provisioning of the AWS instance.  
-Else, create a workspace using the following namespace pattern `production-YYYY-MM-DD`.  e.g.: `production-2023-01-30`
+Create a (new) production workspace using the following namespace pattern `production-YYYY-MM-DD`; e.g.: `production-2023-01-30`:
 
 ```bash
-# copy `production/config-instance.yaml.sample` to another location and modify using emacs.
-
 cp ./production/config-instance.yaml.sample config-instance.yaml
-emacs config-instance.yaml  # verify the location of the ssh keys for your AWS instance in your copy of `config-instance.yaml` under `ssh_keys`.
-                            # verify the location of the public ssh key in `aws/main.tf`
-
+emacs config-instance.yaml  # verify the location of the SSH keys for your AWS instance: /tmp/go-ssh
+emacs aws/main.tf # technically optional; verify the location of the public ssh key in `aws/main.tf`
 ```
 
 5. test the deployment
