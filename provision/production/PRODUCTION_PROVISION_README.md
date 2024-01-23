@@ -156,6 +156,9 @@ Deploy command:
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-instance.yaml
 ```
 
+STALLLLLLED HEEEEEERE :(
+(`-show` and `-output` do not seem to work; can still skip ahead and use raw terraform commands)
+
 Just to check, ask it to display what it just did (display the Terraform state):
 ```
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -show
@@ -172,16 +175,16 @@ The previous command creates a terraform tfvars. These variables override the va
 
 **NOTE**: write down the IP address of the AWS instance that is created.
 
-This can be found in `REPLACE_ME_WITH_TERRAFORM_BACKEND.cfg`  (e.g. production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg)
+This can be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg`  (e.g. production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg)
 If you need to check what you have just done, here are some helpful Terraform commands:
 
 ```bash
-cat REPLACE_ME_WITH_TERRAFORM_BACKEND.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json, sm-test-go-fastapi-alias.tfvars.json
+cat REPLACE_ME_WITH_S3_WORKSPACE_NAME.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json, sm-test-go-fastapi-alias.tfvars.json
 ```
 
 The previous command creates an ansible inventory file.
 ```bash
-cat REPLACE_ME_WITH_TERRAFORM_BACKEND-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
+cat REPLACE_ME_WITH_S3_WORKSPACE_NAME-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
 ```
 
 Useful terraform commands to check what you have just done
@@ -209,10 +212,10 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ````
 
 **NOTE**: change the command below to point to the terraform workspace you use above. 
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-stack.yaml
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-stack.yaml
 
 ```bash
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-stack.yaml
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-stack.yaml
 ```
 
 
@@ -262,7 +265,7 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 ```bash
 # Destroy Using Tool.
 # Make sure you point to the correct workspace before destroying the stack by using the -show command or the -output command
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -destroy
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -destroy
 ```
 
 ```bash
