@@ -135,18 +135,35 @@ emacs config-instance.yaml  # verify the location of the SSH keys for your AWS i
 emacs aws/main.tf # technically optional; verify the location of the public ssh key in `aws/main.tf`
 ```
 
-5. test the deployment
-```bash
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -dry-run --conf config-instance.yaml
+As well, give a human-readable string for the instance/tags/name (EC2 instance name tag), make it the same at the namespace pattern above; i.e. `production-2024-01-22`:
+
+```
+emacs config-instance.yaml
 ```
 
-7. deploy if all looks good.
+5. Test the deployment
+
+`REPLACE_ME_WITH_S3_WORKSPACE_NAME` would be something like `production-<TODAYS_DATE>`; i.e. `production-2024-01-22`
+
 ```bash
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose --conf config-instance.yaml
-# display the terraform state. The aws resources that were created.
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -show
-# display the public ip address of the aws instance
-go-deploy --workspace REPLACE_ME_WITH_TERRAFORM_BACKEND --working-directory aws -verbose -output
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -dry-run --conf config-instance.yaml
+```
+
+7. Deploy
+
+Deploy command:
+```bash
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-instance.yaml
+```
+
+Just to check, ask it to display what it just did (display the Terraform state):
+```
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -show
+```
+
+Finally, just show the IP address of the AWS instance:
+```
+go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -output
 ```
 
 Useful Details for troubleshooting:
