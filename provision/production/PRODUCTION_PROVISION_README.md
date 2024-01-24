@@ -223,23 +223,26 @@ Finally, get ansible ready:
 export ANSIBLE_HOST_KEY_CHECKING=False
 ````
 
-Run the deployment of the stack:
+Run the deployment of the stack within the instance:
 
 ```bash
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-stack.yaml
 ```
 
-## Testing deployment:
+## Testing deployment (within the dev image):
 
-1. Access go-fastapi from the command line by ssh'ing into the newly provisioned EC2 instance (this too is run via the dockerized dev environment):
+1. Access go-fastapi instance from the CLI by ssh'ing into the newly provisioned EC2 instance:
+```
 ssh -i /tmp/go-ssh ubuntu@IP_ADDRESS
+```
 
-2. Access go-fastapi from a browser:
+3. Access go-fastapi from a browser:
 
-We use health checks in the `docker-compose` file.  
-Use go-fastapi DNS name. http://{go-fastapi_host}/docs
++We use health checks in the `docker-compose` file.+ (where to put this?)
 
-3. Debugging:
+Use the go-fastapi CNAME name. https://{fastapi_host}/docs
+
+3. Debugging (in the AWS instance):
 
 * Use -dry-run and copy and paste the command and execute it manually
 * ssh to the machine; the username is ubuntu. Try using DNS names to make sure they are fine.
@@ -270,7 +273,7 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 ```
 
 
-## Destroy Instance and Delete Workspace:
+## Destroy Instance and other destructive things:
 
 ```bash
 # Destroy Using Tool.
