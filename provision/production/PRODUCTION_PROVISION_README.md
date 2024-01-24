@@ -64,7 +64,7 @@ go-ssh
 2. Spin up the provided dockerized development environment:
 
 ```bash
-docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.1  /bin/bash
+docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
 ```
@@ -103,7 +103,7 @@ emacs /tmp/go-aws-credentials
 
 "Initializing" a Terraform backend connects your local Terraform instantiation to a workspace; we are using S3 as the shared workspace medium (Terraform has others as well). This workspace will contain information on EC2 instances, network info, etc.; you (and other developers in the future) can discover and manipulate these states, bringing servers and services up and down in a shared and coordinated way. These Terraform backends are an arbitrary bundle and can be grouped as needed. In general, the production systems should all use the same pre-coordinated workspace, but you may create new ones for experimentation, etc.
 
-Typically, the name of the workspace is `go-workspace-` + the name of the service; i.e. `go-workspace-api`.
+Typically, the name of the workspace is `go-workspace-` + the name of the service; i.e. `go-workspace-api` for the use case here.
 
 ```bash
 
