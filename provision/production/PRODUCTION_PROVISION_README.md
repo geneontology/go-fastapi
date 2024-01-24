@@ -48,7 +48,7 @@ Your (personal developer) AWS credentials are used by Terraform to provision the
 
 **NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file farther down.
 
-1_5. SSH Keys
+2. SSH Keys
 
 The keys we'll be using can be found in the shared SpderOak store. If you don't know what this is, ask @kltm.
 
@@ -61,7 +61,7 @@ go-ssh.pub
 go-ssh
 ```
 
-2. Spin up the provided dockerized development environment:
+3. Spin up the provided dockerized development environment:
 
 ```bash
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
@@ -69,7 +69,7 @@ git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
 ```
 
-2_25. Copy in SSH keys
+4. Copy in SSH keys
 
 Copy the ssh keys from your docker host into the running docker image, in `/tmp`:
 
@@ -87,7 +87,7 @@ Make sure they have the right perms to be used:
 chmod 600 /tmp/go-ssh*
 ```
 
-2_5. Establish the AWS credential files
+5. Establish the AWS credential files
 
 Copy and modify the AWS credential file to the default location `/tmp/go-aws-credentials`.
 
@@ -99,7 +99,7 @@ Add your personal dev keys into the file; update the `aws_access_key_id` and `aw
 emacs /tmp/go-aws-credentials
 ```
 
-3. Initialize the S3 Terraform backend:
+6. Initialize the S3 Terraform backend:
 
 "Initializing" a Terraform backend connects your local Terraform instantiation to a workspace; we are using S3 as the shared workspace medium (Terraform has others as well). This workspace will contain information on EC2 instances, network info, etc.; you (and other developers in the future) can discover and manipulate these states, bringing servers and services up and down in a shared and coordinated way. These Terraform backends are an arbitrary bundle and can be grouped as needed. In general, the production systems should all use the same pre-coordinated workspace, but you may create new ones for experimentation, etc.
 
@@ -125,7 +125,7 @@ go-deploy -init --working-directory aws -verbose
 go-deploy --working-directory aws -list-workspaces -verbose 
 ```
 
-4. Provision new instance on AWS, for potential production use:
+7. Provision new instance on AWS, for potential production use:
 
 Create a (new) production workspace using the following namespace pattern `production-YYYY-MM-DD`; e.g.: `production-2023-01-30`:
 
@@ -141,7 +141,7 @@ As well, give a human-readable string for the instance/tags/name (EC2 instance n
 emacs config-instance.yaml
 ```
 
-5. Test the deployment
+8. Test the deployment
 
 `REPLACE_ME_WITH_S3_WORKSPACE_NAME` would be something like `production-<TODAYS_DATE>`; i.e. `production-2024-01-22`
 
@@ -149,15 +149,14 @@ emacs config-instance.yaml
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -dry-run --conf config-instance.yaml
 ```
 
-7. Deploy
+9. Deploy
 
 Deploy command:
 ```bash
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-instance.yaml
 ```
 
-STALLLLLLED HEEEEEERE :(
-(`-show` and `-output` do not seem to work; can still skip ahead and use raw terraform commands)
+10. Checking what we have done
 
 Just to check, ask it to display what it just did (display the Terraform state):
 ```
@@ -169,25 +168,24 @@ Finally, just show the IP address of the AWS instance:
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -output
 ```
 
-Useful Details for troubleshooting:
-This will produce an IP address in the resulting inventory.json file.
-The previous command creates a terraform tfvars. These variables override the variables in `aws/main.tf`
+**NOTE**: write down the IP address of the AWS instance that is created. This can also be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg` (e.g. production-YYYY-MM-DD.cfg).
 
-**NOTE**: write down the IP address of the AWS instance that is created.
+Useful details for troubleshooting:
+These commands will produce an IP address in the resulting `inventory.json` file.
+The previous command creates Terraform "tfvars". These variables override the variables in `aws/main.tf`
 
-This can be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg`  (e.g. production-YYYY-MM-DD.cfg, sm-test-go-fastapi-alias.cfg)
 If you need to check what you have just done, here are some helpful Terraform commands:
 
 ```bash
-cat REPLACE_ME_WITH_S3_WORKSPACE_NAME.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json, sm-test-go-fastapi-alias.tfvars.json
+cat REPLACE_ME_WITH_S3_WORKSPACE_NAME.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json
 ```
 
 The previous command creates an ansible inventory file.
 ```bash
-cat REPLACE_ME_WITH_S3_WORKSPACE_NAME-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory, sm-test-go-fastapi-alias-inventory
+cat REPLACE_ME_WITH_S3_WORKSPACE_NAME-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory
 ```
 
-Useful terraform commands to check what you have just done
+Useful Terraform commands to check what you have just done
 
 ```bash
 terraform -chdir=aws workspace show   # current terraform workspace
@@ -196,28 +194,40 @@ terraform -chdir=aws output           # shows public ip of aws instance
 ```
 
 ## Configuring and deploying software (go-fastapi) _stack_:
+
 These commands continue to be run in the dockerized development environment.
 
-* Make DNS names for go-fastapi point to the public IP address. If using cloudflare, put the ip in cloudflare DNS record. Otherwise put the ip in the AWS Route 53 DNS record. 
+* Make sure there is a CNAME pointing to the public IP address from above. At this stage, for testing, put the IP in an AWS Route 53 CNAME record. (E.g. api-test.geneontology.org.)
+
+**POSSIBLE CUT START**
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
-* s3 credentials are placed in a file using the format described above
-* s3 uri if SSL is enabled. Location of SSL certs/key
+* S3 credentials are placed in a file using the format described above
+* S3 uri if SSL is enabled. Location of SSL certs/key
 * QoS mitigation if QoS is enabled
 * Use the same workspace name as in the previous step
+**POSSIBLE CUT END**
 
+Let's ready the the instance, starting by editing the config:
 ```bash
 cp ./production/config-stack.yaml.sample ./config-stack.yaml
-emacs ./config-stack.yaml    # MAKE SURE TO CHANGE THE GO-FASTAPI TAG (strip the v), also replace all the REPLACE_MEs
+emacs ./config-stack.yaml
+```
+Change these in emacs:
+* `S3_BUCKET`: "go-workspace-api" (as above)
+* `S3_SSL_CERTS_LOCATION`: "s3://go-service-lockbox/geneontology.org.tar.gz"; this is generally of the form: go-service-lockbox/_TLD_.tar.gz";
+* `fastapi_host`: "api-test.geneontology.org"; (must be a FQDN)
+* `fastapi_tag`: E.g. "0.2.0"; this should be the Dockerhub _tagged_ version of the API (which is how we deploy within the image), which is conincidentally the GitHub version of the API _sans the final "v"_. <- important point! 
+
+Finally, get ansible ready:
+```
 export ANSIBLE_HOST_KEY_CHECKING=False
 ````
 
-**NOTE**: change the command below to point to the terraform workspace you use above. 
-go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-stack.yaml
+Run the deployment of the stack:
 
 ```bash
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose --conf config-stack.yaml
 ```
-
 
 ## Testing deployment:
 
@@ -260,7 +270,7 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 ```
 
 
-### Destroy Instance and Delete Workspace:
+## Destroy Instance and Delete Workspace:
 
 ```bash
 # Destroy Using Tool.
@@ -288,14 +298,14 @@ terraform -chdir=aws workspace delete <NAME_OF_WORKSPACE_THAT_IS_NOT_DEFAULT>  #
 1. start the docker container `go-dev` in interactive mode.
 
 ```bash
-docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.2  /bin/bash
+docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 ```
 
 In the command above we used the `--rm` option which means the container will be deleted when you exit.
 If that is not the intent and you want to delete it later at your own convenience. Use the following `docker run` command.
 
 ```bash
-docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.2  /bin/bash
+docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 ```
 
 2. To exit or stop the container:
