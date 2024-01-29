@@ -3,20 +3,15 @@
   - vars.yaml
 
   tasks:
-  - name: Init swarm
-    shell: |
-         docker swarm init
-         /bin/true
   - name: Create and start services
-    shell: |
-         docker stack deploy --compose-file {{ stage_dir }}/docker-compose.yaml goapi
+    shell: nohup docker compose -f {{ stage_dir }}/docker-compose.yaml up -d
     register: output
     args:
       executable: /bin/bash
 
   - name: Check status
     shell: |
-           docker stack ps goapi
+           docker compose -f {{ stage_dir }}/docker-compose.yaml ps
     register: output 
     args:
       executable: /bin/bash
