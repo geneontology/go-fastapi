@@ -1,9 +1,9 @@
 # go-fastapi Deployment
 
-This guide describes the deployment of the `go-fastapi` stack to AWS using Terraform, ansible, and the "go-deploy" Python library. 
+This guide describes the deployment of the `go-fastapi` stack to AWS using Terraform, ansible, and the "go-deploy" Python library.
 
-## Prerequisites: 
-**NOTE**: we have a docker-based environment with all these tools installed. 
+## Prerequisites:
+**NOTE**: we have a docker-based environment with all these tools installed.
 
 #### software:
 
@@ -30,7 +30,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
   - docker-production-compose.yaml
   - various configuration files
 
-#### DNS: 
+#### DNS:
 
 DNS records are used for `go-fastapi`; they are typically the "production" record and the dev/testing record. Yhe go-deploy tool allows for creating DNS records (type A) that would be populated by the public ip addresses of the aws instance. If you don't use this option, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org` or any other record that you create in Route 53.
 
@@ -38,7 +38,7 @@ DNS records are used for `go-fastapi`; they are typically the "production" recor
 
 # BREAK FOR NEW DOC #
 
-## Configuring and deploying EC2 _instances_: 
+## Configuring and deploying EC2 _instances_:
 
 This is all completed in a dockerized development environment (all commands take place inside the docker container).
 
@@ -64,6 +64,7 @@ go-ssh
 3. Spin up the provided dockerized development environment:
 
 ```bash
+docker rm go-dev
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
@@ -89,7 +90,7 @@ chmod 600 /tmp/go-ssh*
 
 5. Establish the AWS credential files
 
-Copy and modify the AWS credential file to the default location `/tmp/go-aws-credentials`.
+Within the running image, copy and modify the AWS credential file to the default location `/tmp/go-aws-credentials`.
 
 ```bash
 cp production/go-aws-credentials.sample /tmp/go-aws-credentials
@@ -121,13 +122,13 @@ aws s3 ls s3://go-workspace-api
 # Initialize (if it doesn't work, we fail):
 go-deploy -init --working-directory aws -verbose
 
-# Use these commands to figure out the name of an existing workspace if any. The name should have a pattern `production-YYYY-MM-DD`
-go-deploy --working-directory aws -list-workspaces -verbose 
+# Use these commands to figure out the name of an existing workspace if any. The name should have a pattern `go-api-production-YYYY-MM-DD`
+go-deploy --working-directory aws -list-workspaces -verbose
 ```
 
 7. Provision new instance on AWS, for potential production use:
 
-Create a (new) production workspace using the following namespace pattern `production-YYYY-MM-DD`; e.g.: `production-2023-01-30`:
+Create a (new) production workspace using the following namespace pattern `go-api-production-YYYY-MM-DD`; e.g.: `go-api-production-2023-01-30`:
 
 ```bash
 cp ./production/config-instance.yaml.sample config-instance.yaml
@@ -135,7 +136,7 @@ emacs config-instance.yaml  # verify the location of the SSH keys for your AWS i
 emacs aws/main.tf # technically optional; verify the location of the public ssh key in `aws/main.tf`
 ```
 
-As well, give a human-readable string for the instance/tags/name (EC2 instance name tag), make it the same at the namespace pattern above; i.e. `production-2024-01-22`:
+As well, give a human-readable string for the instance/tags/name (EC2 instance name tag), make it the same at the namespace pattern above; i.e. `go-api-production-2024-01-22`:
 
 ```
 emacs config-instance.yaml
@@ -143,7 +144,7 @@ emacs config-instance.yaml
 
 8. Test the deployment
 
-`REPLACE_ME_WITH_S3_WORKSPACE_NAME` would be something like `production-<TODAYS_DATE>`; i.e. `production-2024-01-22`
+`REPLACE_ME_WITH_S3_WORKSPACE_NAME` would be something like `go-api-production-<TODAYS_DATE>`; i.e. `go-api-production-2024-01-22`
 
 ```bash
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -dry-run --conf config-instance.yaml
@@ -168,7 +169,7 @@ Finally, just show the IP address of the AWS instance:
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -output
 ```
 
-**NOTE**: write down the IP address of the AWS instance that is created. This can also be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg` (e.g. production-YYYY-MM-DD.cfg).
+**NOTE**: write down the IP address of the AWS instance that is created. This can also be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg` (e.g. go-api-production-YYYY-MM-DD.cfg).
 
 Useful details for troubleshooting:
 These commands will produce an IP address in the resulting `inventory.json` file.
@@ -177,12 +178,12 @@ The previous command creates Terraform "tfvars". These variables override the va
 If you need to check what you have just done, here are some helpful Terraform commands:
 
 ```bash
-cat REPLACE_ME_WITH_S3_WORKSPACE_NAME.tfvars.json # e.g, production-YYYY-MM-DD.tfvars.json
+cat REPLACE_ME_WITH_S3_WORKSPACE_NAME.tfvars.json # e.g, go-api-production-YYYY-MM-DD.tfvars.json
 ```
 
 The previous command creates an ansible inventory file.
 ```bash
-cat REPLACE_ME_WITH_S3_WORKSPACE_NAME-inventory.cfg  # e.g, production-YYYY-MM-DD-inventory
+cat REPLACE_ME_WITH_S3_WORKSPACE_NAME-inventory.cfg  # e.g, go-api-production-YYYY-MM-DD-inventory
 ```
 
 Useful Terraform commands to check what you have just done
@@ -190,7 +191,7 @@ Useful Terraform commands to check what you have just done
 ```bash
 terraform -chdir=aws workspace show   # current terraform workspace
 terraform -chdir=aws show             # current state deployed ...
-terraform -chdir=aws output           # shows public ip of aws instance 
+terraform -chdir=aws output           # shows public ip of aws instance
 ```
 
 ## Configuring and deploying software (go-fastapi) _stack_:
@@ -216,7 +217,7 @@ Change these in emacs:
 * `S3_BUCKET`: "go-workspace-api" (as above)
 * `S3_SSL_CERTS_LOCATION`: "s3://go-service-lockbox/geneontology.org.tar.gz"; this is generally of the form: go-service-lockbox/_TLD_.tar.gz";
 * `fastapi_host`: "api-test.geneontology.org"; (must be a FQDN)
-* `fastapi_tag`: E.g. "0.2.0"; this should be the Dockerhub _tagged_ version of the API (which is how we deploy within the image), which is conincidentally the GitHub version of the API _sans the final "v"_. <- important point! 
+* `fastapi_tag`: E.g. "0.2.0"; this should be the Dockerhub _tagged_ version of the API (which is how we deploy within the image), which is conincidentally the GitHub version of the API _sans the final "v"_. <- important point!
 
 Finally, get ansible ready:
 ```
@@ -249,9 +250,9 @@ Use the go-fastapi CNAME name. https://{fastapi_host}/docs
 
 ```bash
 docker-compose -f stage_dir/docker-compose.yaml ps
-docker-compose -f stage_dir/docker-compose.yaml down # whenever you make any changes 
+docker-compose -f stage_dir/docker-compose.yaml down # whenever you make any changes
 docker-compose -f stage_dir/docker-compose.yaml up -d
-docker-compose -f stage_dir/docker-compose.yaml logs -f 
+docker-compose -f stage_dir/docker-compose.yaml logs -f
 ```
 
 4. Testing LogRotate:
@@ -334,4 +335,3 @@ chown root /tmp/go-*
 chgrp root /tmp/go-*
 chmod 400 /tmp/go-ssh
 ```
-
