@@ -621,31 +621,27 @@ async def get_term_details_by_taxon_id(
         final_taxon = final_taxon + new_taxon
     query = (
         """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
+            PREFIX metago: <http://model.geneontology.org/>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+            PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
+            PREFIX pav: <http://purl.org/pav/>
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            PREFIX biolink: <https://w3id.org/biolink/vocab/>
 
-        SELECT distinct ?gocam
+            SELECT ?gocam
 
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?s enabled_by: ?gpnode .
-                ?gpnode rdf:type ?identifier .
-                FILTER(?identifier != owl:NamedIndividual) .
-            }
+            WHERE
+                {
+                    ?gocam rdf:type owl:Ontology ;
+                    biolink:in_taxon <%s> ;
 
-            ?identifier rdfs:subClassOf ?v0 .
-            ?identifier rdfs:label ?name .
-
-            ?v0 owl:onProperty in_taxon: .
-            ?v0 owl:someValuesFrom <%s>
-        }
+                }
     """
         % final_taxon
     )
+    print(query)
     results = si._sparql_query(query)
     collated_results = []
     for result in results:
