@@ -1,0 +1,33 @@
+name: AWS Test Using Go Deploy
+
+on:
+  push:
+    branches:
+      - main 
+  pull_request:
+    branches:
+      - main 
+  workflow_dispatch:
+
+env:
+  tagged_image: geneontology/go-devops-base:latest
+
+jobs:
+  AwsTest:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Pull Devops Image
+        run: |
+          docker pull ${{ env.tagged_image }}
+
+      - name: Provision and Test
+        run: |
+          docker run --rm \
+              -e GEN_SSH_KEYS=1 \
+              -e S3_CERT_BUCKET=${{ secrets.S3_CERT_BUCKET}} -e S3_TF_BACKEND=${{ secrets.S3_TF_BACKEND }} \
+              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} -e AWS_ACCESS_SECRET=${{ secrets.AWS_ACCESS_SECRET }} \
+              -v ${{ github.workspace }}/provision:/go-deploytesting -w /go-deploytesting \
+              -t ${{ env.tagged_image }} ./github/run.sh

@@ -1,0 +1,17 @@
+ssh_keys:
+     public: /tmp/go-ssh.pub
+     private: /tmp/go-ssh
+
+instance:
+    tags:
+       Name: cicd-test-go-fast-api
+    instance_type: t2.large
+    use_elastic_ip: False
+    dns_zone_id: REPLACE_ME_WITH_ZONE_ID 
+    dns_record_name: REPLACE_ME_WITH_RECORD_NAME
+    disk_size: 200
+    open_ports:
+       - 80
+       - 22
+       - 443
+

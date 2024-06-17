@@ -8,7 +8,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 test_client = TestClient(app)
-gene_ids = ["WB:WBGene00002147", "MGI:3588192", "FB:FBgn0003731"]
+
+gene_ids = ["WB:WBGene00002147", "FB:FBgn0003731"]  # , "SGD:S000003407", "MGI:3588192"]
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
@@ -36,13 +37,15 @@ class TestGeneProductAPI(unittest.TestCase):
 
         :return: None
         """
-        id = urllib.parse.quote("FB:FBgn0003731")
-        data = {
-            "causalmf": 2,
-        }
-        response = test_client.get(f"/api/gp/{id}/models", params=data)
-        self.assertGreater(len(response.json()), 0)
-        self.assertEqual(response.status_code, 200)
+        for gid in gene_ids:
+            id = urllib.parse.quote(gid)
+            print(id)
+            data = {
+                "causalmf": 2,
+            }
+            response = test_client.get(f"/api/gp/{id}/models", params=data)
+            self.assertGreater(len(response.json()), 0)
+            self.assertEqual(response.status_code, 200)
 
 
 if __name__ == "__main__":

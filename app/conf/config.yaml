@@ -1,5 +1,5 @@
 solr_url:
-  url: "https://golr-aux.geneontology.io/solr/"
+  url: "https://golr.geneontology.org/solr/"
   timeout: 30
 ontologies:
   - id: go

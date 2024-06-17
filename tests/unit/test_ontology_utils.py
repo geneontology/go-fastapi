@@ -22,7 +22,7 @@ class TestOntologyUtils(unittest.TestCase):
     def test_get_ontology_config(self):
         """Test getting the ontology config from golr."""
         golr_url = get_golr_config()["solr_url"]["url"]
-        self.assertIn("golr-aux.geneontology.io", golr_url)
+        self.assertIn("golr.geneontology.org", golr_url)
 
     def test_go_sparql(self):
         """Test fetching label for a given GO term."""
