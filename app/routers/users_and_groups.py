@@ -1,4 +1,5 @@
 """The users and groups endpoints."""
+
 import logging
 
 from fastapi import APIRouter, Path

@@ -1,4 +1,5 @@
 """Module contains the API endpoints for handling prefixes and expansions."""
+
 import logging
 
 from curies import Converter

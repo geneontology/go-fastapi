@@ -1,4 +1,5 @@
 """settings for the application."""
+
 import logging
 from enum import Enum
 from os import path

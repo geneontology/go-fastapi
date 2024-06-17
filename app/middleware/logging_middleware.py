@@ -1,4 +1,5 @@
 """Middleware to log requests."""
+
 import logging
 
 from fastapi import Request

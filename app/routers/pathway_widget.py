@@ -1,4 +1,5 @@
 """Pathway widget API endpoints."""
+
 import logging
 
 from curies import Converter
