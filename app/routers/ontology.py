@@ -23,7 +23,6 @@ router = APIRouter()
 
 
 class GraphType(str, Enum):
-
     """Enum for the different types of graphs that can be returned."""
 
     topology_graph = "topology_graph"
