@@ -19,7 +19,6 @@ logger = logging.getLogger()
 
 
 class TestLabelerEndpoint(unittest.TestCase):
-
     """Test the labeler endpoint."""
 
     def test_labeler_endpoint(self):

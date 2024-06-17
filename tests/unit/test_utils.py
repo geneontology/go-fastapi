@@ -20,7 +20,6 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 
 class TestPrefixUtils(unittest.TestCase):
-
     """test the basic utils methods."""
 
     def test_prefix_utils(self):

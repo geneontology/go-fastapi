@@ -15,7 +15,6 @@ logger = logging.getLogger()
 
 
 class TestGeneProductAPI(unittest.TestCase):
-
     """Test the pathway API endpoints."""
 
     def test_get_gocams_by_geneproduct_id(self):
