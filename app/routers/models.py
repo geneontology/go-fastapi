@@ -641,7 +641,6 @@ async def get_term_details_by_taxon_id(
     """
         % final_taxon
     )
-    print(query)
     results = si._sparql_query(query)
     collated_results = []
     for result in results:
