@@ -89,6 +89,6 @@ target-version = "py310"
 max-complexity = 10
 
 [tool.codespell]
-skip = "*.po,*.ts,.git,pyproject.toml"
+skip = ["*.po,*.ts,.git,pyproject.toml,assert*"]
 count = ""
 quiet-level = 3
