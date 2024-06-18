@@ -1,4 +1,5 @@
 """prefix utility functions."""
+
 import logging
 
 from curies import Converter

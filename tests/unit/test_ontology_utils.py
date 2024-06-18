@@ -16,7 +16,6 @@ go_ids = ["GO:0008150"]
 
 
 class TestOntologyUtils(unittest.TestCase):
-
     """Test the ontology utils."""
 
     def test_get_ontology_config(self):

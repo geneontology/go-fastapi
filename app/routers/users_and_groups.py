@@ -1,4 +1,5 @@
 """The users and groups endpoints."""
+
 import logging
 
 from fastapi import APIRouter, Path
@@ -77,9 +78,7 @@ async def get_user_by_orcid(
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
 
-		SELECT  ?name  			(GROUP_CONCAT(distinct ?organization;separator="@|@") AS ?organizations)
- 	                       		(GROUP_CONCAT(distinct ?affiliationIRI;separator="@|@") AS ?affiliationsIRI)
-                        		(GROUP_CONCAT(distinct ?affiliation;separator="@|@") AS ?affiliations)
+		SELECT  ?name
 								(GROUP_CONCAT(distinct ?gocam;separator="@|@") as ?gocams)
 								(GROUP_CONCAT(distinct ?date;separator="@|@") as ?gocamsDate)
 								(GROUP_CONCAT(distinct ?title;separator="@|@") as ?gocamsTitle)
@@ -126,15 +125,6 @@ async def get_user_by_orcid(
 
   			?goid rdfs:label ?goname .
 
-            # Getting some information on the contributor
-            optional { ?orcidIRI rdfs:label ?name } .
-            BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-            optional { ?orcidIRI vcard:organization-name ?organization } .
-            optional {
-                ?orcidIRI has_affiliation: ?affiliationIRI .
-                ?affiliationIRI rdfs:label ?affiliation
-            } .
-
             # crash the query for SYNGO user "http://orcid.org/0000-0002-1190-4481"^^xsd:string
             optional {
   			?gpid rdfs:label ?gpname .
@@ -150,9 +140,6 @@ async def get_user_by_orcid(
     collated = {}
     results = si._sparql_query(query)
     for result in results:
-        collated["organizations"] = result["organizations"].get("value")
-        collated["affiliations"] = result["affiliations"].get("value")
-        collated["affiliationsIRI"] = result["affiliationsIRI"].get("value")
         collated["gocams"] = result["gocams"].get("value")
         collated["gocamsDate"] = result["gocamsDate"].get("value")
         collated["gocamsTitle"] = result["gocamsTitle"].get("value")

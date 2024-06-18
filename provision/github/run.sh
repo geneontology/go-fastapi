@@ -13,16 +13,50 @@ sed "s/REPLACE_ME_GOAPI_S3_STATE_STORE/$s3_terraform_backend/g" ./github/backend
 zone_id=`aws route53 list-hosted-zones-by-name --dns-name geneontology.io. --max-items 1  --query "HostedZones[].Id" --output text  | tr "/" " " | awk '{ print $2 }'`
 record_name=cicd-test-go-fastapi.geneontology.io
 
-aws route53 list-resource-record-sets --hosted-zone-id $zone_id  --max-items 1000 --query "ResourceRecordSets[].Name" | grep $record_name
+check_record() {
+    aws route53 list-resource-record-sets --hosted-zone-id $zone_id --max-items 1000 --query "ResourceRecordSets[?Name == '$record_name'] | [0].Name" --output text
+    return $?
+}
+
+delete_record() {
+    record_set=$(aws route53 list-resource-record-sets --hosted-zone-id $zone_id --query "ResourceRecordSets[?Name == '$record_name']" --output json)
+
+    if [ -z "$record_set" ]; then
+        echo "Record not found, nothing to delete."
+        return 1
+    else
+      # Destroy
+      go-deploy --working-directory aws -w test-go-deploy-api -destroy -verbose
+      rm -f ./github/config-instance.yaml ./github/config-stack.yaml openapi.json
+      exit $ret
+    fi
+}
+
+# Initial check for the record
+check_record
 ret=$?
 
-if [ "${ret}" == 0 ]
-then
-   echo "$record_name exists. Cannot proceed. Tray again"
-   exit 1
-fi
+if [ "${ret}" == 0 ]; then
+    echo "$record_name exists. Attempting to delete."
+    delete_record
+    del_ret=$?
 
-echo "Great. $record_name not found ... Proceeeding"
+    if [ "${del_ret}" == 0 ]; then
+        echo "Successfully deleted $record_name. Trying again."
+        check_record
+        ret=$?
+
+        if [ "${ret}" == 0 ]; then
+            echo "$record_name still exists after deletion attempt. Cannot proceed."
+        else
+            echo "$record_name does not exist. Proceeding."
+        fi
+    else
+        echo "Failed to delete $record_name. Cannot proceed."
+    fi
+else
+    echo "$record_name does not exist. Proceeding."
+fi
 
 sed "s/REPLACE_ME_WITH_ZONE_ID/$zone_id/g" ./github/config-instance.yaml.sample > ./github/config-instance.yaml
 sed -i "s/REPLACE_ME_WITH_RECORD_NAME/$record_name/g" ./github/config-instance.yaml

@@ -18,7 +18,6 @@ go_cam_ids = ["59a6110e00000067", "SYNGO_369", "581e072c00000820", "gomodel:59a6
 
 
 class TestApp(unittest.TestCase):
-
     """Test the models endpoints."""
 
     def test_gometadata_by_model_ids(self):
@@ -109,13 +108,19 @@ class TestApp(unittest.TestCase):
         self.assertGreater(len(response.json()), 100)
         self.assertEqual(response.status_code, 200)
 
-    @skip("This test is skipped because it takes too long to run.")
     def test_get_term_details_by_taxon_id(self):
         """Test the endpoint to retrieve term details by taxon ID."""
         taxon_id = "NCBITaxon:9606"
         response = test_client.get(f"/api/taxon/{taxon_id}/models")
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.json()), 20)
+        self.assertGreater(len(response.json()), 800)
+
+    def test_get_term_details_by_pombase_taxon_id(self):
+        """Test the endpoint to retrieve term details by pombase taxon ID."""
+        taxon_id = "NCBITaxon:4896"
+        response = test_client.get(f"/api/taxon/{taxon_id}/models")
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.json()), 10)
 
     def test_get_pmid_by_model_id(self):
         """Test the endpoint to retrieve PubMed IDs by model ID."""

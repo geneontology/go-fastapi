@@ -21,7 +21,6 @@ subgraphs = ["GO:0009453", "GO:0052128", "GO:0052131"]  # energy taxis, positive
 
 
 class TestApp(unittest.TestCase):
-
     """Test the ontology endpoints."""
 
     def test_term_id_endpoint(self):

@@ -1,4 +1,5 @@
 """bioentity router."""
+
 import logging
 from enum import Enum
 from typing import List
@@ -29,7 +30,6 @@ logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
-
     """
     Enumeration for Gene Ontology relationship types used for filtering associations.
 
