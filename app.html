@@ -52,7 +52,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-app.main">app.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-app.main">app.main module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.main.general_exception_handler"><code class="docutils literal notranslate"><span class="pre">general_exception_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.main.value_error_handler"><code class="docutils literal notranslate"><span class="pre">value_error_handler()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-app">Module contents</a></li>
 </ul>
 </li>
@@ -170,6 +174,29 @@
 <section id="module-app.main">
 <span id="app-main-module"></span><h2>app.main module<a class="headerlink" href="#module-app.main" title="Permalink to this heading"></a></h2>
 <p>main application entry point.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.general_exception_handler">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">general_exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.main.general_exception_handler" title="Permalink to this definition"></a></dt>
+<dd><p>Global exception handler for all other exceptions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.value_error_handler">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">value_error_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ValueError</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.main.value_error_handler" title="Permalink to this definition"></a></dt>
+<dd><p>Global exception handler for ValueErrors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> – </p></li>
+<li><p><strong>exc</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-app">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app" title="Permalink to this heading"></a></h2>
