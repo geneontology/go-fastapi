@@ -1,7 +1,7 @@
 """main application entry point."""
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.middleware.logging_middleware import LoggingMiddleware
@@ -52,6 +52,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"message": "An unexpected error occurred. Please try again later."},
+    )
+
+@app.exception_handler(requests.exceptions.RequestException)
+async def requests_exception_handler(request: Request, exc: requests.exceptions.RequestException):
+    return JSONResponse(
+        status_code=502,
+        content={"message": "External service error. Please try again later."},
+    )
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8080, log_level="info", reload=True)

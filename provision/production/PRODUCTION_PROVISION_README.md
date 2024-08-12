@@ -38,7 +38,7 @@ DNS records are used for `go-fastapi`; they are typically the "production" recor
 
 #### SSH Keys:
 
-For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
+For testing purposes you can use your own ssh keys. But for production please ask for the go ssh keys.
 /tmp/go-ssh.pub
 /tmp/go-ssh
 

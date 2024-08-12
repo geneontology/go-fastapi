@@ -14,7 +14,7 @@ from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform, transform_array
-
+from pprint import pprint
 logger = logging.getLogger()
 
 
@@ -38,6 +38,7 @@ async def get_term_metadata_by_id(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
+    pprint(query)
     results = si._sparql_query(query)
     transformed_result = transform(
         results[0],
@@ -46,6 +47,7 @@ async def get_term_metadata_by_id(
     cmaps = get_prefixes("go")
     converter = Converter.from_prefix_map(cmaps, strict=False)
     transformed_result["goid"] = converter.compress(transformed_result["goid"])
+    print(cmaps)
     return transformed_result
 
 
