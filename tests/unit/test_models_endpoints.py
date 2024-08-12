@@ -149,6 +149,7 @@ class TestApp(unittest.TestCase):
 
         :return: None
         """
+
         with self.assertRaises(HTTPError):
             test_client.get("/api/go-cam/notatallrelevant")
 

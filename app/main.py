@@ -1,10 +1,12 @@
 """main application entry point."""
 
+import logging
+
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import requests
+
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.routers import (
     bioentity,
@@ -19,7 +21,6 @@ from app.routers import (
     slimmer,
     users_and_groups,
 )
-import logging
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -61,27 +62,25 @@ app.add_middleware(
 # Global exception handler for ValueErrors
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
+    """
+    Global exception handler for ValueErrors.
+
+    :param request:
+    :param exc:
+    :return:
+    """
     logger.error(f"Value error occurred: {exc}")
-    return JSONResponse(
-        status_code=400,
-        content={"message": f"Value error occurred: {exc}"}
-    )
+    return JSONResponse(status_code=400, content={"message": f"Value error occurred: {exc}"})
 
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for all other exceptions."""
     return JSONResponse(
         status_code=500,
         content={"message": "An unexpected error occurred. Please try again later."},
     )
 
-
-@app.exception_handler(requests.exceptions.RequestException)
-async def requests_exception_handler(request: Request, exc: requests.exceptions.RequestException):
-    return JSONResponse(
-        status_code=502,
-        content={"message": "External service error. Please try again later."},
-    )
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8080, log_level="info", reload=True)

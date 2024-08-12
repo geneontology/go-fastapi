@@ -14,6 +14,7 @@ from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform, transform_array
+
 logger = logging.getLogger()
 
 
