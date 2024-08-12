@@ -50,8 +50,6 @@ async def get_gocams_by_geneproduct_id(
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
-    print("in the method")
-    print(id)
     logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id)
     query = (
         """
