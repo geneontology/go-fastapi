@@ -555,9 +555,6 @@ async def get_model_details_by_model_id_json(
     else:
         replaced_id = id
 
-    print("id is replaced id:", replaced_id)
-    print("id is:", id)
-
     path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
     response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
     response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
