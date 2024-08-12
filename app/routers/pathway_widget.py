@@ -39,6 +39,9 @@ async def get_gocams_by_geneproduct_id(
 
     (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).
     """
+    if ":" not in id:
+        raise ValueError("Invalid CURIE format")
+
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 

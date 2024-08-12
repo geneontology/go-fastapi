@@ -1,9 +1,10 @@
 """main application entry point."""
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import JSONResponse
+import requests
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.routers import (
     bioentity,
@@ -18,6 +19,9 @@ from app.routers import (
     slimmer,
     users_and_groups,
 )
+import logging
+
+logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(
     title="GO API",
@@ -54,12 +58,23 @@ app.add_middleware(
 )
 
 
+# Global exception handler for ValueErrors
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    logger.error(f"Value error occurred: {exc}")
+    return JSONResponse(
+        status_code=400,
+        content={"message": f"Value error occurred: {exc}"}
+    )
+
+
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={"message": "An unexpected error occurred. Please try again later."},
     )
+
 
 @app.exception_handler(requests.exceptions.RequestException)
 async def requests_exception_handler(request: Request, exc: requests.exceptions.RequestException):
