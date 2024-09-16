@@ -137,6 +137,12 @@ emacs aws/main.tf # technically optional; verify the location of the public ssh 
 ```
 
 As well, give a human-readable string for the instance/tags/name (EC2 instance name tag), make it the same at the namespace pattern above; i.e. `go-api-production-2024-01-22`:
+also update others as follows:
+
+Name: REPLACE_ME should be "go-api-production-YYYY-MM-DD".
+dns_record_name: should be "go-api-production-YYYY-MM-DD.geneontology.org"
+dns_zone_id: should be "Z04640331A23NHVPCC784" (for geneontology.org).
+
 
 ```
 emacs config-instance.yaml
@@ -198,7 +204,7 @@ terraform -chdir=aws output           # shows public ip of aws instance
 
 These commands continue to be run in the dockerized development environment.
 
-* Make sure there is a CNAME pointing to the public IP address from above. At this stage, for testing, put the IP in an AWS Route 53 CNAME record. (E.g. api-test.geneontology.org.)
+* Make sure there is a CNAME pointing to the public IP address from above. At this stage, for testing, put the IP in an AWS Route 53 CNAME record. (E.g. api-test.geneontology.org.).  Login into aws, list DNS entries for geneontology.org and ensure an 'A name' entry for go-api-production-YYY-MM-DD.geneontology.org associated with the IP address has been defined.
 
 **POSSIBLE CUT START**
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
