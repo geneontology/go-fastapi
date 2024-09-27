@@ -147,7 +147,9 @@ terraform -chdir=aws output           # shows public ip of aws instance
 ## Configuring and deploying software (go-fastapi) _stack_:
 These commands continue to be run in the dockerized development environment.
 
-* Make DNS names for go-fastapi point to the public IP address. If using cloudflare, put the ip in cloudflare DNS record. Otherwise put the ip in the AWS Route 53 DNS record. 
+```bash
+* replace "REPLACE_ME" values in config-instance.yaml for dns_record_name and dns_zone_id, 
+dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN plus the REPLACE_ME_WITH_TERRAFORM_BACKEND, eg. api-production-2024-08-21.geneontology.org
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
 * s3 credentials are placed in a file using the format described above
 * s3 uri if SSL is enabled. Location of SSL certs/key
