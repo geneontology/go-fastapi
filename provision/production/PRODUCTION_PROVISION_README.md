@@ -52,7 +52,9 @@ Your (personal developer) AWS credentials are used by Terraform to provision the
 
 The keys we'll be using can be found in the shared SpderOak store. If you don't know what this is, ask @kltm.
 
-For testing purposes you can you your own ssh keys. But for production please ask for the go ssh keys.
+For testing purposes you can use your own ssh keys. But for production please ask for the go ssh keys.
+/tmp/go-ssh.pub
+/tmp/go-ssh
 
 The names will be:
 
@@ -198,9 +200,10 @@ terraform -chdir=aws output           # shows public ip of aws instance
 
 These commands continue to be run in the dockerized development environment.
 
-* Make sure there is a CNAME pointing to the public IP address from above. At this stage, for testing, put the IP in an AWS Route 53 CNAME record. (E.g. api-test.geneontology.org.)
-
 **POSSIBLE CUT START**
+```bash
+* replace "REPLACE_ME" values in config-instance.yaml for dns_record_name and dns_zone_id, 
+dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN plus the REPLACE_ME_WITH_TERRAFORM_BACKEND, eg. api-production-2024-08-21.geneontology.org
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
 * S3 credentials are placed in a file using the format described above
 * S3 uri if SSL is enabled. Location of SSL certs/key

@@ -1,0 +1,9 @@
+terraform {
+  backend "s3" {
+    bucket  = "REPLACE_ME_GOAPI_S3_STATE_STORE"
+    profile = "default"
+    key     = "cicd-testing-goapi/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true
+  }
+}

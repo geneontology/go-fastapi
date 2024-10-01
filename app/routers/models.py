@@ -555,9 +555,6 @@ async def get_model_details_by_model_id_json(
     else:
         replaced_id = id
 
-    print("id is replaced id:", replaced_id)
-    print("id is:", id)
-
     path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
     response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
     response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
@@ -621,28 +618,23 @@ async def get_term_details_by_taxon_id(
         final_taxon = final_taxon + new_taxon
     query = (
         """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
+            PREFIX metago: <http://model.geneontology.org/>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+            PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
+            PREFIX pav: <http://purl.org/pav/>
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            PREFIX biolink: <https://w3id.org/biolink/vocab/>
 
-        SELECT distinct ?gocam
+            SELECT ?gocam
 
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?s enabled_by: ?gpnode .
-                ?gpnode rdf:type ?identifier .
-                FILTER(?identifier != owl:NamedIndividual) .
-            }
+            WHERE
+                {
+                    ?gocam rdf:type owl:Ontology ;
+                    biolink:in_taxon <%s> ;
 
-            ?identifier rdfs:subClassOf ?v0 .
-            ?identifier rdfs:label ?name .
-
-            ?v0 owl:onProperty in_taxon: .
-            ?v0 owl:someValuesFrom <%s>
-        }
+                }
     """
         % final_taxon
     )

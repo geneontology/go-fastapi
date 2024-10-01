@@ -1,4 +1,5 @@
 """settings for the application."""
+
 import logging
 from enum import Enum
 from os import path
@@ -41,21 +42,18 @@ def get_golr_config():
 
 
 class ESOLR(Enum):
-
     """Enum for the GOLR URL."""
 
     GOLR = get_golr_config()["solr_url"]["url"]
 
 
 class ESPARQL(Enum):
-
     """Enum for the SPARQL endpoint URL."""
 
     SPARQL = get_sparql_endpoint()
 
 
 class ESOLRDoc(Enum):
-
     """Enum for the GOLR document type."""
 
     ONTOLOGY = "ontology_class"

@@ -13,7 +13,7 @@ test_client = TestClient(app)
 
 # Test data
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-go_ids = ["GO:0008150"]
+go_ids = ["GO:0008150", "NCBITaxon:1"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
@@ -21,13 +21,13 @@ subgraphs = ["GO:0009453", "GO:0052128", "GO:0052131"]  # energy taxis, positive
 
 
 class TestApp(unittest.TestCase):
-
     """Test the ontology endpoints."""
 
     def test_term_id_endpoint(self):
         """Test the endpoint to get the details of a Gene Ontology term by its identifier."""
         for id in go_ids:
             response = test_client.get(f"/api/ontology/term/{id}")
+            print(response.json())
             self.assertEqual(response.status_code, 200)
 
     def test_ontology_ancestors_shared_sub_obj(self):

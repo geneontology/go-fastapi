@@ -1,4 +1,5 @@
 """Pathway widget API endpoints."""
+
 import logging
 
 from curies import Converter
@@ -38,6 +39,9 @@ async def get_gocams_by_geneproduct_id(
 
     (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).
     """
+    if ":" not in id:
+        raise ValueError("Invalid CURIE format")
+
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 
@@ -46,8 +50,6 @@ async def get_gocams_by_geneproduct_id(
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
     id = converter.expand(id)
-    print("in the method")
-    print(id)
     logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id)
     query = (
         """

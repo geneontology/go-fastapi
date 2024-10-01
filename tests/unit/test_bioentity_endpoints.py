@@ -20,7 +20,6 @@ logger = logging.getLogger()
 
 
 class TestBioentityEndpoints(unittest.TestCase):
-
     """Test the bioentity endpoints."""
 
     def test_golr_solr(self):

@@ -19,7 +19,6 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestSlimmerEndpoint(unittest.TestCase):
-
     """test the slimmer endpoints."""
 
     @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
