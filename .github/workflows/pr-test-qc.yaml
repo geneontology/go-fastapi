@@ -3,7 +3,7 @@ name: go-fastapi-QC
 on:
   pull_request:
     branches:
-      - no_op
+      - main
     types: [opened, synchronize, reopened]
 
 jobs:
