@@ -225,6 +225,16 @@ Change these in emacs:
 * `fastapi_host`: "api-test.geneontology.org"; (must be a FQDN)
 * `fastapi_tag`: E.g. "0.2.0"; this should be the Dockerhub _tagged_ version of the API (which is how we deploy within the image), which is conincidentally the GitHub version of the API _sans the final "v"_. <- important point!
 
+
+Point staging to a different location by default
+```bash
+emacs provision/vars.yaml
+```
+
+Change in emacs:
+*  `fastapi_host`: api.geneontology.org
+*  `fastapi_host_alias`: '{{ go-api-production-YYY-MM-DD.geneontology.org}}'  example  '{{ go-api-production-2024-09-20.geneontology.org }}'
+
 Finally, get ansible ready:
 ```
 export ANSIBLE_HOST_KEY_CHECKING=False
