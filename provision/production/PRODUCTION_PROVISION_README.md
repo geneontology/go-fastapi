@@ -68,6 +68,7 @@ go-ssh
 ```bash
 docker rm go-dev
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
+cd /tmp
 git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
 ```
@@ -202,7 +203,7 @@ These commands continue to be run in the dockerized development environment.
 
 **POSSIBLE CUT START**
 ```bash
-* replace "REPLACE_ME" values in config-instance.yaml for dns_record_name and dns_zone_id, 
+* replace "REPLACE_ME" values in config-instance.yaml for dns_record_name and dns_zone_id,
 dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN plus the REPLACE_ME_WITH_TERRAFORM_BACKEND, eg. api-production-2024-08-21.geneontology.org
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
 * S3 credentials are placed in a file using the format described above
@@ -217,7 +218,7 @@ cp ./production/config-stack.yaml.sample ./config-stack.yaml
 emacs ./config-stack.yaml
 ```
 Change these in emacs:
-* `S3_BUCKET`: "go-workspace-api" (as above)
+* `S3_BUCKET`: "go-service-logs-api" (as above)
 * `S3_SSL_CERTS_LOCATION`: "s3://go-service-lockbox/geneontology.org.tar.gz"; this is generally of the form: go-service-lockbox/_TLD_.tar.gz";
 * `fastapi_host`: "api-test.geneontology.org"; (must be a FQDN)
 * `fastapi_tag`: E.g. "0.2.0"; this should be the Dockerhub _tagged_ version of the API (which is how we deploy within the image), which is conincidentally the GitHub version of the API _sans the final "v"_. <- important point!
