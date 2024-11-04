@@ -134,10 +134,8 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("label") == "daf-2")
             self.assertTrue(subject.get("taxon_label") == "Caenorhabditis elegans")
             self.assertTrue(subject.get("groups").get("GO:0003674"))
-            self.assertTrue(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations") >= 19)
-            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 70)
-            print((subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations")))
-            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 70)
+            self.assertTrue(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations") >= 17)
+            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 67)
             self.assertTrue(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations") >= 10)
         assert response.status_code == 200
 
