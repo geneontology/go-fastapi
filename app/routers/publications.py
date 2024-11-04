@@ -4,6 +4,7 @@ from fastapi import APIRouter, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
+from app.main import DataNotFoundException
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 
 USER_AGENT = get_user_agent()
@@ -46,4 +47,6 @@ async def get_model_details_by_pmid(
     for result in results:
         collated["gocam"] = result["gocam"].get("value")
         collated_results.append(collated)
+    if not collated_results:
+        return DataNotFoundException(detail=f"Item with ID {id} not found")
     return results

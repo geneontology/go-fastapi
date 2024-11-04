@@ -10,7 +10,7 @@ from ontobio.golr.golr_associations import search_associations
 
 from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
-
+from app.main import DataNotFoundException
 from .slimmer import gene_to_uniprot_from_mygene
 
 INVOLVED_IN = "involved_in"
@@ -96,6 +96,8 @@ async def get_bioentity_by_id(
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
     bioentity = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals, False)
+    if not bioentity:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return bioentity
 
 
@@ -170,7 +172,8 @@ async def get_annotations_by_goterm_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
-
+    if not data:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
 
 
@@ -273,6 +276,8 @@ async def get_genes_by_goterm_id(
             url=ESOLR.GOLR,
             rows=rows,
         )
+    if not association_return:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return {"associations": association_return.get("associations")}
 
 
@@ -342,7 +347,8 @@ async def get_taxon_by_goterm_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
-
+    if not data:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
 
 
@@ -437,4 +443,6 @@ async def get_annotations_by_gene_id(
             for asc in pr_assocs["associations"]:
                 logger.info(asc)
                 assocs["associations"].append(asc)
+    if not assocs or assocs["associations"] == 0:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return {"associations": assocs.get("associations")}

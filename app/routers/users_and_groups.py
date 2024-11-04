@@ -6,6 +6,7 @@ from fastapi import APIRouter, Path
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
+from app.main import DataNotFoundException
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
@@ -51,6 +52,8 @@ async def get_users():
         """
     results = si._sparql_query(query)
     results = transform_array(results, ["organizations", "affiliations"])
+    if not results:
+        return DataNotFoundException(detail="No users found")
     return results
 
 
@@ -147,6 +150,8 @@ async def get_user_by_orcid(
         collated["bpnames"] = result["bpnames"].get("value")
         collated["gpids"] = result["gpids"].get("value")
         collated_results.append(collated)
+    if not collated_results:
+        return DataNotFoundException(detail=f"Item with ID {orcid} not found")
     return collated_results
 
 
@@ -219,6 +224,8 @@ async def get_models_by_orcid(
         collated["gpids"] = result["gpids"].get("value")
         collated["gpnames"] = result["gpnames"].get("value")
         collated_results.append(collated)
+    if not collated_results:
+        return DataNotFoundException(detail=f"Item with ID {orcid} not found")
     return collated_results
 
 
@@ -291,6 +298,8 @@ async def get_gp_models_by_orcid(
         collated["dates"] = result["dates"].get("value")
         collated["titles"] = result["titles"].get("value")
         collated_results.append(collated)
+    if not collated_results:
+        return DataNotFoundException(detail=f"Item with ID {orcid} not found")
     return collated_results
 
 
@@ -323,6 +332,8 @@ async def get_groups():
             GROUP BY ?url ?name
         """
     results = si._sparql_query(query)
+    if not results:
+        return DataNotFoundException(detail="No groups found")
     return results
 
 
@@ -390,4 +401,6 @@ async def get_group_metadata_by_name(
         collated["gocams"] = result["gocams"].get("value")
         collated["bps"] = result["bps"].get("value")
         collated_results.append(collated)
+    if not collated_results:
+        return DataNotFoundException(detail=f"Item with ID {name} not found")
     return collated_results

@@ -5,6 +5,7 @@ import logging
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 
+from app.main import DataNotFoundException
 from app.utils.prefix_utils import get_prefixes
 
 logger = logging.getLogger()
@@ -44,6 +45,9 @@ async def get_expand_curie(id: str = Path(..., description="identifier in CURIE 
     # have to set strict to "False" to allow for WB and WormBase as prefixes that
     # map to the same expanded URI prefix
     converter = Converter.from_prefix_map(cmaps, strict=False)
+    expanded = converter.expand(id)
+    if not expanded:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return converter.expand(id)
 
 
@@ -61,4 +65,7 @@ async def get_contract_uri(uri: str = Query(..., description="URI of the resourc
     """
     cmaps = get_prefixes("go")
     converter = Converter.from_prefix_map(cmaps, strict=False)
+    compressed = converter.compress(uri)
+    if not compressed:
+        raise DataNotFoundException(detail=f"Item with URI {uri} not found")
     return converter.compress(uri)

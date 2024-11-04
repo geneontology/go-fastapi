@@ -7,6 +7,7 @@ from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
+from app.main import DataNotFoundException
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
@@ -165,4 +166,7 @@ async def get_gocams_by_geneproduct_id(
             % id
         )
     results = si._sparql_query(query)
+    transformed_results = transform_array(results)
+    if not transformed_results:
+        raise DataNotFoundException(detail=f"No models found for gene product {id}")
     return transform_array(results)

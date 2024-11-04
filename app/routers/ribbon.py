@@ -13,6 +13,7 @@ from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_ag
 from app.utils.sparql_utils import transform_array
 
 from .slimmer import gene_to_uniprot_from_mygene
+from ..main import DataNotFoundException
 
 logger = logging.getLogger()
 
@@ -38,6 +39,8 @@ async def get_subsets_by_term(
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
     results = transform_array(results, [])
+    if not results:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return results
 
 
@@ -51,6 +54,8 @@ async def get_subset_by_id(
 ):
     """Returns a subset (slim) by its id which is usually a name."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
+    if not result:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return result
 
 
@@ -326,4 +331,7 @@ async def get_ribbon_results(
     # bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
 
     result = {"categories": categories, "subjects": subjects}
+    if result.get("categories") is None and result.get("subjects") is None:
+        raise DataNotFoundException(detail="No data found for the provided parameters")
+
     return result

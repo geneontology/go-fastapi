@@ -2,7 +2,7 @@
 
 import logging
 from typing import List
-
+from app.main import DataNotFoundException
 from fastapi import APIRouter, Query
 
 from app.utils.ontology_utils import batch_fetch_labels
@@ -22,4 +22,7 @@ async def expand_curie(
 ):
     """Fetches a map from IDs to labels e.g. GO:0003677."""
     logger.info("fetching labels for IDs")
-    return batch_fetch_labels(id)
+    labels = batch_fetch_labels(id)
+    if not labels:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+    return labels
