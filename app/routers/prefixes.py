@@ -5,7 +5,7 @@ import logging
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 
-from app.main import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.prefix_utils import get_prefixes
 
 logger = logging.getLogger()

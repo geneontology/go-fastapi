@@ -6,7 +6,8 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi import HTTPException
+
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.routers import (
     bioentity,
@@ -24,9 +25,6 @@ from app.routers import (
 
 logger = logging.getLogger("uvicorn.error")
 
-class DataNotFoundException(HTTPException):
-    def __init__(self, detail: str = "Data not found"):
-        super().__init__(status_code=404, detail=detail)
 
 app = FastAPI(
     title="GO API",
@@ -85,13 +83,17 @@ async def general_exception_handler(request: Request, exc: Exception):
         content={"message": "An unexpected error occurred. Please try again later."},
     )
 
+
 @app.exception_handler(DataNotFoundException)
 async def data_not_found_exception_handler(request: Request, exc: DataNotFoundException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail}
-    )
+    """
+    Global exception handler for DataNotFoundException.
 
+    :param request:
+    :param exc:
+    :return:
+    """
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 
 if __name__ == "__main__":

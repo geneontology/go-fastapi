@@ -2,9 +2,10 @@
 
 import logging
 from typing import List
-from app.main import DataNotFoundException
+
 from fastapi import APIRouter, Query
 
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.ontology_utils import batch_fetch_labels
 from app.utils.settings import get_user_agent
 

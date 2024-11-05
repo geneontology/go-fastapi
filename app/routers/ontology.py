@@ -10,7 +10,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
-from app.main import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
@@ -287,6 +287,7 @@ async def get_go_term_detail_by_go_id(
     if not transformed_results:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return transformed_results
+
 
 @router.get(
     "/api/go/{id}/hierarchy",

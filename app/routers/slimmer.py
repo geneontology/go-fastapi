@@ -8,7 +8,7 @@ from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
 
-from app.main import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.settings import ESOLR, get_user_agent
 
 INVOLVED_IN = "involved_in"
