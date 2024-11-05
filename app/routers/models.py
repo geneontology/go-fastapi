@@ -258,11 +258,9 @@ async def get_gocam_models(
     if start:
         query += "\nOFFSET " + str(start)
     results = si._sparql_query(query)
-    results = transform_array(results, ["orcids", "names", "groupids", "groupnames"])
-    print(results)
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
-    return results
+    transformed_results = transform_array(results, ["orcids", "names", "groupids", "groupnames"])
+    print(transformed_results)
+    return transform_array(results, ["orcids", "names", "groupids", "groupnames"])
 
 
 @router.get("/api/models/go", tags=["models"], description="Returns go term details based on a GO-CAM model ID.")
