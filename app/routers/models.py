@@ -259,6 +259,7 @@ async def get_gocam_models(
         query += "\nOFFSET " + str(start)
     results = si._sparql_query(query)
     results = transform_array(results, ["orcids", "names", "groupids", "groupnames"])
+    print(results)
     if not results:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return results

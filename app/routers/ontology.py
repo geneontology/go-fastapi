@@ -387,4 +387,4 @@ async def get_gocam_models_by_go_id(
     transformed_results = transform_array(results)
     if not transformed_results:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
-    return
+    return transformed_results
