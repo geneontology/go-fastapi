@@ -85,11 +85,16 @@ async def get_ribbon_results(
     ),
 ):
     """Fetch the summary of annotations for a given gene or set of genes."""
+    mgied_subjects = []
+
     for sub in subject:
         if sub.startswith("MGI:"):
-            subject.remove(sub)
-            sub = "MGI:" + sub
-            subject.append(sub)
+            sub = sub.replace("MGI:", "MGI:MGI:")  # Assign the result back to sub
+            mgied_subjects.append(sub)
+        else:
+            mgied_subjects.append(sub)
+
+    subject = mgied_subjects
 
     # Step 1: create the categories
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
@@ -144,15 +149,19 @@ async def get_ribbon_results(
     for s in subject_ids:
         if "HGNC:" in s or "NCBIGene:" in s or "ENSEMBL:" in s:
             prots = gene_to_uniprot_from_mygene(s)
+            print("prots:  ", prots)
             if len(prots) > 0:
                 mapped_ids[s] = prots[0]
+                print("mapped_ids:  ", mapped_ids)
                 reverse_mapped_ids[prots[0]] = s
                 if len(prots) == 0:
                     prots = [s]
                 slimmer_subjects += prots
+                print("slimmer_subjects:  ", slimmer_subjects)
         else:
             slimmer_subjects.append(s)
 
+    print("slimmer_subjects:  ", slimmer_subjects)
     logger.info("SLIMMER SUBS: %s", slimmer_subjects)
     subject_ids = slimmer_subjects
 

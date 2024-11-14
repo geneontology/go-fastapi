@@ -99,7 +99,6 @@ class TestOntologyAPI(unittest.TestCase):
         """Test fly ribbon returns."""
         data = {"subset": "goslim_agr", "subject": ["FB:FBgn0051155"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
-        pprint(response.json())
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Polr2G")
@@ -114,7 +113,6 @@ class TestOntologyAPI(unittest.TestCase):
         """Test MGI ribbon annotation returns."""
         data = {"subset": "goslim_agr", "subject": ["MGI:1917258"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
-        pprint(response.json())
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Ace2")
@@ -157,6 +155,21 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("groups").get("GO:0005576").get("ALL").get("nb_annotations") >= 7)
             self.assertTrue(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations") >= 10)
         self.assertTrue(response.status_code == 200)
+
+
+    def test_mgi_ortho_ribbon_calls(self):
+        """Test MGI ortholog ribbon annotations."""
+        data = {"subset": "goslim_agr", "subject": ["MGI:88469","Xenbase:XB-GENE-994160",
+                                                    "HGNC:2227","RGD:2378",
+                                                    "ZFIN:ZDB-GENE-060606-1","FB:FBgn003185"],
+                 "exclude_PB":"true",
+                 "exclude_IBA":"false",
+                 "cross_aspect":"false"
+                }
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertGreater(len(response.json().get("subjects")),  0)
+        self.assertIn("MGI:88469", [subject.get("id") for subject in response.json().get("subjects")])
+        self.assertEqual(response.status_code, 200)
 
     def test_term_subsets_endpoint(self):
         """Test the endpoint to get the subsets of a Gene Ontology term by its identifier."""
