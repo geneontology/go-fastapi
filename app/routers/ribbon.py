@@ -80,14 +80,16 @@ async def get_ribbon_results(
     ),
 ):
     """Fetch the summary of annotations for a given gene or set of genes."""
-
     mgied_subjects = []
+
     for sub in subject:
         if sub.startswith("MGI:"):
             sub = sub.replace("MGI:", "MGI:MGI:")  # Assign the result back to sub
             mgied_subjects.append(sub)
         else:
             mgied_subjects.append(sub)
+
+    subject = mgied_subjects
 
     # Step 1: create the categories
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
