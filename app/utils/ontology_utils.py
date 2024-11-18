@@ -2,6 +2,7 @@
 
 import logging
 
+import requests
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
@@ -10,7 +11,8 @@ from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
-from app.utils.golr_utils import gu_run_solr_text_on
+from app.exceptions.global_exceptions import DataNotFoundException
+from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()
@@ -352,3 +354,32 @@ def get_go_subsets_sparql_query(goid):
     }
     """
     )
+
+
+def is_valid_goid(goid) -> bool:
+    """
+    Check if the provided GO identifier is valid by querying the AmiGO Solr (GOLR) instance.
+
+    :param goid: The GO identifier to be checked.
+    :type goid: str
+    :return: True if the GO identifier is valid, False otherwise.
+    :rtype: bool
+    """
+    # Ensure the GO ID starts with the proper prefix
+    if not goid.startswith("GO:"):
+        raise ValueError("Invalid GO ID format")
+
+    fields = ""
+
+    try:
+        data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, goid, fields)
+        if data:
+            return True
+    except DataNotFoundException as e:
+        # Log the exception if needed
+        print(f"Exception occurred: {e}")
+        # Propagate the exception and return False
+        raise e
+
+    # Default return False if no data is found
+    return False

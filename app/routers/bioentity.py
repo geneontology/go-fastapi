@@ -2,6 +2,7 @@
 
 import logging
 from enum import Enum
+from http.client import HTTPException
 from typing import List
 
 from fastapi import APIRouter, Path, Query
@@ -13,6 +14,7 @@ from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
+from ..utils.ontology_utils import is_valid_goid
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -144,6 +146,15 @@ async def get_annotations_by_goterm_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    try:
+        is_valid_goid(id)
+        if is_valid_goid(id) is True:
+            print("valid")
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     if rows is None:
         rows = 100000
     # dictates the fields to return, annotation_class,aspect
@@ -173,6 +184,7 @@ async def get_annotations_by_goterm_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
+    print(data)
     if not data:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
@@ -230,7 +242,12 @@ async def get_genes_by_goterm_id(
     """
     if rows is None:
         rows = 100000
+
+
+    if not id:  # No results from Solr
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     association_return = {}
+
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         association_return = search_associations(
             subject_category="gene",
@@ -275,10 +292,8 @@ async def get_genes_by_goterm_id(
             invert_subject_object=True,
             user_agent=USER_AGENT,
             url=ESOLR.GOLR,
-            rows=rows,
-        )
-    if not association_return:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+            rows=rows)
+
     return {"associations": association_return.get("associations")}
 
 
