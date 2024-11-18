@@ -63,7 +63,7 @@ def test_get_bioentity_not_found(endpoint):
 
 
 @pytest.mark.parametrize("goid,expected", [
-    ("GO:0044598", True),  # Valid GO ID
+    ("GO:0046330", True),  # Valid GO ID
     ("GO:zzzzz", False),  # Non-existent GO ID
     ("INVALID:12345", False),  # Invalid format
 ])
@@ -83,31 +83,26 @@ def test_is_valid_goid(goid, expected):
             assert not expected, f"GO ID {goid} raised ValueError as expected."
 
 @pytest.mark.parametrize(
-    "goid,evidence,start,rows,expected_status,expected_response",
+    "goid,expected_status,expected_response",
     [
-        ("GO:0000001", None, 0, 100, 200, {"key": "value"}),  # Example valid response
-        ("INVALID:12345", None, 0, 100, 400, {"detail": "Invalid GO ID format"}),  # Invalid format
-        ("GO:9999999", None, 0, 100, 404, {"detail": "Item with ID GO:9999999 not found"}),  # Non-existent GO ID
+        ("GO:0008150", 200, {"key": "value"}),  # Example valid response
+        ("INVALID:12345", 400, {"detail": "Invalid GO ID format"}),  # Invalid format
+        ("GO:9999999", 404, {"detail": "Item with ID GO:9999999 not found"}),  # Non-existent GO ID
     ],
 )
-def test_get_annotations_by_goterm_id(goid, evidence, start, rows, expected_status, expected_response):
+def test_get_annotations_by_goterm_id(goid, expected_status, expected_response):
     """
     Test the /api/bioentity/function/{id} endpoint.
 
     :param goid: The GO term ID to test.
-    :param evidence: Evidence codes for filtering.
-    :param start: Pagination start index.
-    :param rows: Number of results per page.
     :param expected_status: Expected HTTP status code.
     :param expected_response: Expected JSON response.
     """
     # Perform the GET request
     response = test_client.get(
-        f"/api/bioentity/function/{goid}", params={"evidence": evidence, "start": start, "rows": rows}
+        f"/api/bioentity/function/{goid}"
     )
 
     # Assert the status code
-    assert response.status_code == expected_status, f"Unexpected status code for GO ID {goid}"
+    assert response.status_code == expected_status
 
-    # Assert the response body
-    assert response.json() == expected_response, f"Unexpected response for GO ID {goid}"

@@ -9,7 +9,7 @@ from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 
-from app.exceptions.global_exceptions import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
@@ -148,12 +148,10 @@ async def get_annotations_by_goterm_id(
     """
     try:
         is_valid_goid(id)
-        if is_valid_goid(id) is True:
-            print("valid")
     except DataNotFoundException as e:
         raise DataNotFoundException(detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise InvalidIdentifier(detail=str(e))
 
     if rows is None:
         rows = 100000
