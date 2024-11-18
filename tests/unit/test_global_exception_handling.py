@@ -106,3 +106,14 @@ def test_get_annotations_by_goterm_id(goid, expected_status, expected_response):
     # Assert the status code
     assert response.status_code == expected_status
 
+
+def test_labeler_data_not_found_exception():
+    """
+    Test the labeler endpoint with "GO:0003677".
+
+    :return: None
+    """
+    endpoint = "/api/ontol/labeler"
+    data = {"id": "GO:zzzz"}
+    response = test_client.get(endpoint, params=data)
+    assert response.status_code == 404

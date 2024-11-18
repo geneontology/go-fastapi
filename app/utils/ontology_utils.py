@@ -39,6 +39,8 @@ def batch_fetch_labels(ids):
         label = goont_fetch_label(id)
         if label is not None:
             m[id] = label
+        else:
+            raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return m
 
 
@@ -58,6 +60,8 @@ def goont_fetch_label(id):
     si = SparqlImplementation(ont_r)
     query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
     bindings = si._sparql_query(query.query_str())
+    if not bindings:
+        return None
     rows = [r["label"]["value"] for r in bindings]
     return rows[0]
 
