@@ -166,5 +166,4 @@ async def get_gocams_by_geneproduct_id(
             % id
         )
     results = si._sparql_query(query)
-    transformed_results = transform_array(results)
     return transform_array(results)

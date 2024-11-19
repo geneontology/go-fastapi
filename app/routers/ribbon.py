@@ -8,7 +8,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
-from app.exceptions.global_exceptions import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
@@ -34,6 +34,14 @@ async def get_subsets_by_term(
     )
 ):
     """Returns subsets (slims) associated to an ontology term."""
+
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
