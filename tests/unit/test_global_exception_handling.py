@@ -117,3 +117,42 @@ def test_labeler_data_not_found_exception():
     data = {"id": "GO:zzzz"}
     response = test_client.get(endpoint, params=data)
     assert response.status_code == 404
+
+ontology_endpoints = [f"/api/go/{id}/models",
+                      ]
+
+
+@pytest.mark.parametrize("endpoint", [
+    "/api/go/FAKE:12345/models",
+    "/api/go/FAKE:12345/hierarchy",
+    "/api/go/FAKE:12345",
+    "/api/association/between/FAKE:12345/FAKE:12345"
+    # "/api/ontol/labeler",  # Uncomment if this endpoint should be included
+])
+def test_ontology_endpoints_not_found_error_handling(endpoint):
+    """
+    Test that the DataNotFoundException is raised when the id does not exist.
+    """
+    # Perform the GET request
+    response = test_client.get(endpoint)
+
+    # Assert the status code is 404 (Not Found)
+    assert response.status_code == 400, f"Endpoint {endpoint} failed with status code {response.status_code}"
+
+
+@pytest.mark.parametrize("endpoint", [
+    "/api/go/GO:12345/models",
+    "/api/go/GO:12345/hierarchy",
+    "/api/go/GO:12345",
+    "/api/association/between/GO:12345/GO:12345"
+    # "/api/ontol/labeler",  # Uncomment if this endpoint should be included
+])
+def test_ontology_endpoints_not_found_error_handling(endpoint):
+    """
+    Test that the DataNotFoundException is raised when the id does not exist.
+    """
+    # Perform the GET request
+    response = test_client.get(endpoint)
+
+    # Assert the status code is 404 (Not Found)
+    assert response.status_code == 404, f"Endpoint {endpoint} failed with status code {response.status_code}"

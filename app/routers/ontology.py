@@ -10,7 +10,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
-from app.exceptions.global_exceptions import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
@@ -36,10 +36,20 @@ async def get_term_metadata_by_id(
     ),
 ):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
     results = si._sparql_query(query)
+    if not results:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+
     transformed_result = transform(
         results[0],
         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
@@ -47,8 +57,6 @@ async def get_term_metadata_by_id(
     cmaps = get_prefixes("go")
     converter = Converter.from_prefix_map(cmaps, strict=False)
     transformed_result["goid"] = converter.compress(transformed_result["goid"])
-    if not transformed_result:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return transformed_result
 
 
@@ -60,13 +68,19 @@ async def get_term_graph_by_id(
     graph_type: GraphType = Query(GraphType.topology_graph),
 ):
     """Returns graph of an ontology term, e.g. GO:0003677."""
+
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     graph_type = graph_type + "_json"  # GOLR field names
 
     data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, graph_type)
     # step required as these graphs are made into strings in the json
     data[graph_type] = json.loads(data[graph_type])
-    if not data[graph_type]:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
 
 
@@ -90,6 +104,13 @@ async def get_subgraph_by_term_id(
     :param rows: The number of results to return
     :return: A is_a/part_of subgraph of the ontology term including the term's ancestors and descendants, label and ID.
     """
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     if rows is None:
         rows = 100000
     query_filters = ""
@@ -119,8 +140,6 @@ async def get_subgraph_by_term_id(
         ancestors.append({"id": parent})
 
     data = {"descendents": descendents, "ancestors": ancestors}
-    if data.get("descendents") is None and data.get("ancestors") is None:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
 
 
@@ -139,6 +158,15 @@ async def get_ancestors_shared_by_two_terms(
     :param subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
     :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
+
+    try:
+        ontology_utils.is_valid_goid(subject)
+        ontology_utils.is_valid_goid(object)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     fields = "isa_partof_closure,isa_partof_closure_label"
 
     subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
@@ -157,8 +185,6 @@ async def get_ancestors_shared_by_two_terms(
         if found:
             shared.append(sub)
             shared_labels.append(subres["isa_partof_closure_label"][i])
-    if shared is None and shared_labels is None:
-        raise DataNotFoundException(detail=f"Item with ID {subject} and {object} not found")
     return {"goids": shared, "gonames: ": shared_labels}
 
 
@@ -179,6 +205,14 @@ async def get_ancestors_shared_between_two_terms(
     :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     :param relation: 'relation between two terms' can only be one of two values: shared or closest
     """
+    try:
+        ontology_utils.is_valid_goid(subject)
+        ontology_utils.is_valid_goid(object)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     fields = "isa_partof_closure,isa_partof_closure_label"
     logger.info(relation)
     if relation == "shared" or relation is None:
@@ -256,8 +290,6 @@ async def get_ancestors_shared_between_two_terms(
                 shared_part_of.append(part_of)
 
         result = {"sharedIsA": shared_is_a, "sharedPartOf": shared_part_of}
-        if result.get("sharedIsA") is None and result.get("sharedPartOf") is None:
-            raise DataNotFoundException(detail=f"Item with ID {subject} and {object} not found")
         return result
 
 
@@ -276,6 +308,14 @@ async def get_go_term_detail_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
+
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.create_go_summary_sparql(id)
@@ -284,8 +324,6 @@ async def get_go_term_detail_by_go_id(
         results[0],
         ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
     )
-    if not transformed_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return transformed_results
 
 
@@ -304,6 +342,13 @@ async def get_go_hierarchy_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -342,8 +387,6 @@ async def get_go_hierarchy_go_id(
         collated["label"] = result["label"].get("value")
         collated["hierarchy"] = result["hierarchy"].get("value")
         collated_results.append(collated)
-    if not collated_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return collated_results
 
 
@@ -361,6 +404,13 @@ async def get_gocam_models_by_go_id(
     :param id: A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)
     :return: GO-CAM model identifiers for a given GO term ID.
     """
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -385,6 +435,4 @@ async def get_gocam_models_by_go_id(
     )
     results = si._sparql_query(query)
     transformed_results = transform_array(results)
-    if not transformed_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return transformed_results
