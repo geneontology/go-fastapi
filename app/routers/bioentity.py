@@ -10,7 +10,7 @@ from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
-from app.utils.golr_utils import gu_run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on, is_valid_bioentity
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -81,6 +81,13 @@ async def get_bioentity_by_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    try:
+        is_valid_bioentity(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     if rows is None:
         rows = 100000
     # special case MGI, sigh
@@ -238,13 +245,15 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    try:
+        is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     if rows is None:
         rows = 100000
-
-
-    if not id:  # No results from Solr
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
-    association_return = {}
 
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         association_return = search_associations(
@@ -329,6 +338,14 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
+
+    try:
+        is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     if rows is None:
         rows = 100000
     fields = "taxon,taxon_label"
@@ -414,6 +431,13 @@ async def get_annotations_by_gene_id(
     scenes for querying.
 
     """
+    try:
+        is_valid_bioentity(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e))
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e))
+
     if rows is None:
         rows = 100000
 

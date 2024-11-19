@@ -33,13 +33,25 @@ def test_ncbi_taxon_error_handling():
 
 
 @pytest.mark.parametrize("endpoint", [
-    "/api/bioentity/FAKE:12345",
     "/api/bioentity/function/FAKE:12345",
     "/api/bioentity/function/FAKE:12345/taxons",
-    "/api/bioentity/gene/FAKE:12345/function",
-    # "/api/ontol/labeler",  # Uncomment if this endpoint should be included
 ])
-def test_get_bioentity_not_found(endpoint):
+def test_get_bioentity_goid_not_found(endpoint):
+    """
+    Test that the DataNotFoundException is raised when the id does not exist.
+    """
+    # Perform the GET request
+    response = test_client.get(endpoint)
+
+    # Assert the status code is 400 (Invalid Request)
+    assert response.status_code == 400, f"Endpoint {endpoint} failed with status code {response.status_code}"
+
+
+@pytest.mark.parametrize("endpoint", [
+    "/api/bioentity/FAKE:12345",
+    "/api/bioentity/gene/FAKE:12345/function"
+])
+def test_get_bioentity_entity_id_not_found(endpoint):
     """
     Test that the DataNotFoundException is raised when the id does not exist.
     """
