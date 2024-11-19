@@ -37,7 +37,7 @@ async def get_term_metadata_by_id(
 ):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
     try:
-        ontology_utils.is_valid_goid(id)
+        ontology_utils.is_golr_recognized_curie(id)
     except DataNotFoundException as e:
         raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
