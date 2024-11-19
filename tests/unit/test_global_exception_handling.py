@@ -97,7 +97,7 @@ def test_is_valid_goid(goid, expected):
 
 
 @pytest.mark.parametrize("entity_id,expected", [
-    ("MGI:MGI:3588192", True),  # Valid ID
+    ("MGI:3588192", True),  # Valid ID
     ("ZFIN:ZDB-GENE-000403-1", True),  # Valid ID
     ("MGI:zzzzz", False),  # Invalid
     ("ZFIN:12345", False),  # Invalid

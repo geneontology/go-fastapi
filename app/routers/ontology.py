@@ -74,6 +74,7 @@ async def get_term_graph_by_id(
     except DataNotFoundException as e:
         raise DataNotFoundException(detail=str(e))
     except ValueError as e:
+        print("triggered value error")
         raise InvalidIdentifier(detail=str(e))
 
     graph_type = graph_type + "_json"  # GOLR field names

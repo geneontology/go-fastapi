@@ -93,7 +93,7 @@ class TestApp(unittest.TestCase):
 
     def test_get_go_term_detail_by_go_id(self):
         """Test the endpoint to retrieve GO term details by GO ID."""
-        response = test_client.get("/api/go/GO_0008150")
+        response = test_client.get("/api/go/GO:0008150")
         self.assertIn("goid", response.json())
         self.assertIn("label", response.json())
         self.assertEqual(response.json()["goid"], "http://purl.obolibrary.org/obo/GO_0008150")

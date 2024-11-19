@@ -117,6 +117,12 @@ def is_valid_bioentity(entity_id) -> bool:
     if ":" not in entity_id:
         raise ValueError("Invalid CURIE format")
 
+    if "MGI:" in entity_id:
+        if "MGI:MGI:" in entity_id:
+            pass
+        else:
+            entity_id = entity_id.replace("MGI:", "MGI:MGI:")
+
     fields = ""
 
     try:

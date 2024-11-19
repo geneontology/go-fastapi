@@ -370,7 +370,7 @@ def is_valid_goid(goid) -> bool:
     :rtype: bool
     """
     # Ensure the GO ID starts with the proper prefix
-    if not goid.startswith("GO:"):
+    if not goid.startswith("GO:") and not goid.startswith("GO_"):
         raise ValueError("Invalid GO ID format")
 
     fields = ""
