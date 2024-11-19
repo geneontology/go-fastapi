@@ -38,7 +38,6 @@ async def get_expand_curie(id: str = Path(..., description="identifier in CURIE 
 
     e.g. MGI:3588192, MGI:MGI:3588192, ZFIN:ZDB-GENE-000403-1.
     """
-
     if ":" not in id:
         raise ValueError("Invalid CURIE format")
 

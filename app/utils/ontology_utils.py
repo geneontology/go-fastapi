@@ -2,7 +2,6 @@
 
 import logging
 
-import requests
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.implementations.sparql.sparql_query import SparqlQuery
@@ -379,6 +378,40 @@ def is_valid_goid(goid) -> bool:
         data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, goid, fields)
         if data:
             return True
+    except DataNotFoundException as e:
+        # Log the exception if needed
+        print(f"Exception occurred: {e}")
+        # Propagate the exception and return False
+        raise e
+
+    # Default return False if no data is found
+    return False
+
+
+def is_golr_recognized_curie(id) -> bool:
+    """
+    Check if the provided identifier is valid by querying the AmiGO Solr (GOLR) instance.
+
+    :param id: The GO identifier to be checked.
+    :type id: str
+    :return: True if the GO identifier is valid, False otherwise.
+    :rtype: bool
+    """
+    # Ensure the GO ID starts with the proper prefix
+    if ":" not in id and "_" not in id:
+        raise ValueError("Invalid CURIE format")
+
+    fields = ""
+
+    try:
+        data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+        if data:
+            return True
+        else:
+            data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, fields)
+            if data:
+                return True
+
     except DataNotFoundException as e:
         # Log the exception if needed
         print(f"Exception occurred: {e}")

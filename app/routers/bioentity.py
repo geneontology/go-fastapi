@@ -2,7 +2,6 @@
 
 import logging
 from enum import Enum
-from http.client import HTTPException
 from typing import List
 
 from fastapi import APIRouter, Path, Query
@@ -13,8 +12,8 @@ from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdent
 from app.utils.golr_utils import gu_run_solr_text_on, is_valid_bioentity
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
-from .slimmer import gene_to_uniprot_from_mygene
 from ..utils.ontology_utils import is_valid_goid
+from .slimmer import gene_to_uniprot_from_mygene
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -33,6 +32,7 @@ logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
+
     """
     Enumeration for Gene Ontology relationship types used for filtering associations.
 
@@ -338,7 +338,6 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
-
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:

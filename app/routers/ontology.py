@@ -24,6 +24,7 @@ router = APIRouter()
 
 
 class GraphType(str, Enum):
+
     """Enum for the different types of graphs that can be returned."""
 
     topology_graph = "topology_graph"
@@ -37,7 +38,7 @@ async def get_term_metadata_by_id(
 ):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
     try:
-        ontology_utils.is_valid_goid(id)
+        ontology_utils.is_golr_recognized_curie(id)
     except DataNotFoundException as e:
         raise DataNotFoundException(detail=str(e))
     except ValueError as e:
@@ -68,7 +69,6 @@ async def get_term_graph_by_id(
     graph_type: GraphType = Query(GraphType.topology_graph),
 ):
     """Returns graph of an ontology term, e.g. GO:0003677."""
-
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
@@ -159,7 +159,6 @@ async def get_ancestors_shared_by_two_terms(
     :param subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
     :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
     """
-
     try:
         ontology_utils.is_valid_goid(subject)
         ontology_utils.is_valid_goid(object)
@@ -309,7 +308,6 @@ async def get_go_term_detail_by_go_id(
     please note, this endpoint was migrated from the GO-CAM service api and may not be
     supported in its current form in the future.
     """
-
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:

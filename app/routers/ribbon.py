@@ -34,7 +34,6 @@ async def get_subsets_by_term(
     )
 ):
     """Returns subsets (slims) associated to an ontology term."""
-
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:

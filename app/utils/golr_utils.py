@@ -3,7 +3,7 @@
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.utils.settings import ESOLRDoc, ESOLR
+from app.utils.settings import ESOLR, ESOLRDoc
 
 
 # Respect the method name for run_sparql_on with enums
@@ -27,7 +27,7 @@ def run_solr_on(solr_instance, category, id, fields):
         response = requests.get(query, timeout=timeout_seconds)
         return response.json()["response"]["docs"][0]
         # Process the response here
-    except IndexError as e:
+    except IndexError:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
     except requests.Timeout as e:
         print(f"Request timed out: {e}")
