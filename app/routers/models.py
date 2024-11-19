@@ -376,8 +376,6 @@ async def get_goterms_by_model_id(
             collated["definitions"] = [result["definitions"].get("value")]
             collated["gocam"] = result["gocam"].get("value")
     collated_results.append(collated)
-    if not collated_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return collated_results
 
 
@@ -465,8 +463,6 @@ async def get_geneproducts_by_model_id(
         """
     results = si._sparql_query(query)
     results = transform_array(results, ["gpids", "gpnames"])
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return results
 
 
@@ -537,8 +533,6 @@ async def get_pmid_by_model_id(
     for result in results:
         collated = {"gocam": result["gocam"].get("value"), "sources": result["sources"].get("value")}
         collated_results.append(collated)
-    if not collated_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return collated_results
 
 
@@ -566,8 +560,6 @@ async def get_model_details_by_model_id_json(
     path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
     response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
     response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
-    if not response.json():
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return response.json()
 
 
@@ -608,8 +600,6 @@ async def get_term_details_by_model_id(
             "object": result["object"].get("value"),
         }
         collated_results.append(collated)
-    if not collated_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return collated_results
 
 
@@ -655,6 +645,4 @@ async def get_term_details_by_taxon_id(
     for result in results:
         collated = {"gocam": result["gocam"].get("value")}
         collated_results.append(collated)
-    if not collated_results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return collated_results

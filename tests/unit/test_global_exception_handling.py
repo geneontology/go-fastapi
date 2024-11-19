@@ -6,6 +6,7 @@ from app.exceptions.global_exceptions import DataNotFoundException
 from app.main import app
 import pytest
 
+from app.utils.golr_utils import is_valid_bioentity
 from app.utils.ontology_utils import is_valid_goid
 
 test_client = TestClient(app)
@@ -51,7 +52,7 @@ def test_get_bioentity_not_found(endpoint):
 @pytest.mark.parametrize("endpoint", [
     "/api/bioentity/function/FAKE:12345/genes",
 ])
-def test_get_bioentity_not_found(endpoint):
+def test_get_bioentity_genes_not_found(endpoint):
     """
     Test that the DataNotFoundException is raised when the id does not exist.
     """
@@ -81,6 +82,29 @@ def test_is_valid_goid(goid, expected):
             assert not expected, f"GO ID {goid} raised DataNotFoundException as expected."
         except ValueError:
             assert not expected, f"GO ID {goid} raised ValueError as expected."
+
+
+@pytest.mark.parametrize("entity_id,expected", [
+    ("MGI:MGI:3588192", True),  # Valid ID
+    ("ZFIN:ZDB-GENE-000403-1", True),  # Valid ID
+    ("MGI:zzzzz", False),  # Invalid
+    ("ZFIN:12345", False),  # Invalid
+])
+def test_is_valid_entity_id(entity_id, expected):
+    """
+    Test that the is_valid_goid function behaves as expected.
+    """
+    if expected:
+        assert is_valid_bioentity(entity_id) == True
+    else:
+        try:
+            result = is_valid_bioentity(entity_id)
+            assert result == False
+        except DataNotFoundException:
+            assert not expected, f"GO ID {entity_id} raised DataNotFoundException as expected."
+        except ValueError:
+            assert not expected, f"GO ID {entity_id} raised ValueError as expected."
+
 
 @pytest.mark.parametrize(
     "goid,expected_status,expected_response",

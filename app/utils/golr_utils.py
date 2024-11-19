@@ -3,6 +3,7 @@
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
+from app.utils.settings import ESOLRDoc, ESOLR
 
 
 # Respect the method name for run_sparql_on with enums
@@ -102,3 +103,31 @@ def gu_run_solr_text_on(
         print("Request timed out")
     except requests.RequestException as e:
         print(f"Request error: {e}")
+
+def is_valid_bioentity(entity_id) -> bool:
+    """
+    Check if the provided identifier is valid by querying the AmiGO Solr (GOLR) instance.
+
+    :param entity_id: The bioentity identifier
+    :type entity_id: str
+    :return: True if the entity identifier is valid, False otherwise.
+    :rtype: bool
+    """
+    # Ensure the GO ID starts with the proper prefix
+    if ":" not in entity_id:
+        raise ValueError("Invalid CURIE format")
+
+    fields = ""
+
+    try:
+        data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, entity_id, fields)
+        if data:
+            return True
+    except DataNotFoundException as e:
+        # Log the exception if needed
+        print(f"Exception occurred: {e}")
+        # Propagate the exception and return False
+        raise e
+
+    # Default return False if no data is found
+    return False

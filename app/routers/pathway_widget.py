@@ -167,6 +167,4 @@ async def get_gocams_by_geneproduct_id(
         )
     results = si._sparql_query(query)
     transformed_results = transform_array(results)
-    if not transformed_results:
-        raise DataNotFoundException(detail=f"No models found for gene product {id}")
     return transform_array(results)
