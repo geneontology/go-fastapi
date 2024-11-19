@@ -41,8 +41,6 @@ async def get_expand_curie(id: str = Path(..., description="identifier in CURIE 
     if ":" not in id:
         raise ValueError("Invalid CURIE format")
 
-
-
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 

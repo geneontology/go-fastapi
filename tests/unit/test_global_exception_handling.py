@@ -101,6 +101,7 @@ def test_is_valid_goid(goid, expected):
     ("ZFIN:ZDB-GENE-000403-1", True),  # Valid ID
     ("MGI:zzzzz", False),  # Invalid
     ("ZFIN:12345", False),  # Invalid
+    ("HGNC:12345", False),  # Invalid
 ])
 def test_is_valid_entity_id(entity_id, expected):
     """
@@ -113,9 +114,11 @@ def test_is_valid_entity_id(entity_id, expected):
             result = is_valid_bioentity(entity_id)
             assert result == False
         except DataNotFoundException:
-            assert not expected, f"GO ID {entity_id} raised DataNotFoundException as expected."
+            print("data not found exception")
+            assert not expected, f"ID {entity_id} raised DataNotFoundException as expected."
         except ValueError:
-            assert not expected, f"GO ID {entity_id} raised ValueError as expected."
+            print("value error")
+            assert not expected, f"ID {entity_id} raised ValueError as expected."
 
 
 @pytest.mark.parametrize(

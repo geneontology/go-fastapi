@@ -32,7 +32,6 @@ logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
-
     """
     Enumeration for Gene Ontology relationship types used for filtering associations.
 
@@ -84,9 +83,9 @@ async def get_bioentity_by_id(
     try:
         is_valid_bioentity(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if rows is None:
         rows = 100000
@@ -156,9 +155,9 @@ async def get_annotations_by_goterm_id(
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if rows is None:
         rows = 100000
@@ -248,9 +247,9 @@ async def get_genes_by_goterm_id(
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if rows is None:
         rows = 100000
@@ -299,7 +298,8 @@ async def get_genes_by_goterm_id(
             invert_subject_object=True,
             user_agent=USER_AGENT,
             url=ESOLR.GOLR,
-            rows=rows)
+            rows=rows,
+        )
 
     return {"associations": association_return.get("associations")}
 
@@ -341,9 +341,9 @@ async def get_taxon_by_goterm_id(
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if rows is None:
         rows = 100000
@@ -433,9 +433,9 @@ async def get_annotations_by_gene_id(
     try:
         is_valid_bioentity(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if rows is None:
         rows = 100000

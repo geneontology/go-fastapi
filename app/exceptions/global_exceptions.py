@@ -4,7 +4,6 @@ from fastapi import HTTPException
 
 
 class DataNotFoundException(HTTPException):
-
     """
     Exception for when data is not found.
 
@@ -24,8 +23,8 @@ class DataNotFoundException(HTTPException):
         """
         super().__init__(status_code=404, detail=detail)
 
-class InvalidIdentifier(HTTPException):
 
+class InvalidIdentifier(HTTPException):
     """
     Exception for when data is not found.
 

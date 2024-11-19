@@ -24,7 +24,6 @@ router = APIRouter()
 
 
 class GraphType(str, Enum):
-
     """Enum for the different types of graphs that can be returned."""
 
     topology_graph = "topology_graph"
@@ -38,11 +37,11 @@ async def get_term_metadata_by_id(
 ):
     """Returns metadata of an ontology term, e.g. GO:0003677."""
     try:
-        ontology_utils.is_golr_recognized_curie(id)
+        ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -72,10 +71,9 @@ async def get_term_graph_by_id(
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        print("triggered value error")
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     graph_type = graph_type + "_json"  # GOLR field names
 
@@ -108,9 +106,9 @@ async def get_subgraph_by_term_id(
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if rows is None:
         rows = 100000
@@ -163,9 +161,9 @@ async def get_ancestors_shared_by_two_terms(
         ontology_utils.is_valid_goid(subject)
         ontology_utils.is_valid_goid(object)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     fields = "isa_partof_closure,isa_partof_closure_label"
 
@@ -209,9 +207,9 @@ async def get_ancestors_shared_between_two_terms(
         ontology_utils.is_valid_goid(subject)
         ontology_utils.is_valid_goid(object)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     fields = "isa_partof_closure,isa_partof_closure_label"
     logger.info(relation)
@@ -311,9 +309,9 @@ async def get_go_term_detail_by_go_id(
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -344,9 +342,9 @@ async def get_go_hierarchy_go_id(
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())
@@ -406,9 +404,9 @@ async def get_gocam_models_by_go_id(
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     cmaps = get_prefixes("go")
     ont_r = OntologyResource(url=get_sparql_endpoint())

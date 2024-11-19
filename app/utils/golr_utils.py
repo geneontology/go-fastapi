@@ -1,5 +1,7 @@
 """golr utils."""
 
+from zipfile import error
+
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
@@ -9,7 +11,7 @@ from app.utils.settings import ESOLR, ESOLRDoc
 
 # Respect the method name for run_sparql_on with enums
 def run_solr_on(solr_instance, category, id, fields):
-    """Return the result of a solr query on the given solrInstance, for a certain document_category and id."""
+    """Return the result of a Solr query."""
     query = (
         solr_instance.value
         + 'select?q=*:*&fq=document_category:"'
@@ -21,19 +23,29 @@ def run_solr_on(solr_instance, category, id, fields):
         + "&wt=json&indent=on"
     )
 
-    print(query)
-    timeout_seconds = 60  # Set the desired timeout value in seconds
+    print("Solr query:", query)
+    timeout_seconds = 60
 
     try:
         response = requests.get(query, timeout=timeout_seconds)
-        return response.json()["response"]["docs"][0]
-        # Process the response here
-    except IndexError:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+        response.raise_for_status()  # Raise an error for non-2xx responses
+        response_json = response.json()
+        print("Solr response JSON:", response_json)
+
+        docs = response_json.get("response", {}).get("docs", [])
+        if not docs:
+            raise DataNotFoundException(detail=f"Item with ID {id} not found")
+        return docs[0]
+
+    except IndexError as e:
+        print("IndexError: No docs found, raising DataNotFoundException")
+        raise DataNotFoundException(detail=f"Item with ID {id} not found") from e
     except requests.Timeout as e:
         print(f"Request timed out: {e}")
+        raise
     except requests.RequestException as e:
-        print(f"No results found: {e}")
+        print(f"Request failed: {e}")
+        raise
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
@@ -105,6 +117,7 @@ def gu_run_solr_text_on(
     except requests.RequestException as e:
         print(f"Request error: {e}")
 
+
 def is_valid_bioentity(entity_id) -> bool:
     """
     Check if the provided identifier is valid by querying the AmiGO Solr (GOLR) instance.
@@ -130,19 +143,25 @@ def is_valid_bioentity(entity_id) -> bool:
         data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, entity_id, fields)
         if data:
             return True
-    except DataNotFoundException as e:
-        # Log the exception if needed
-        fix_possible_hgnc_id = gene_to_uniprot_from_mygene(entity_id)
-        print(fix_possible_hgnc_id)
-        try:
-            if fix_possible_hgnc_id:
-                data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, fix_possible_hgnc_id[0], fields)
-                if data:
-                    return True
-        except DataNotFoundException as e:
-            print(f"Exception occurred: {e}")
-            # Propagate the exception and return False
-            raise e
-
-    # Default return False if no data is found
+    except DataNotFoundException:
+        if "HGNC" in entity_id:
+            try:
+                fix_possible_hgnc_id = gene_to_uniprot_from_mygene(entity_id)
+            except DataNotFoundException as e:
+                print(f"Data Not Found Exception occurred: {e}")
+                # Propagate the exception and return False
+                raise e from error
+            try:
+                if fix_possible_hgnc_id:
+                    data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, fix_possible_hgnc_id[0], fields)
+                    if data:
+                        return True
+            except DataNotFoundException as e:
+                print(f"Data Not Found Exception occurred: {e}")
+                print("No results found for the provided entity ID")
+                # Propagate the exception and return False
+                raise e from error
+    except Exception as e:
+        print(f"Unexpected error in gene_to_uniprot_from_mygene: {e}")
+        return False
     return False

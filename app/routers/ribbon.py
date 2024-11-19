@@ -37,9 +37,9 @@ async def get_subsets_by_term(
     try:
         ontology_utils.is_valid_goid(id)
     except DataNotFoundException as e:
-        raise DataNotFoundException(detail=str(e))
+        raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
-        raise InvalidIdentifier(detail=str(e))
+        raise InvalidIdentifier(detail=str(e)) from e
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
