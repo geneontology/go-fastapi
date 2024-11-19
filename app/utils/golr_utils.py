@@ -3,6 +3,7 @@
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
+from app.routers.slimmer import gene_to_uniprot_from_mygene
 from app.utils.settings import ESOLR, ESOLRDoc
 
 
@@ -131,9 +132,17 @@ def is_valid_bioentity(entity_id) -> bool:
             return True
     except DataNotFoundException as e:
         # Log the exception if needed
-        print(f"Exception occurred: {e}")
-        # Propagate the exception and return False
-        raise e
+        fix_possible_hgnc_id = gene_to_uniprot_from_mygene(entity_id)
+        print(fix_possible_hgnc_id)
+        try:
+            if fix_possible_hgnc_id:
+                data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, fix_possible_hgnc_id[0], fields)
+                if data:
+                    return True
+        except DataNotFoundException as e:
+            print(f"Exception occurred: {e}")
+            # Propagate the exception and return False
+            raise e
 
     # Default return False if no data is found
     return False
