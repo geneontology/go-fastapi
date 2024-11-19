@@ -6,6 +6,7 @@ from app.exceptions.global_exceptions import DataNotFoundException
 from app.main import app
 import pytest
 
+from app.middleware.logging_middleware import logger
 from app.utils.golr_utils import is_valid_bioentity
 from app.utils.ontology_utils import is_valid_goid
 
@@ -114,10 +115,10 @@ def test_is_valid_entity_id(entity_id, expected):
             result = is_valid_bioentity(entity_id)
             assert result == False
         except DataNotFoundException:
-            print("data not found exception")
+            logger.info("data not found exception")
             assert not expected, f"ID {entity_id} raised DataNotFoundException as expected."
         except ValueError:
-            print("value error")
+            logger.info("value error")
             assert not expected, f"ID {entity_id} raised ValueError as expected."
 
 

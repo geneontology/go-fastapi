@@ -6,7 +6,7 @@ import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.routers.slimmer import gene_to_uniprot_from_mygene
-from app.utils.settings import ESOLR, ESOLRDoc
+from app.utils.settings import ESOLR, ESOLRDoc, logger
 
 
 # Respect the method name for run_sparql_on with enums
@@ -23,14 +23,14 @@ def run_solr_on(solr_instance, category, id, fields):
         + "&wt=json&indent=on"
     )
 
-    print("Solr query:", query)
+    logger.info(f"Solr query: {query}")
     timeout_seconds = 60
 
     try:
         response = requests.get(query, timeout=timeout_seconds)
         response.raise_for_status()  # Raise an error for non-2xx responses
         response_json = response.json()
-        print("Solr response JSON:", response_json)
+        logger.info("Solr response JSON:", response_json)
 
         docs = response_json.get("response", {}).get("docs", [])
         if not docs:
@@ -38,13 +38,13 @@ def run_solr_on(solr_instance, category, id, fields):
         return docs[0]
 
     except IndexError as e:
-        print("IndexError: No docs found, raising DataNotFoundException")
+        logger.info("IndexError: No docs found, raising DataNotFoundException")
         raise DataNotFoundException(detail=f"Item with ID {id} not found") from e
     except requests.Timeout as e:
-        print(f"Request timed out: {e}")
+        logger.info(f"Request timed out: {e}")
         raise
     except requests.RequestException as e:
-        print(f"Request failed: {e}")
+        logger.info(f"Request failed: {e}")
         raise
 
 
@@ -85,7 +85,7 @@ def gu_run_solr_text_on(
         + "&wt=json&indent=on"
         + optionals
     )
-    print(query)
+    logger.info(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 
     try:
@@ -113,9 +113,9 @@ def gu_run_solr_text_on(
             return return_doc
             # Process the response here
     except requests.Timeout:
-        print("Request timed out")
+        logger.info("Request timed out")
     except requests.RequestException as e:
-        print(f"Request error: {e}")
+        logger.info(f"Request error: {e}")
 
 
 def is_valid_bioentity(entity_id) -> bool:
@@ -148,7 +148,7 @@ def is_valid_bioentity(entity_id) -> bool:
             try:
                 fix_possible_hgnc_id = gene_to_uniprot_from_mygene(entity_id)
             except DataNotFoundException as e:
-                print(f"Data Not Found Exception occurred: {e}")
+                logger.info(f"Data Not Found Exception occurred: {e}")
                 # Propagate the exception and return False
                 raise e from error
             try:
@@ -157,11 +157,11 @@ def is_valid_bioentity(entity_id) -> bool:
                     if data:
                         return True
             except DataNotFoundException as e:
-                print(f"Data Not Found Exception occurred: {e}")
-                print("No results found for the provided entity ID")
+                logger.info(f"Data Not Found Exception occurred: {e}")
+                logger.info("No results found for the provided entity ID")
                 # Propagate the exception and return False
                 raise e from error
     except Exception as e:
-        print(f"Unexpected error in gene_to_uniprot_from_mygene: {e}")
+        logger.info(f"Unexpected error in gene_to_uniprot_from_mygene: {e}")
         return False
     return False

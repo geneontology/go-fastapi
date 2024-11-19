@@ -28,7 +28,7 @@ class TestApp(unittest.TestCase):
         """Test the endpoint to get the details of a Gene Ontology term by its identifier."""
         for id in ontology_ids:
             response = test_client.get(f"/api/ontology/term/{id}")
-            print(response.json())
+            logger.info(response.json())
             self.assertEqual(response.status_code, 200)
 
     def test_ontology_ancestors_shared_sub_obj(self):
@@ -52,8 +52,8 @@ class TestApp(unittest.TestCase):
         data = {"relation": "shared"}
         response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
         self.assertIn("GO:0008150", response.json().get("shared"))
-        print(response.json().get("shared"))
-        print(response.json().get("shared_labels"))
+        logger.info(response.json().get("shared"))
+        logger.info(response.json().get("shared_labels"))
         self.assertIsNotNone(response.json().get("shared_labels"))
         self.assertEqual(response.status_code, 200)
 

@@ -1,7 +1,6 @@
 """Unit tests for the endpoints in the slimmer module."""
 import logging
 import unittest
-from pprint import pprint
 
 from fastapi.testclient import TestClient
 
@@ -36,7 +35,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
         response = test_client.get(endpoint, params=data)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.json()), 2)
-        pprint(response.json())
+        logger.info(response.json())
         for item in response.json():
             self.assertIn(item.get("slim"), ["GO:0003674", "GO:0008150", "GO:0005575"])
             self.assertEqual(item.get("subject"), "ZFIN:ZDB-GENE-980526-388")

@@ -258,7 +258,7 @@ async def get_gocam_models(
         query += "\nOFFSET " + str(start)
     results = si._sparql_query(query)
     transformed_results = transform_array(results, ["orcids", "names", "groupids", "groupnames"])
-    print(transformed_results)
+    logger.info(transformed_results)
     return transform_array(results, ["orcids", "names", "groupids", "groupnames"])
 
 

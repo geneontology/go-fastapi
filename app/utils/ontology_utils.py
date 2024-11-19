@@ -169,7 +169,7 @@ def get_ontology(id):
     handle = id
     for c in cfg["ontologies"]:
         if c["id"] == id:
-            print("getting handle for id: {} from cfg".format(id))
+            logger.info("getting handle for id: {} from cfg".format(id))
             handle = c["handle"]
 
     if handle not in omap:
@@ -179,7 +179,7 @@ def get_ontology(id):
     else:
         logging.info("Using cached for {}".format(handle))
 
-    print("handle: " + handle)
+    logger.info("handle: " + handle)
     return omap[handle]
 
 
@@ -380,7 +380,7 @@ def is_valid_goid(goid) -> bool:
             return True
     except DataNotFoundException as e:
         # Log the exception if needed
-        print(f"Exception occurred: {e}")
+        logger.info(f"Exception occurred: {e}")
         # Propagate the exception and return False
         raise e
 
@@ -414,7 +414,7 @@ def is_golr_recognized_curie(id) -> bool:
 
     except DataNotFoundException as e:
         # Log the exception if needed
-        print(f"Exception occurred: {e}")
+        logger.info(f"Exception occurred: {e}")
         # Propagate the exception and return False
         raise e
 

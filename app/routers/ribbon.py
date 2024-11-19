@@ -156,20 +156,19 @@ async def get_ribbon_results(
     for s in subject_ids:
         if "HGNC:" in s or "NCBIGene:" in s or "ENSEMBL:" in s:
             prots = gene_to_uniprot_from_mygene(s)
-            print("prots:  ", prots)
+            logger.info(f"prots:  {prots}")
             if len(prots) > 0:
                 mapped_ids[s] = prots[0]
-                print("mapped_ids:  ", mapped_ids)
+                logger.info(f"mapped_ids:  {mapped_ids}")
                 reverse_mapped_ids[prots[0]] = s
                 if len(prots) == 0:
                     prots = [s]
                 slimmer_subjects += prots
-                print("slimmer_subjects:  ", slimmer_subjects)
+                logger.info(f"slimmer_subjects:  {slimmer_subjects}")
         else:
             slimmer_subjects.append(s)
 
-    print("slimmer_subjects:  ", slimmer_subjects)
-    logger.info("SLIMMER SUBS: %s", slimmer_subjects)
+    logger.info(f"SLIMMER_SUBS:  {slimmer_subjects}")
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject

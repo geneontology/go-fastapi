@@ -38,7 +38,7 @@ class TestGeneProductAPI(unittest.TestCase):
         """
         for gid in gene_ids:
             id = urllib.parse.quote(gid)
-            print(id)
+            logger.info(id)
             data = {
                 "causalmf": 2,
             }

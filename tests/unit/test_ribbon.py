@@ -1,10 +1,10 @@
 """Unit tests for the endpoints in the ribbon module."""
 import unittest
-from pprint import pprint
 
 from fastapi.testclient import TestClient
 
 from app.main import app
+import logging
 
 test_client = TestClient(app)
 
@@ -15,6 +15,7 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
+logger = logging.getLogger()
 
 class TestOntologyAPI(unittest.TestCase):
     """Test the ribbon API endpoints."""
@@ -73,7 +74,7 @@ class TestOntologyAPI(unittest.TestCase):
         """Test sgd ribbon with not available annotations."""
         data = {"subset": "goslim_agr", "subject": ["SGD:S000002812"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
-        pprint(response.json())
+        logger.info(response.json())
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("groups").get("GO:0008219") is None)
@@ -141,7 +142,7 @@ class TestOntologyAPI(unittest.TestCase):
         """Test RGD annotations in the ribbon."""
         data = {"subset": "goslim_agr", "subject": ["RGD:70971"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
-        pprint(response.json())
+        logger.info(response.json())
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Hamp")
