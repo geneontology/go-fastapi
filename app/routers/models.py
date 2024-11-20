@@ -44,7 +44,6 @@ async def get_gocam_models(
         start = 0
         size = last
 
-
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
 
