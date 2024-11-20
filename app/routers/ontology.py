@@ -8,7 +8,8 @@ from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
-
+from pydantic import BaseModel
+from typing import List
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
@@ -149,13 +150,13 @@ async def get_subgraph_by_term_id(
 )
 async def get_ancestors_shared_by_two_terms(
     subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259", example="GO:0006259"),
-    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483", example="GO:0046483"),
+    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0016070", example="GO:0016070"),
 ):
     """
     Returns the ancestor ontology terms shared by two ontology terms.
 
     :param subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
-    :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
+    :param object: 'CURIE identifier of a GO term, e.g. GO:0016070'
     """
     try:
         ontology_utils.is_valid_goid(subject)
@@ -193,14 +194,14 @@ async def get_ancestors_shared_by_two_terms(
 )
 async def get_ancestors_shared_between_two_terms(
     subject: str = Path(..., description="Identifier of a GO term, e.g. GO:0006259", example="GO:0006259"),
-    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0046483", example="GO:0046483"),
+    object: str = Path(..., description="Identifier of a GO term, e.g. GO:0016070", example="GO:0016070"),
     relation: str = Query(None, description="relation between two terms", example="closest"),
 ):
     """
     Returns the ancestor ontology terms shared by two ontology terms.
 
     :param subject: 'CURIE identifier of a GO term, e.g. GO:0006259'
-    :param object: 'CURIE identifier of a GO term, e.g. GO:0046483'
+    :param object: 'CURIE identifier of a GO term, e.g. GO:0016070'
     :param relation: 'relation between two terms' can only be one of two values: shared or closest
     """
     try:
@@ -324,10 +325,17 @@ async def get_go_term_detail_by_go_id(
     return transformed_results
 
 
+class GOHierarchyItem(BaseModel):
+    GO: str
+    label: str
+    hierarchy: str
+
+
 @router.get(
     "/api/go/{id}/hierarchy",
     tags=["ontology"],
     description="Returns parent and children relationships for a given GO ID, e.g. GO:0005885",
+    response_model=List[GOHierarchyItem],
 )
 async def get_go_hierarchy_go_id(
     id: str = Path(..., description="A GO-Term ID, e.g. GO:0097136", example="GO:0008150")
@@ -377,12 +385,14 @@ async def get_go_hierarchy_go_id(
         % id
     )
     results = si._sparql_query(query)
+
     collated_results = []
-    collated = {}
     for result in results:
-        collated["GO"] = result["GO"].get("value")
-        collated["label"] = result["label"].get("value")
-        collated["hierarchy"] = result["hierarchy"].get("value")
+        collated = {
+            "GO": result["GO"].get("value"),
+            "label": result["label"].get("value"),
+            "hierarchy": result["hierarchy"].get("value"),
+        }
         collated_results.append(collated)
     return collated_results
 
@@ -393,12 +403,12 @@ async def get_go_hierarchy_go_id(
     description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150",
 )
 async def get_gocam_models_by_go_id(
-    id: str = Path(..., description="A GO-Term ID(e.g. GO:0097136 ...)", example="GO:0097136")
+    id: str = Path(..., description="A GO-Term ID(e.g. GO:0008150 ...)", example="GO:0008150")
 ):
     """
     Returns GO-CAM model identifiers for a given GO term ID.
 
-    :param id: A GO-Term ID(e.g. GO:0005885, GO:0097136 ...)
+    :param id: A GO-Term ID(e.g. GO:0008150 ...)
     :return: GO-CAM model identifiers for a given GO term ID.
     """
     try:
@@ -430,6 +440,7 @@ async def get_gocam_models_by_go_id(
     """
         % id
     )
+    logger.info(query)
     results = si._sparql_query(query)
     transformed_results = transform_array(results)
     return transformed_results
