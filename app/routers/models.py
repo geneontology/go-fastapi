@@ -8,6 +8,7 @@ from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
@@ -38,10 +39,11 @@ async def get_gocam_models(
         "this input gene",
     ),
 ):
-    """Returns metadata of an ontology term, e.g. GO:0003677."""
+    """Returns metadata of GO-CAM models, e.g. 59a6110e00000067."""
     if last:
         start = 0
         size = last
+
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -278,6 +280,12 @@ async def get_goterms_by_model_id(
             stripped_ids.append(model_id)
         else:
             stripped_ids.append(model_id)
+    for stripped_id in stripped_ids:
+        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
+        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+        if response.status_code == 403 or response.status_code == 404:
+            raise DataNotFoundException("GO-CAM model not found.")
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     gocam = ""
@@ -395,10 +403,16 @@ async def get_geneproducts_by_model_id(
     stripped_ids = []
     for model_id in gocams:
         if model_id.startswith("gomodel:"):
-            model_id = id.replace("gomodel:", "")
+            model_id = model_id.replace("gomodel:", "")
             stripped_ids.append(model_id)
         else:
             stripped_ids.append(model_id)
+    for stripped_id in stripped_ids:
+        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
+        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+        if response.status_code == 403 or response.status_code == 404:
+            raise DataNotFoundException("GO-CAM model not found.")
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     gocam = ""
@@ -477,10 +491,16 @@ async def get_pmid_by_model_id(
     stripped_ids = []
     for model_id in gocams:
         if model_id.startswith("gomodel:"):
-            model_id = id.replace("gomodel:", "")
+            model_id = model_id.replace("gomodel:", "")
             stripped_ids.append(model_id)
         else:
             stripped_ids.append(model_id)
+    for stripped_id in stripped_ids:
+        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
+        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+        if response.status_code == 403 or response.status_code == 404:
+            raise DataNotFoundException("GO-CAM model not found.")
+
     gocam = ""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
@@ -572,7 +592,14 @@ async def get_term_details_by_model_id(
 ):
     """Returns model details based on a GO-CAM model ID."""
     if id.startswith("gomodel:"):
-        id = id.replace("gomodel:", "")
+        replaced_id = id.replace("gomodel:", "")
+    else:
+        replaced_id = id
+
+    path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
+    response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+    if response.status_code == 403 or response.status_code == 404:
+        raise DataNotFoundException("GO-CAM model not found.")
 
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)

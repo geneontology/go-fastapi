@@ -34,6 +34,13 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 2)
 
+    def test_data_not_found_handling(self):
+        """Test the endpoint to retrieve gene product metadata by model IDs."""
+        data = {"gocams": ["gomodel:fake_id", "fake_id"]}
+        response = test_client.get("/api/models/gp", params=data)
+        print(response.json())
+        self.assertEqual(response.status_code, 404)
+
     def test_pubmedmetadata_by_model_ids(self):
         """Test the endpoint to retrieve PubMed metadata by model IDs."""
         data = {"gocams": ["59a6110e00000067", "SYNGO_369"]}
