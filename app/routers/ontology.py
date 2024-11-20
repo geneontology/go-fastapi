@@ -3,13 +3,14 @@
 import json
 import logging
 from enum import Enum
+from typing import List
 
 from curies import Converter
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 from pydantic import BaseModel
-from typing import List
+
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
@@ -326,6 +327,17 @@ async def get_go_term_detail_by_go_id(
 
 
 class GOHierarchyItem(BaseModel):
+    """
+    A GO Hierarchy return model.
+
+    This helps the hierarchy endpoint render in the swagger interface correctly,
+    even when a return is missing a component here.
+
+    :param GO: The GO ID.
+    :param label: The label of the GO ID.
+    :param hierarchy: The hierarchy of the GO ID.
+    """
+
     GO: str
     label: str
     hierarchy: str

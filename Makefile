@@ -39,7 +39,7 @@ install:
 	poetry install
 
 help:
-	@echo ""
+	@echo "##################################################################################################"
 	@echo "make all -- installs requirements, deploys and starts the site locally"
 	@echo "make install -- install dependencies"
 	@echo "make start -- start the API locally"
@@ -47,4 +47,6 @@ help:
 	@echo "make lint -- runs linter in fix mode"
 	@echo "make spell -- runs spell checker"
 	@echo "make help -- show this help"
-	@echo ""
+	@echo "make start -- start the API locally at localhost:8080/docs (takes about 10 seconds to start)"
+	@echo "make start-dev -- start the API locally at localhost:8081/docs (takes about 10 seconds to start)"
+	@echo "##################################################################################################"
