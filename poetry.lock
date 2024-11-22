@@ -1058,25 +1058,6 @@ paramiko = ">=2.11.0"
 pyyaml = ">=6.0"
 
 [[package]]
-name = "gocam"
-version = "0.1.0"
-description = "GO CAM Data Model (Python)"
-optional = false
-python-versions = "<4.0,>=3.9"
-files = [
-    {file = "gocam-0.1.0-py3-none-any.whl", hash = "sha256:c780b1ba551f45282ce359067c511656e334458633c34359155ab7ac599deac4"},
-    {file = "gocam-0.1.0.tar.gz", hash = "sha256:98bb7a7604a2a3a9abd302d6eca6d0a2f0293f024e85e6f2eb19dab7cbb09b04"},
-]
-
-[package.dependencies]
-click = ">=8,<9"
-linkml-runtime = ">=1.1.24,<2.0.0"
-ndex2 = ">=3.9.0,<4.0.0"
-pydantic = ">=2,<3"
-pyyaml = ">=6,<7"
-requests = ">=2,<3"
-
-[[package]]
 name = "graphviz"
 version = "0.20.1"
 description = "Simple Python interface for Graphviz"
@@ -4750,4 +4731,4 @@ docs = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.1"
-content-hash = "20d6908ed2e0386d8ad4692d4f589ea6e025d1fa9caba8493ea985f3c496632f"
+content-hash = "8d735ddb93eee233c8804c96352332e7c2ef8aa179a262ff726340a198f005fb"
