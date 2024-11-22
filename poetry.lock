@@ -202,33 +202,33 @@ test = ["hypothesis", "pytest", "pytest-benchmark[histogram]", "pytest-cov", "py
 
 [[package]]
 name = "bioregistry"
-version = "0.6.99"
+version = "0.11.26"
 description = "Integrated registry of biological databases and nomenclatures"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 files = [
-    {file = "bioregistry-0.6.99-py3-none-any.whl", hash = "sha256:7c30edaea11cbed1e13f64ba1debdabc12b65b70c0bc2d904b8b2ed692b9a404"},
-    {file = "bioregistry-0.6.99.tar.gz", hash = "sha256:22bc981f39c5aaa1a5430d695728a6dade6edcbfb0abbc2e42b4013a9fe4102b"},
+    {file = "bioregistry-0.11.26-py3-none-any.whl", hash = "sha256:d70421daf8b045dfaf3382679d99429b6a0a5bd515820ca1000280a00d235152"},
+    {file = "bioregistry-0.11.26.tar.gz", hash = "sha256:299b423644498f5232a7e32f70c90f170d159dccfeae0765f21579792a3398a7"},
 ]
 
 [package.dependencies]
 click = "*"
-curies = "*"
-more-click = ">=0.1.2"
+curies = ">=0.7.0"
+more_click = ">=0.1.2"
 pydantic = "*"
 pystow = ">=0.1.13"
 requests = "*"
 tqdm = "*"
 
 [package.extras]
-align = ["beautifulsoup4", "class-resolver", "defusedxml", "fairsharing-client (>=0.1.0)", "pyyaml", "tabulate"]
-charts = ["matplotlib", "matplotlib-venn", "pandas", "seaborn"]
-docs = ["autodoc-pydantic", "sphinx", "sphinx-autodoc-typehints (==1.21.1)", "sphinx-automodapi", "sphinx-click", "sphinx-rtd-theme"]
+align = ["beautifulsoup4", "class-resolver", "defusedxml", "fairsharing-client (>=0.1.0)", "pandas", "pyyaml", "tabulate"]
+charts = ["jinja2", "matplotlib", "matplotlib_venn", "pandas", "seaborn"]
+docs = ["autodoc_pydantic", "sphinx (>=8)", "sphinx-click", "sphinx-rtd-theme (>=3.0)", "sphinx_automodapi"]
 export = ["ndex2", "pyyaml", "rdflib", "rdflib-jsonld"]
-gha = ["more-itertools"]
-health = ["click-default-group", "pandas", "pyyaml", "tabulate"]
-tests = ["coverage", "more-itertools", "pytest"]
-web = ["bootstrap-flask (<=2.0.0)", "flasgger", "flask", "markdown", "pyyaml", "rdflib", "rdflib-jsonld"]
+gha = ["more_itertools"]
+health = ["click_default_group", "jinja2", "pandas", "pyyaml", "tabulate"]
+tests = ["coverage", "httpx", "more_itertools", "pytest"]
+web = ["a2wsgi", "bootstrap-flask (<=2.0.0)", "curies[fastapi]", "fastapi", "flask (<2.2.4)", "markdown", "pyyaml", "rdflib", "rdflib-endpoint", "rdflib-jsonld", "uvicorn", "werkzeug (<2.3.0)"]
 
 [[package]]
 name = "biothings-client"

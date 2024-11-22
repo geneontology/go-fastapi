@@ -30,7 +30,7 @@ spell:
 	poetry run tox -e codespell
 
 unit-tests:
-	poetry run pytest tests/unit/*.py
+	poetry run pytest -v tests/unit/*.py
 
 export-requirements:
 	poetry export -f requirements.txt --output requirements.txt
