@@ -15,7 +15,7 @@ logger = logging.getLogger()
 test_client = TestClient(app)
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
 go_cam_ids = ["59a6110e00000067", "SYNGO_369", "581e072c00000820", "gomodel:59a6110e00000067", "gomodel:SYNGO_369"]
-
+go_cam_not_found_ids = ["NGO_369", "581e072c000008", "gomodel:59a6110e000000",]
 
 class TestApp(unittest.TestCase):
     """Test the models endpoints."""
@@ -149,6 +149,17 @@ class TestApp(unittest.TestCase):
             self.assertEqual(response.json().get("id"), "gomodel:" + id.replace("gomodel:", ""))
             self.assertGreater(len(response.json().get("individuals")), 0)
             self.assertGreater(len(response.json().get("facts")), 0)
+
+
+    def test_get_model_details_by_model_id_not_found_json(self):
+        """
+        Test the endpoint to retrieve model details by model ID in JSON format from the S3 bucket, check for success.
+
+        :return: None
+        """
+        for id in go_cam_not_found_ids:
+            response = test_client.get(f"/api/go-cam/{id}")
+            self.assertEqual(response.status_code, 404)
 
     def test_get_model_details_by_model_id_json_failure(self):
         """

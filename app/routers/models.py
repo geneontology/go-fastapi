@@ -570,15 +570,21 @@ async def get_model_details_by_model_id_json(
     :param id: A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)
     :return: model details based on a GO-CAM model ID in JSON format from the S3 bucket.
     """
+    stripped_ids = []
     if id.startswith("gomodel:"):
-        replaced_id = id.replace("gomodel:", "")
+        model_id = id.replace("gomodel:", "")
+        stripped_ids.append(model_id)
     else:
-        replaced_id = id
-
-    path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
-    response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-    response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
-    return response.json()
+            stripped_ids.append(id)
+    for stripped_id in stripped_ids:
+        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
+        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+        if response.status_code == 403 or response.status_code == 404:
+            raise DataNotFoundException("GO-CAM model not found.")
+        else:
+            response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+            response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
+            return response.json()
 
 
 @router.get("/api/models/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID.")
