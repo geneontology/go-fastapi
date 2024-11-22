@@ -25,7 +25,8 @@ def test_value_error_handler():
 def test_value_error_curie():
     response = test_client.get(f"/api/gp/P05067/models")
     assert response.status_code == 400
-    assert response.json() == {"message": "Value error occurred: Invalid CURIE format"}
+    print(response.json())
+    assert response.json() == {"detail": "Invalid CURIE format"}
 
 
 def test_ncbi_taxon_success():

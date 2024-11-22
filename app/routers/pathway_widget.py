@@ -7,6 +7,8 @@ from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
+from app.utils.golr_utils import is_valid_bioentity
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
@@ -39,8 +41,12 @@ async def get_gocams_by_geneproduct_id(
 
     (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).
     """
-    if ":" not in id:
-        raise ValueError("Invalid CURIE format")
+    try:
+        is_valid_bioentity(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
 
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")

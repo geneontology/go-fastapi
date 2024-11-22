@@ -562,7 +562,7 @@ async def get_model_details_by_model_id_json(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="581e072c00000295",
+        example="gomodel:66187e4700001573",
     )
 ):
     """

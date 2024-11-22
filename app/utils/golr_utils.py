@@ -161,6 +161,8 @@ def is_valid_bioentity(entity_id) -> bool:
                 logger.info("No results found for the provided entity ID")
                 # Propagate the exception and return False
                 raise e from error
+        else:
+            raise DataNotFoundException(detail=f"Bioentity with ID {entity_id} not found") from error
     except Exception as e:
         logger.info(f"Unexpected error in gene_to_uniprot_from_mygene: {e}")
         return False

@@ -10,6 +10,7 @@ from app.main import app
 test_client = TestClient(app)
 
 gene_ids = ["WB:WBGene00002147", "FB:FBgn0003731"]  # , "SGD:S000003407", "MGI:3588192"]
+gene_not_found_ids = ["WB:not_real", "FB:fake", "SGD:FAKE", "MGI:MGI:FAKE"]
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
@@ -27,6 +28,12 @@ class TestGeneProductAPI(unittest.TestCase):
             response = test_client.get(f"/api/gp/{gene_id}/models")
             self.assertGreater(len(response.json()), 0)
             self.assertEqual(response.status_code, 200)
+
+    def test_get_gocams_by_geneproduct_not_found(self):
+        for gene_id in gene_not_found_ids:
+            response = test_client.get(f"/api/gp/{gene_id}/models")
+            print(response.json())
+            self.assertEqual(response.status_code, 404)
 
     def test_get_gocams_by_geneproduct_id_causal2(self):
         """
