@@ -28,9 +28,14 @@ def test_value_error_curie():
     assert response.json() == {"message": "Value error occurred: Invalid CURIE format"}
 
 
-def test_ncbi_taxon_error_handling():
+def test_ncbi_taxon_success():
     response = test_client.get("/api/taxon/NCBITaxon%3A4896/models")
     assert response.status_code == 200
+
+
+def test_ncbi_taxon_error_handling():
+    response = test_client.get("/api/taxon/NCBITaxon%3AFAKE/models")
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize("endpoint", [

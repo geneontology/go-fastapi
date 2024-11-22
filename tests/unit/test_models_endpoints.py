@@ -168,8 +168,8 @@ class TestApp(unittest.TestCase):
         :return: None
         """
 
-        with self.assertRaises(HTTPError):
-            test_client.get("/api/go-cam/notatallrelevant")
+        response = test_client.get("/api/go-cam/notatallrelevant")
+        assert response.status_code == 404
 
     def test_get_model_details_by_model_id_json_failure_id(self):
         """
@@ -177,9 +177,8 @@ class TestApp(unittest.TestCase):
 
         :return: None
         """
-        with self.assertRaises(HTTPError):
-            test_client.get("/api/go-cam/gocam:59a6110e00000067")
-
+        response = test_client.get("/api/go-cam/gocam:59a6110e00000067")
+        assert response.status_code == 404
 
 if __name__ == "__main__":
     unittest.main()

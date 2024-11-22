@@ -8,7 +8,8 @@ from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
-from app.exceptions.global_exceptions import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
+from app.utils import ontology_utils
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
@@ -575,7 +576,7 @@ async def get_model_details_by_model_id_json(
         model_id = id.replace("gomodel:", "")
         stripped_ids.append(model_id)
     else:
-            stripped_ids.append(id)
+        stripped_ids.append(id)
     for stripped_id in stripped_ids:
         path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
         response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
@@ -583,7 +584,8 @@ async def get_model_details_by_model_id_json(
             raise DataNotFoundException("GO-CAM model not found.")
         else:
             response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-            response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
+            response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned
+            # an unsuccessful status code
             return response.json()
 
 
@@ -643,6 +645,13 @@ async def get_term_details_by_taxon_id(
     )
 ):
     """Returns model details based on a NCBI Taxon ID."""
+    try:
+        ontology_utils.is_golr_recognized_curie(taxon)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     final_taxon = "http://purl.obolibrary.org/obo/"
