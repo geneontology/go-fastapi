@@ -66,93 +66,46 @@ async def get_user_by_orcid(
     )
 ):
     """Returns model details based on a GO-CAM model ID."""
-    mod_orcid = f'"http://orcid.org/{orcid}"^^xsd:string'
+    mod_orcid = f"https://orcid.org/{orcid}"
+    print(mod_orcid)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
         """
-
         PREFIX metago: <http://model.geneontology.org/>
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
         PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
         PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
         PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
         PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
+        PREFIX biomacromolecule: <http://purl.obolibrary.org/obo/CHEBI_33694>
 
-		SELECT  ?name
-								(GROUP_CONCAT(distinct ?gocam;separator="@|@") as ?gocams)
-								(GROUP_CONCAT(distinct ?date;separator="@|@") as ?gocamsDate)
-								(GROUP_CONCAT(distinct ?title;separator="@|@") as ?gocamsTitle)
-								(GROUP_CONCAT(distinct ?goid;separator="@|@") as ?bpids)
-								(GROUP_CONCAT(distinct ?goname;separator="@|@") as ?bpnames)
-								(GROUP_CONCAT(distinct ?gpid;separator="@|@") as ?gpids)
-								(GROUP_CONCAT(distinct ?gpname;separator="@|@") as ?gpnames)
-        WHERE
-        {
-            BIND(%s as ?orcid) .
-            #BIND("SynGO:SynGO-pim"^^xsd:string as ?orcid) .
-            #BIND("http://orcid.org/0000-0001-7476-6306"^^xsd:string as ?orcid)
-            #BIND("http://orcid.org/0000-0003-1074-8103"^^xsd:string as ?orcid) .
-
-            BIND(IRI(?orcid) as ?orcidIRI) .
+        SELECT distinct ?title ?contributor ?gocam
+WHERE {
+    GRAPH ?gocam {
+        ?gocam metago:graphType metago:noctuaCam ;
+               dc:date ?date ;
+               dc:title ?title ;
+               dc:contributor ?contributor .
 
 
-            # Getting some information on the model
-            GRAPH ?gocam
-            {
-                ?gocam 	metago:graphType metago:noctuaCam ;
-                        dc:date ?date ;
-                        dc:title ?title ;
-                        dc:contributor ?orcid .
-
-                ?entity rdf:type owl:NamedIndividual .
-    			?entity rdf:type ?goid .
-
-                ?s enabled_by: ?gpentity .
-				?gpentity rdf:type ?gpid .
-		    	FILTER(?gpid != owl:NamedIndividual) .
-  			}
-
-
-            VALUES ?GO_class { BP: } .
-            # rdf:type faster then subClassOf+ but require filter
-            # ?goid rdfs:subClassOf+ ?GO_class .
-    		?entity rdf:type ?GO_class .
-
-  			# Filtering out the root BP, MF & CC terms
-			filter(?goid != MF: )
-  			filter(?goid != BP: )
-		  	filter(?goid != CC: )
-
-  			?goid rdfs:label ?goname .
-
-            # crash the query for SYNGO user "http://orcid.org/0000-0002-1190-4481"^^xsd:string
-            optional {
-  			?gpid rdfs:label ?gpname .
-            }
-            BIND(IF(bound(?gpname), ?gpname, ?gpid) as ?gpname)
-
-        }
-		GROUP BY ?name
+        # Contributor filter
+        FILTER(?contributor = "%s")
+    }
+}
         """
         % mod_orcid
     )
-    collated_results = []
-    collated = {}
     results = si._sparql_query(query)
-    for result in results:
-        collated["gocams"] = result["gocams"].get("value")
-        collated["gocamsDate"] = result["gocamsDate"].get("value")
-        collated["gocamsTitle"] = result["gocamsTitle"].get("value")
-        collated["bpids"] = result["bpids"].get("value")
-        collated["bpnames"] = result["bpnames"].get("value")
-        collated["gpids"] = result["gpids"].get("value")
-        collated_results.append(collated)
-    if not collated_results:
-        return DataNotFoundException(detail=f"Item with ID {orcid} not found")
-    return collated_results
+    print(query)
+    if not results:
+       return DataNotFoundException(detail=f"Item with ID {orcid} not found")
+    else:
+        collated_results = []
+        for result in results:
+            collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
+        return collated_results
 
 
 @router.get("/api/users/{orcid}/models", tags=["models"])
