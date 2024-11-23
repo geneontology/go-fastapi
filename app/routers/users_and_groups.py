@@ -96,9 +96,11 @@ WHERE {
         """
         % mod_orcid
     )
+
     results = si._sparql_query(query)
+
     if not results:
-       return DataNotFoundException(detail=f"Item with ID {orcid} not found")
+        raise DataNotFoundException(detail=f"Item with ID {orcid} not found")
     else:
         collated_results = []
         for result in results:
