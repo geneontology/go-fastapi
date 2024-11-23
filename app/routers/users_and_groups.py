@@ -67,7 +67,6 @@ async def get_user_by_orcid(
 ):
     """Returns model details based on a GO-CAM model ID."""
     mod_orcid = f"https://orcid.org/{orcid}"
-    print(mod_orcid)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
@@ -98,7 +97,6 @@ WHERE {
         % mod_orcid
     )
     results = si._sparql_query(query)
-    print(query)
     if not results:
        return DataNotFoundException(detail=f"Item with ID {orcid} not found")
     else:
