@@ -57,7 +57,7 @@ async def get_users():
     return results
 
 
-@router.get("/api/users/{orcid}", tags=["models"])
+@router.get("/api/users/{orcid}", tags=["models"], description="Get GO-CAM models by ORCID")
 async def get_user_by_orcid(
     orcid: str = Path(
         ...,
@@ -65,7 +65,7 @@ async def get_user_by_orcid(
         example="0000-0002-7285-027X",
     )
 ):
-    """Returns model details based on a GO-CAM model ID."""
+    """Returns GO-CAM model identifiers for a particular contributor orcid."""
     mod_orcid = f"https://orcid.org/{orcid}"
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
