@@ -444,7 +444,6 @@ async def get_term_details_by_taxon_id(
     return collated_results
 
 
-
 @router.get(
     "/api/pmid/{id}/models",
     tags=["models"],
@@ -453,11 +452,7 @@ async def get_term_details_by_taxon_id(
 async def get_model_details_by_pmid(
     id: str = Path(..., description="A publication identifier (PMID)" " (e.g. 15314168 or 26954676)")
 ):
-    """
-    Returns models for a given publication identifier (PMID).
-
-    """
-
+    """Returns models for a given publication identifier (PMID)."""
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
 
@@ -499,12 +494,12 @@ async def get_models_by_orcid(
     )
 ):
     """Returns model details based on an orcid."""
-    mod_orcid = f'https://orcid.org/{orcid}'
+    mod_orcid = f"https://orcid.org/{orcid}"
     print(mod_orcid)
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = (
-            """
+        """
             PREFIX metago: <http://model.geneontology.org/>
             PREFIX dc: <http://purl.org/dc/elements/1.1/>
             PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
@@ -528,7 +523,7 @@ async def get_models_by_orcid(
                 }
             }
             """
-            % mod_orcid
+        % mod_orcid
     )
 
     results = si._sparql_query(query)
@@ -540,6 +535,7 @@ async def get_models_by_orcid(
         for result in results:
             collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
         return collated_results
+
 
 @router.get(
     "/api/models",
