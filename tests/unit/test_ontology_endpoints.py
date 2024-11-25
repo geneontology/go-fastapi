@@ -13,7 +13,8 @@ test_client = TestClient(app)
 
 # Test data
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-go_ids = ["GO:0008150", "NCBITaxon:1"]
+ontology_ids = ["GO:0008150", "NCBITaxon:1"]
+go_ids = ["GO:0008150", "GO:0046330"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
@@ -25,9 +26,9 @@ class TestApp(unittest.TestCase):
 
     def test_term_id_endpoint(self):
         """Test the endpoint to get the details of a Gene Ontology term by its identifier."""
-        for id in go_ids:
+        for id in ontology_ids:
             response = test_client.get(f"/api/ontology/term/{id}")
-            print(response.json())
+            logger.info(response.json())
             self.assertEqual(response.status_code, 200)
 
     def test_ontology_ancestors_shared_sub_obj(self):
@@ -51,8 +52,8 @@ class TestApp(unittest.TestCase):
         data = {"relation": "shared"}
         response = test_client.get(f"/api/association/between/{subject}/{object}", params=data)
         self.assertIn("GO:0008150", response.json().get("shared"))
-        print(response.json().get("shared"))
-        print(response.json().get("shared_labels"))
+        logger.info(response.json().get("shared"))
+        logger.info(response.json().get("shared_labels"))
         self.assertIsNotNone(response.json().get("shared_labels"))
         self.assertEqual(response.status_code, 200)
 

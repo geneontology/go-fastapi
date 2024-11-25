@@ -1,11 +1,10 @@
 """Prefix steps."""
 
-from pprint import pprint
-
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, scenario, then
 
 from app.main import app
+from app.middleware.logging_middleware import logger
 
 EXTRA_TYPES = {
     "String": str,
@@ -63,10 +62,10 @@ def api_result_second(endpoint, thing):
     :rtype: TestResponse
     """
     test_client = TestClient(app)
-    print("")
-    print(endpoint + thing)
+    logger.info("")
+    logger.info(endpoint + thing)
     response = test_client.get(f"{endpoint}{thing}")
-    pprint(response.json())
+    logger.info(response.json())
     return response
 
 

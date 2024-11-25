@@ -14,8 +14,9 @@ logger = logging.getLogger()
 
 test_client = TestClient(app)
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
-go_cam_ids = ["59a6110e00000067", "SYNGO_369", "581e072c00000820", "gomodel:59a6110e00000067", "gomodel:SYNGO_369"]
-
+go_cam_ids = ["gomodel:66187e4700001573", "66187e4700001573", "59a6110e00000067", "SYNGO_369",
+              "581e072c00000820", "gomodel:59a6110e00000067", "gomodel:SYNGO_369"]
+go_cam_not_found_ids = ["NGO_369", "581e072c000008", "gomodel:59a6110e000000",]
 
 class TestApp(unittest.TestCase):
     """Test the models endpoints."""
@@ -33,6 +34,13 @@ class TestApp(unittest.TestCase):
         response = test_client.get("/api/models/gp", params=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 2)
+
+    def test_data_not_found_handling(self):
+        """Test the endpoint to retrieve gene product metadata by model IDs."""
+        data = {"gocams": ["gomodel:fake_id", "fake_id"]}
+        response = test_client.get("/api/models/gp", params=data)
+        print(response.json())
+        self.assertEqual(response.status_code, 404)
 
     def test_pubmedmetadata_by_model_ids(self):
         """Test the endpoint to retrieve PubMed metadata by model IDs."""
@@ -74,7 +82,7 @@ class TestApp(unittest.TestCase):
         """Test the endpoint to retrieve the list of groups."""
         response = test_client.get("/api/groups")
 
-        print(response.json())
+        logger.info(response.json())
         self.assertGreater(len(response.json()), 15)
         self.assertEqual(response.status_code, 200)
 
@@ -93,7 +101,7 @@ class TestApp(unittest.TestCase):
 
     def test_get_go_term_detail_by_go_id(self):
         """Test the endpoint to retrieve GO term details by GO ID."""
-        response = test_client.get("/api/go/GO_0008150")
+        response = test_client.get("/api/go/GO:0008150")
         self.assertIn("goid", response.json())
         self.assertIn("label", response.json())
         self.assertEqual(response.json()["goid"], "http://purl.obolibrary.org/obo/GO_0008150")
@@ -143,6 +151,17 @@ class TestApp(unittest.TestCase):
             self.assertGreater(len(response.json().get("individuals")), 0)
             self.assertGreater(len(response.json().get("facts")), 0)
 
+
+    def test_get_model_details_by_model_id_not_found_json(self):
+        """
+        Test the endpoint to retrieve model details by model ID in JSON format from the S3 bucket, check for success.
+
+        :return: None
+        """
+        for id in go_cam_not_found_ids:
+            response = test_client.get(f"/api/go-cam/{id}")
+            self.assertEqual(response.status_code, 404)
+
     def test_get_model_details_by_model_id_json_failure(self):
         """
         Test the endpoint to retrieve model details by model ID that does not exist, check for failure.
@@ -150,8 +169,8 @@ class TestApp(unittest.TestCase):
         :return: None
         """
 
-        with self.assertRaises(HTTPError):
-            test_client.get("/api/go-cam/notatallrelevant")
+        response = test_client.get("/api/go-cam/notatallrelevant")
+        assert response.status_code == 404
 
     def test_get_model_details_by_model_id_json_failure_id(self):
         """
@@ -159,9 +178,8 @@ class TestApp(unittest.TestCase):
 
         :return: None
         """
-        with self.assertRaises(HTTPError):
-            test_client.get("/api/go-cam/gocam:59a6110e00000067")
-
+        response = test_client.get("/api/go-cam/gocam:59a6110e00000067")
+        assert response.status_code == 404
 
 if __name__ == "__main__":
     unittest.main()

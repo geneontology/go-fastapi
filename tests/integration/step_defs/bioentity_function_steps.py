@@ -1,11 +1,10 @@
 """Bioentity Function Steps."""
 
-from pprint import pprint
-
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, scenario, then
 
 from app.main import app
+from app.middleware.logging_middleware import logger
 
 EXTRA_TYPES = {
     "String": str,
@@ -109,7 +108,7 @@ def endpoint_first_returns(result, term):
     data = result.json()
     found_it = False
     term = term.replace('"', "")
-    pprint(data)
+    logger.info(data)
     for association in data.get("associations"):
         if association.get("object").get("id") == term:
             found_it = True

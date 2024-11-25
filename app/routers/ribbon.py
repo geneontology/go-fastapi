@@ -8,6 +8,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
@@ -33,11 +34,20 @@ async def get_subsets_by_term(
     )
 ):
     """Returns subsets (slims) associated to an ontology term."""
+    try:
+        ontology_utils.is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     query = ontology_utils.get_go_subsets_sparql_query(id)
     results = si._sparql_query(query)
     results = transform_array(results, [])
+    if not results:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return results
 
 
@@ -51,6 +61,8 @@ async def get_subset_by_id(
 ):
     """Returns a subset (slim) by its id which is usually a name."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
+    if not result:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return result
 
 
@@ -144,16 +156,19 @@ async def get_ribbon_results(
     for s in subject_ids:
         if "HGNC:" in s or "NCBIGene:" in s or "ENSEMBL:" in s:
             prots = gene_to_uniprot_from_mygene(s)
+            logger.info(f"prots:  {prots}")
             if len(prots) > 0:
                 mapped_ids[s] = prots[0]
+                logger.info(f"mapped_ids:  {mapped_ids}")
                 reverse_mapped_ids[prots[0]] = s
                 if len(prots) == 0:
                     prots = [s]
                 slimmer_subjects += prots
+                logger.info(f"slimmer_subjects:  {slimmer_subjects}")
         else:
             slimmer_subjects.append(s)
 
-    logger.info("SLIMMER SUBS: %s", slimmer_subjects)
+    logger.info(f"SLIMMER_SUBS:  {slimmer_subjects}")
     subject_ids = slimmer_subjects
 
     # should remove any undefined subject
@@ -331,4 +346,7 @@ async def get_ribbon_results(
     # bioentity,bioentity_label,taxon,taxon_label&fq=bioentity:(%22MGI:MGI:98214%22%20or%20%22RGD:620474%22)
 
     result = {"categories": categories, "subjects": subjects}
+    if result.get("categories") is None and result.get("subjects") is None:
+        raise DataNotFoundException(detail="No data found for the provided parameters")
+
     return result
