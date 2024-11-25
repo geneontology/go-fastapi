@@ -53,6 +53,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-app.main">app.main module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.main.data_not_found_exception_handler"><code class="docutils literal notranslate"><span class="pre">data_not_found_exception_handler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#app.main.general_exception_handler"><code class="docutils literal notranslate"><span class="pre">general_exception_handler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#app.main.value_error_handler"><code class="docutils literal notranslate"><span class="pre">value_error_handler()</span></code></a></li>
 </ul>
@@ -116,6 +117,15 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.ontology">app.routers.ontology module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem.GO"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem.GO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem.hierarchy"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem.hierarchy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem.label"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem.label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem.model_config"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GOHierarchyItem.model_fields"><code class="docutils literal notranslate"><span class="pre">GOHierarchyItem.model_fields</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.ontology.GraphType"><code class="docutils literal notranslate"><span class="pre">GraphType</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.routers.html#app.routers.ontology.GraphType.topology_graph"><code class="docutils literal notranslate"><span class="pre">GraphType.topology_graph</span></code></a></li>
 </ul>
@@ -174,6 +184,23 @@
 <section id="module-app.main">
 <span id="app-main-module"></span><h2>app.main module<a class="headerlink" href="#module-app.main" title="Permalink to this heading"></a></h2>
 <p>main application entry point.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.data_not_found_exception_handler">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">data_not_found_exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataNotFoundException</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.main.data_not_found_exception_handler" title="Permalink to this definition"></a></dt>
+<dd><p>Global exception handler for DataNotFoundException.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> – </p></li>
+<li><p><strong>exc</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="app.main.general_exception_handler">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">general_exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.main.general_exception_handler" title="Permalink to this definition"></a></dt>
