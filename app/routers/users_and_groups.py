@@ -131,55 +131,32 @@ async def get_models_by_orcid(
         PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
         PREFIX biomacromolecule: <http://purl.obolibrary.org/obo/CHEBI_33694>
 
-        SELECT ?identifier ?name ?species (count(?name) as ?usages)
-        (GROUP_CONCAT(?cam;separator="@|@") as ?gocams)
-        (GROUP_CONCAT(?date;separator="@|@") as ?dates)
-        (GROUP_CONCAT(?title;separator="@|@") as ?titles)
-        WHERE
-        {
-            #BIND("SynGO:SynGO-pim"^^xsd:string as ?orcid) .
-            #BIND("http://orcid.org/0000-0001-7476-6306"^^xsd:string as ?orcid)
-            #BIND("http://orcid.org/0000-0003-1074-8103"^^xsd:string as ?orcid) .
-          	#BIND("http://orcid.org/0000-0001-5259-4945"^^xsd:string as ?orcid) .
+        SELECT distinct ?title ?contributor ?gocam
+WHERE {
+    GRAPH ?gocam {
+        ?gocam metago:graphType metago:noctuaCam ;
+               dc:date ?date ;
+               dc:title ?title ;
+               dc:contributor ?contributor .
 
-            BIND(%s as ?orcid)
-            BIND(IRI(?orcid) as ?orcidIRI) .
 
-            # Getting some information on the model
-            GRAPH ?cam {
-                ?cam metago:graphType metago:noctuaCam .
-                ?cam dc:contributor ?orcid .
-                ?cam dc:title ?title .
-                ?cam dc:date ?date .
-
-                ?s enabled_by: ?id .
-                ?id rdf:type ?identifier .
-                FILTER(?identifier != owl:NamedIndividual) .
-            }
-            ?identifier rdfs:label ?name .
-            ?identifier rdfs:subClassOf ?v0 .
-            ?v0 owl:onProperty <http://purl.obolibrary.org/obo/RO_0002162> .
-            ?v0 owl:someValuesFrom ?taxon .
-            ?taxon rdfs:label ?species .
-        }
-        GROUP BY ?identifier ?name ?species
-        ORDER BY DESC(?usages)
+        # Contributor filter
+        FILTER(?contributor = "%s")
+    }
+}
         """
         % mod_orcid
     )
 
     results = si._sparql_query(query)
-    collated_results = []
-    collated = {}
-    for result in results:
-        collated["bpids"] = result["bpids"].get("value")
-        collated["bpnames"] = result["bpnames"].get("value")
-        collated["gpids"] = result["gpids"].get("value")
-        collated["gpnames"] = result["gpnames"].get("value")
-        collated_results.append(collated)
-    if not collated_results:
-        return DataNotFoundException(detail=f"Item with ID {orcid} not found")
-    return collated_results
+
+    if not results:
+        raise DataNotFoundException(detail=f"Item with ID {orcid} not found")
+    else:
+        collated_results = []
+        for result in results:
+            collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
+        return collated_results
 
 
 @router.get("/api/users/{orcid}/gp", tags=["models"], description="Get GPs by orcid")
@@ -190,7 +167,7 @@ async def get_gp_models_by_orcid(
         example="0000-0002-7285-027X",
     )
 ):
-    """Returns GP model details based on a orcid."""
+    """Returns GO-CAM model identifiers for a particular contributor orcid."""
     mod_orcid = f'"http://orcid.org/{orcid}"^^xsd:string'
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
