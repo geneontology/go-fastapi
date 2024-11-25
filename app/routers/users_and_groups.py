@@ -57,109 +57,7 @@ async def get_users():
     return results
 
 
-@router.get("/api/users/{orcid}", tags=["models"], description="Get GO-CAM models by ORCID")
-async def get_user_by_orcid(
-    orcid: str = Path(
-        ...,
-        description="The ORCID of the user (e.g. 0000-0002-7285-027X)",
-        example="0000-0002-7285-027X",
-    )
-):
-    """Returns GO-CAM model identifiers for a particular contributor orcid."""
-    mod_orcid = f"https://orcid.org/{orcid}"
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = (
-        """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
-        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-        PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-        PREFIX biomacromolecule: <http://purl.obolibrary.org/obo/CHEBI_33694>
-
-        SELECT distinct ?title ?contributor ?gocam
-WHERE {
-    GRAPH ?gocam {
-        ?gocam metago:graphType metago:noctuaCam ;
-               dc:date ?date ;
-               dc:title ?title ;
-               dc:contributor ?contributor .
-
-
-        # Contributor filter
-        FILTER(?contributor = "%s")
-    }
-}
-        """
-        % mod_orcid
-    )
-
-    results = si._sparql_query(query)
-
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {orcid} not found")
-    else:
-        collated_results = []
-        for result in results:
-            collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
-        return collated_results
-
-
-@router.get("/api/users/{orcid}/models", tags=["models"])
-async def get_models_by_orcid(
-    orcid: str = Path(
-        ...,
-        description="The ORCID of the user (e.g. 0000-0002-7285-027X)",
-        example="0000-0002-7285-027X",
-    )
-):
-    """Returns model details based on an orcid."""
-    mod_orcid = f'"http://orcid.org/{orcid}"^^xsd:string'
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = (
-        """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
-        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-        PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-        PREFIX biomacromolecule: <http://purl.obolibrary.org/obo/CHEBI_33694>
-
-        SELECT distinct ?title ?contributor ?gocam
-WHERE {
-    GRAPH ?gocam {
-        ?gocam metago:graphType metago:noctuaCam ;
-               dc:date ?date ;
-               dc:title ?title ;
-               dc:contributor ?contributor .
-
-
-        # Contributor filter
-        FILTER(?contributor = "%s")
-    }
-}
-        """
-        % mod_orcid
-    )
-
-    results = si._sparql_query(query)
-
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {orcid} not found")
-    else:
-        collated_results = []
-        for result in results:
-            collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
-        return collated_results
-
-
-@router.get("/api/users/{orcid}/gp", tags=["models"], description="Get GPs by orcid")
+@router.get("/api/users/{orcid}/gp", tags=["models"], description="Get GPs by orcid", deprecated=True)
 async def get_gp_models_by_orcid(
     orcid: str = Path(
         ...,
@@ -188,11 +86,6 @@ async def get_gp_models_by_orcid(
         (GROUP_CONCAT(?title;separator="@|@") as ?titles)
         WHERE
         {
-            #BIND("SynGO:SynGO-pim"^^xsd:string as ?orcid) .
-            #BIND("http://orcid.org/0000-0001-7476-6306"^^xsd:string as ?orcid)
-            #BIND("http://orcid.org/0000-0003-1074-8103"^^xsd:string as ?orcid) .
-          	#BIND("http://orcid.org/0000-0001-5259-4945"^^xsd:string as ?orcid) .
-
             BIND(%s as ?orcid)
             BIND(IRI(?orcid) as ?orcidIRI) .
 
@@ -334,3 +227,54 @@ async def get_group_metadata_by_name(
     if not collated_results:
         return DataNotFoundException(detail=f"Item with ID {name} not found")
     return collated_results
+
+
+@router.get("/api/users/{orcid}", tags=["models"], description="Get GO-CAM models by ORCID", deprecated=True)
+async def get_go_cam_models_by_orcid(
+    orcid: str = Path(
+        ...,
+        description="The ORCID of the user (e.g. 0000-0002-7285-027X)",
+        example="0000-0002-7285-027X",
+    )
+):
+    """Returns GO-CAM model identifiers for a particular contributor orcid."""
+    mod_orcid = f"https://orcid.org/{orcid}"
+    ont_r = OntologyResource(url=get_sparql_endpoint())
+    si = SparqlImplementation(ont_r)
+    query = (
+        """
+        PREFIX metago: <http://model.geneontology.org/>
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+        PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
+        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+        PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
+        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
+        PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
+        PREFIX biomacromolecule: <http://purl.obolibrary.org/obo/CHEBI_33694>
+
+        SELECT distinct ?title ?contributor ?gocam
+WHERE {
+    GRAPH ?gocam {
+        ?gocam metago:graphType metago:noctuaCam ;
+               dc:date ?date ;
+               dc:title ?title ;
+               dc:contributor ?contributor .
+
+
+        # Contributor filter
+        FILTER(?contributor = "%s")
+    }
+}
+        """
+        % mod_orcid
+    )
+
+    results = si._sparql_query(query)
+
+    if not results:
+        raise DataNotFoundException(detail=f"Item with ID {orcid} not found")
+    else:
+        collated_results = []
+        for result in results:
+            collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
+        return collated_results

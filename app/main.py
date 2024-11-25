@@ -16,7 +16,6 @@ from app.routers import (
     ontology,
     pathway_widget,
     prefixes,
-    publications,
     ribbon,
     search,
     slimmer,
@@ -46,7 +45,6 @@ app.include_router(models.router)
 app.include_router(prefixes.router)
 app.include_router(labeler.router)
 app.include_router(search.router)
-app.include_router(publications.router)
 app.include_router(users_and_groups.router)
 
 # Logging
