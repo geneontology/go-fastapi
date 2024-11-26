@@ -29,6 +29,16 @@ class TestGeneProductAPI(unittest.TestCase):
             self.assertGreater(len(response.json()), 0)
             self.assertEqual(response.status_code, 200)
 
+    def test_get_gocams_by_invalid_geneproduct_id(self):
+        """
+        Test getting Gene Ontology models associated with a gene product by its ID.
+
+        :param id: The identifier of the gene product. (parametrized)
+        """
+        for gene_id in gene_not_found_ids:
+            response = test_client.get(f"/api/gp/{gene_id}/models")
+            self.assertEqual(response.status_code, 404)
+
     def test_get_gocams_by_geneproduct_not_found(self):
         for gene_id in gene_not_found_ids:
             response = test_client.get(f"/api/gp/{gene_id}/models")
