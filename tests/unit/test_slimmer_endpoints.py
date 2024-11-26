@@ -78,6 +78,8 @@ class TestSlimmerEndpoint(unittest.TestCase):
             "slim": ["GO:0005575"],
         }
         response = test_client.get(endpoint, params=data)
+        for subject in response.json().get("subjects"):
+            print(subject)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.json()), 0)
 

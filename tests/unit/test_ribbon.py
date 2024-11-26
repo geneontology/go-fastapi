@@ -9,6 +9,10 @@ import logging
 test_client = TestClient(app)
 
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72"]
+ortho_gene_ids = ["WB:WBGene00002147", "HGNC:3449", "HGNC:16942",
+                  "MGI:1930134", "MGI:1349436", "RGD:1559716",
+                  "RGD:1308743", "Xenbase:XB-GENE-4594134", "ZFIN:ZDB-GENE-050522-431",
+                  "ZFIN:ZDB-GENE-090312-15", "FB:FBgn0261984", "SGD:S000001121"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
@@ -114,6 +118,9 @@ class TestOntologyAPI(unittest.TestCase):
         """Test MGI ribbon annotation returns."""
         data = {"subset": "goslim_agr", "subject": ["MGI:1917258"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        for subject in response.json().get("subjects"):
+            print(subject.get("id"))
+            self.assertFalse(subject.get("id").startswith("MGI:MGI:"))
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "Ace2")
@@ -184,6 +191,16 @@ class TestOntologyAPI(unittest.TestCase):
             response = test_client.get(f"/api/ontology/subset/{id}")
             self.assertEqual(response.status_code, 200)
 
+    def test_ribbon_with_many_subjects(self):
+        """Test the ontology ribbon with many subjects."""
+        data = {"subset": "goslim_agr", "subject": ortho_gene_ids,
+                "exclude_PB":True, "exclude_IBA":False, "cross_aspect":False}
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        data = response.json()
+        for subject in data.get("subjects"):
+            print(subject.get("id"))
+            self.assertFalse(subject.get("id").startswith("MGI:MGI:"))
+        self.assertEqual(response.status_code, 200)
 
 if __name__ == "__main__":
     unittest.main()
