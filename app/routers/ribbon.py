@@ -313,20 +313,32 @@ async def get_ribbon_results(
     fields = "bioentity,bioentity_label,taxon,taxon_label"
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, q, qf, fields, fq, False)
 
+    # Create a new list to store updated entities
+    updated_subjects = []
+
     for entity in subjects:
+        # Add details from the `data` list
         for entity_detail in data:
             subject_id = entity_detail["bioentity"]
             if entity["id"] == subject_id:
                 entity["label"] = entity_detail["bioentity_label"]
                 entity["taxon_id"] = entity_detail["taxon"]
                 entity["taxon_label"] = entity_detail["taxon_label"]
-        if entity.get("id").startswith("MGI:MGI:"):
-            entity_new = entity
-            subjects.remove(entity)
-            old_id = entity_new.get("id")
+
+        # Check for and fix "MGI:MGI:" prefix in `id`
+        if entity.get("id", "").startswith("MGI:MGI:"):
+            # Create a new dictionary to avoid modifying the original entity
+            entity_new = entity.copy()
+            old_id = entity_new["id"]
             new_id = old_id.replace("MGI:MGI:", "MGI:")
             entity_new["id"] = new_id
-            subjects.append(entity_new)
+            updated_subjects.append(entity_new)
+        else:
+            # Add the entity as-is if no changes are needed
+            updated_subjects.append(entity)
+
+    # Replace the original list with the updated list
+    subjects = updated_subjects
 
     # map the entity back to their original IDs
     for entity in subjects:
