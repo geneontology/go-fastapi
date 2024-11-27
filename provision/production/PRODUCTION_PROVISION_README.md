@@ -281,12 +281,6 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 ## Destroy Instance and other destructive things:
 
 ```bash
-# Destroy Using Tool.
-# Make sure you point to the correct workspace before destroying the stack by using the -show command or the -output command
-go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -destroy
-```
-
-```bash
 # Destroy Manually
 # Make sure you point to the correct workspace before destroying the stack.  
 # You need to be "in" the workspace you want to destroy.  You can use the following commands to help you.
