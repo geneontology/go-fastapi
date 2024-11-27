@@ -32,11 +32,7 @@ This guide describes the deployment of the `go-fastapi` stack to AWS using Terra
 
 #### DNS:
 
-DNS records are used for `go-fastapi`; they are typically the "production" record and the dev/testing record. Yhe go-deploy tool allows for creating DNS records (type A) that would be populated by the public ip addresses of the aws instance. If you don't use this option, you would need to point this record to the elastic IP of the VM. For testing purposes, you can use: `aes-test-go-fastapi.geneontology.org` or any other record that you create in Route 53.
-
-**NOTE**: If using cloudflare, you would need to point the cloudflare dns record to the elastic IP.
-
-# BREAK FOR NEW DOC #
+**NOTE**: For production, API routing is configured via cloudflare, you point the cloudflare dns record to the elastic IP generated with this procedure.
 
 ## Configuring and deploying EC2 _instances_:
 
@@ -44,13 +40,16 @@ This is all completed in a dockerized development environment (all commands take
 
 1. Prepare _your_ AWS credentials:
 
-Your (personal developer) AWS credentials are used by Terraform to provision the AWS instance and by the provisioned instance to access the certificate store and the S3 buckets used to store Apache logs. These are your personal AWS credentials and should have been appropriately created to give you these permissions.
+Your (personal developer) AWS credentials are used by Terraform to provision the AWS instance and by the provisioned 
+instance to access the certificate store and the S3 buckets used to store Apache logs. These are your personal AWS 
+credentials and should have been appropriately created to give you these permissions.
 
-**NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file farther down.
+**NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. 
+These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file farther down.
 
 2. SSH Keys
 
-The keys we'll be using can be found in the shared SpderOak store. If you don't know what this is, ask @kltm.
+The keys we'll be using can be found in the shared SpiderOak store. If you don't know what this is, ask @kltm.
 
 For testing purposes you can use your own ssh keys. But for production please ask for the go ssh keys.
 /tmp/go-ssh.pub
@@ -172,7 +171,8 @@ Finally, just show the IP address of the AWS instance:
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -output
 ```
 
-**NOTE**: write down the IP address of the AWS instance that is created. This can also be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg` (e.g. go-api-production-YYYY-MM-DD.cfg).
+**NOTE**: write down the IP address of the AWS instance that is created. 
+This can also be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg` (e.g. go-api-production-YYYY-MM-DD.cfg).
 
 Useful details for troubleshooting:
 These commands will produce an IP address in the resulting `inventory.json` file.
@@ -201,8 +201,6 @@ terraform -chdir=aws output           # shows public ip of aws instance
 
 These commands continue to be run in the dockerized development environment.
 
-**POSSIBLE CUT START**
-```bash
 * replace "REPLACE_ME" values in config-instance.yaml for dns_record_name and dns_zone_id,
 dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN plus the REPLACE_ME_WITH_TERRAFORM_BACKEND, eg. api-production-2024-08-21.geneontology.org
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
@@ -210,9 +208,8 @@ dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN pl
 * S3 uri if SSL is enabled. Location of SSL certs/key
 * QoS mitigation if QoS is enabled
 * Use the same workspace name as in the previous step
-**POSSIBLE CUT END**
 
-Let's ready the the instance, starting by editing the config:
+Let's ready the instance, starting by editing the config:
 ```bash
 cp ./production/config-stack.yaml.sample ./config-stack.yaml
 emacs ./config-stack.yaml
