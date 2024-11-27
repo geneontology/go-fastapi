@@ -288,14 +288,17 @@ go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws 
 
 ```bash
 # Destroy Manually
-# Make sure you point to the correct workspace before destroying the stack.
+# Make sure you point to the correct workspace before destroying the stack.  
+# You need to be "in" the workspace you want to destroy.  You can use the following commands to help you.
 
 terraform -chdir=aws workspace list
+terraform -chdir=aws workspace select <NAME_OF_WORKSPACE_THAT_YOU_WANT_TO_DESTROY> # change to the workspace you want to destroy.
 terraform -chdir=aws workspace show # shows the name of the current workspace
 terraform -chdir=aws show           # shows the state you are about to destroy
 terraform -chdir=aws destroy        # You would need to type Yes to approve.
 
-# Now delete the workspace.
+# Now delete the workspace.  You need to not be in the workspace that was deleted to do this final removal.  We 
+# pick the default workspace.
 
 terraform -chdir=aws workspace select default # change to default workspace
 terraform -chdir=aws workspace delete <NAME_OF_WORKSPACE_THAT_IS_NOT_DEFAULT>  # delete workspace.
@@ -310,7 +313,7 @@ docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4 
 ```
 
 In the command above we used the `--rm` option which means the container will be deleted when you exit.
-If that is not the intent and you want to delete it later at your own convenience. Use the following `docker run` command.
+If that is not the intent, and you want to delete it later at your own convenience. Use the following `docker run` command.
 
 ```bash
 docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
