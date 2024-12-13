@@ -2,10 +2,12 @@
 
 import logging
 from http.client import HTTPException
-from typing import List
 from pprint import pprint
+from typing import List
+
 import requests
 from fastapi import APIRouter, Path, Query
+from gocam.translation.minerva_wrapper import MinervaWrapper
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
 from oaklib.resource import OntologyResource
 
@@ -13,17 +15,19 @@ from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdent
 from app.utils import ontology_utils
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
-from gocam.datamodel.gocam import Model
-from gocam.translation.minerva_wrapper import MinervaWrapper
 
 USER_AGENT = get_user_agent()
 SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 logger = logging.getLogger()
-@router.get("/api/gocam-model/{id}",
-            tags=["models"],
-            description="Returns model details in gocam-py format based on a GO-CAM model ID.")
+
+
+@router.get(
+    "/api/gocam-model/{id}",
+    tags=["models"],
+    description="Returns model details in gocam-py format based on a GO-CAM model ID.",
+)
 async def get_gocam_model_by_id_in_gocam_py_format(
     id: str = Path(
         ...,
@@ -37,7 +41,6 @@ async def get_gocam_model_by_id_in_gocam_py_format(
     :param id: A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)
     :return: model details in gocam-py format based on a GO-CAM model ID.
     """
-
     mw = MinervaWrapper()
     stripped_ids = []
     if id.startswith("gomodel:"):
@@ -59,7 +62,7 @@ async def get_gocam_model_by_id_in_gocam_py_format(
             pprint(gocam_reposnse)
             return gocam_reposnse.model_dump()
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+            raise HTTPException(status_code=500, detail=f"Unexpected error: {e}") from e
 
 
 @router.get("/api/models/go", tags=["models"], description="Returns go term details based on a GO-CAM model ID.")
@@ -355,7 +358,7 @@ async def get_pmid_by_model_id(
 
 @router.get(
     "/api/go-cam/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID in JSON format."
-)
+)  # note: this is the endpoint that is currently used by gocam-py to for use in CTX export.
 async def get_model_details_by_model_id_json(
     id: str = Path(
         ...,

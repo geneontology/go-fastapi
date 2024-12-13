@@ -1,10 +1,19 @@
 """Utils for SPARQL queries."""
 
-from fastapi.responses import ORJSONResponse
 from typing import Any
 
+from fastapi.responses import ORJSONResponse
+
+
 def create_response(data: Any):
+    """
+    Create a response with the given data.
+
+    :param data:
+    :return:
+    """
     return ORJSONResponse(content=data.dict())
+
 
 SEPARATOR = "|"  # separator for splitting values
 
