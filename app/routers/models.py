@@ -1,8 +1,9 @@
 """Model API router."""
 
 import logging
+from http.client import HTTPException
 from typing import List
-
+from pprint import pprint
 import requests
 from fastapi import APIRouter, Path, Query
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -12,12 +13,53 @@ from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdent
 from app.utils import ontology_utils
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
+from gocam.datamodel.gocam import Model
+from gocam.translation.minerva_wrapper import MinervaWrapper
 
 USER_AGENT = get_user_agent()
 SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 logger = logging.getLogger()
+@router.get("/api/gocam-model/{id}",
+            tags=["models"],
+            description="Returns model details in gocam-py format based on a GO-CAM model ID.")
+async def get_gocam_model_by_id_in_gocam_py_format(
+    id: str = Path(
+        ...,
+        description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
+        example="581e072c00000295",
+    )
+) -> dict:
+    """
+    Returns model details in gocam-py format based on a GO-CAM model ID.
+
+    :param id: A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)
+    :return: model details in gocam-py format based on a GO-CAM model ID.
+    """
+
+    mw = MinervaWrapper()
+    stripped_ids = []
+    if id.startswith("gomodel:"):
+        model_id = id.replace("gomodel:", "")
+        stripped_ids.append(model_id)
+    else:
+        stripped_ids.append(id)
+    for stripped_id in stripped_ids:
+        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
+        print(path_to_s3)
+        try:
+            response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+            print(response.json())
+            response.raise_for_status()
+            if response.status_code == 403 or response.status_code == 404:
+                raise DataNotFoundException("GO-CAM model not found.")
+            data = response.json()
+            gocam_reposnse = mw.minerva_object_to_model(data)  # convert minerva object to gocam model
+            pprint(gocam_reposnse)
+            return gocam_reposnse.model_dump()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
 @router.get("/api/models/go", tags=["models"], description="Returns go term details based on a GO-CAM model ID.")
