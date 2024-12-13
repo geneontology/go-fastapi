@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from requests import HTTPError
 
 from app.main import app
+from tests.integration.step_defs.bioentity_function_steps import response_code
 
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
@@ -151,6 +152,16 @@ class TestApp(unittest.TestCase):
             self.assertGreater(len(response.json().get("individuals")), 0)
             self.assertGreater(len(response.json().get("facts")), 0)
 
+    def test_get_model_details_by_model_id_json_gocam_py(self):
+        """
+        Test the endpoint to retrieve model details by model ID in JSON format from the S3 bucket, check for success.
+
+        :return: None
+        """
+        for id in go_cam_ids:
+            response = test_client.get(f"/api/gocam-model/{id}")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json().get("id"), "gomodel:" + id.replace("gomodel:", ""))
 
     def test_get_model_details_by_model_id_not_found_json(self):
         """
