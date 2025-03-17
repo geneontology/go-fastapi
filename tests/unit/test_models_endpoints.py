@@ -191,6 +191,33 @@ class TestApp(unittest.TestCase):
         """
         response = test_client.get("/api/go-cam/gocam:59a6110e00000067")
         assert response.status_code == 404
+        
+    def test_get_model_details_with_format_parameter(self):
+        """Test get model details with different format parameters."""
+        # Test with default format (minerva)
+        response = test_client.get("/api/go-cam/59a6110e00000067")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("id", response.json())
+        
+        # Test with explicit minerva format
+        response = test_client.get("/api/go-cam/59a6110e00000067?format=minerva")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("id", response.json())
+        
+        # Test with gocam format
+        response = test_client.get("/api/go-cam/59a6110e00000067?format=gocam")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("id", response.json())
+        
+        # Test with both formats
+        response = test_client.get("/api/go-cam/59a6110e00000067?format=both")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("minerva", response.json())
+        self.assertIn("gocam", response.json())
+        
+        # Test with invalid format
+        response = test_client.get("/api/go-cam/59a6110e00000067?format=invalid")
+        self.assertEqual(response.status_code, 400)
 
 if __name__ == "__main__":
     unittest.main()

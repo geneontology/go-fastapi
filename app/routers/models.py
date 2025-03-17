@@ -26,17 +26,24 @@ logger = logging.getLogger()
 @router.get(
     "/api/gocam-model/{id}",
     tags=["models"],
-    description="Returns model details in gocam-py format based on a GO-CAM model ID.",
+    description="Returns model details in gocam-py format based on a GO-CAM model ID. Uses the schema defined in the gocam-py library.",
 )
 async def get_gocam_model_by_id_in_gocam_py_format(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="581e072c00000295",
+        examples={"example1": "581e072c00000295"},
     )
 ) -> dict:
     """
     Returns model details in gocam-py format based on a GO-CAM model ID.
+    
+    This endpoint returns only the gocam format, which is recommended for new applications.
+    It follows the schema defined in the gocam-py library:
+    https://github.com/geneontology/gocam-py
+    
+    For backward compatibility with legacy applications or to get both formats,
+    use the `/api/go-cam/{id}` endpoint with the format parameter.
 
     :param id: A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)
     :return: model details in gocam-py format based on a GO-CAM model ID.
@@ -357,37 +364,81 @@ async def get_pmid_by_model_id(
 
 
 @router.get(
-    "/api/go-cam/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID in JSON format."
+    "/api/go-cam/{id}", 
+    tags=["models"], 
+    description="Returns model details based on a GO-CAM model ID in JSON format. Supports both legacy Minerva format and the new GOCAm format."
 )  # note: this is the endpoint that is currently used by gocam-py to for use in CTX export.
 async def get_model_details_by_model_id_json(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="gomodel:66187e4700001573",
-    )
+        examples={"example1": "gomodel:66187e4700001573"},
+    ),
+    format: str = Query(
+        "minerva", 
+        description="Response format - 'minerva' (legacy, default for backward compatibility), 'gocam' (recommended for new applications), or 'both' to return both formats",
+        examples={"minerva": "minerva", "gocam": "gocam", "both": "both"}
+    ),
 ):
     """
     Returns model details based on a GO-CAM model ID in JSON format.
 
+    This endpoint supports multiple response formats:
+    - 'minerva': Legacy Minerva JSON format (default for backward compatibility)
+    - 'gocam': Modern GOCAM JSON format (recommended for new applications)
+    - 'both': Returns both formats in a single response
+
+    The gocam format follows the schema defined in the gocam-py library: 
+    https://github.com/geneontology/gocam-py
+
     :param id: A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)
-    :return: model details based on a GO-CAM model ID in JSON format from the S3 bucket.
+    :param format: Response format - 'minerva' (legacy), 'gocam' (recommended), or 'both'
+    :return: Model details in the requested format (minerva or gocam-py)
     """
+    # Validate format parameter
+    if format not in ["minerva", "gocam", "both"]:
+        raise InvalidIdentifier(f"Invalid format: {format}. Must be 'minerva', 'gocam', or 'both'")
+    
     stripped_ids = []
     if id.startswith("gomodel:"):
         model_id = id.replace("gomodel:", "")
         stripped_ids.append(model_id)
     else:
         stripped_ids.append(id)
+        
     for stripped_id in stripped_ids:
         path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
         response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
+        
         if response.status_code == 403 or response.status_code == 404:
             raise DataNotFoundException("GO-CAM model not found.")
-        else:
-            response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-            response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned
-            # an unsuccessful status code
-            return response.json()
+        
+        # Get the minerva JSON data
+        response.raise_for_status()
+        minerva_data = response.json()
+        
+        # Return appropriate format based on request
+        if format == "minerva":
+            return minerva_data
+        elif format == "gocam":
+            # Convert to gocam format
+            try:
+                mw = MinervaWrapper()
+                gocam_response = mw.minerva_object_to_model(minerva_data)
+                return gocam_response.model_dump()
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error converting to gocam format: {e}") from e
+        else:  # format == "both"
+            # Return both formats
+            try:
+                mw = MinervaWrapper()
+                gocam_response = mw.minerva_object_to_model(minerva_data)
+                return {
+                    "minerva": minerva_data,
+                    "gocam": gocam_response.model_dump()
+                }
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error converting to gocam format: {e}") from e
 
 
 @router.get("/api/models/{id}", tags=["models"], description="Returns model details based on a GO-CAM model ID.")
