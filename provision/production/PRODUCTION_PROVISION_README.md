@@ -40,11 +40,11 @@ This is all completed in a dockerized development environment (all commands take
 
 1. Prepare _your_ AWS credentials:
 
-Your (personal developer) AWS credentials are used by Terraform to provision the AWS instance and by the provisioned 
-instance to access the certificate store and the S3 buckets used to store Apache logs. These are your personal AWS 
+Your (personal developer) AWS credentials are used by Terraform to provision the AWS instance and by the provisioned
+instance to access the certificate store and the S3 buckets used to store Apache logs. These are your personal AWS
 credentials and should have been appropriately created to give you these permissions.
 
-**NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`. 
+**NOTE**: specifically, you will need to supply an `aws_access_key_id` and `aws_secret_access_key`.
 These will be marked with `REPLACE_ME` in the `go-aws-credentials.sample` file farther down.
 
 2. SSH Keys
@@ -171,7 +171,7 @@ Finally, just show the IP address of the AWS instance:
 go-deploy --workspace REPLACE_ME_WITH_S3_WORKSPACE_NAME --working-directory aws -verbose -output
 ```
 
-**NOTE**: write down the IP address of the AWS instance that is created. 
+**NOTE**: write down the IP address of the AWS instance that is created.
 This can also be found in `REPLACE_ME_WITH_S3_WORKSPACE_NAME.cfg` (e.g. go-api-production-YYYY-MM-DD.cfg).
 
 Useful details for troubleshooting:
@@ -202,7 +202,7 @@ terraform -chdir=aws output           # shows public ip of aws instance
 These commands continue to be run in the dockerized development environment.
 
 * replace "REPLACE_ME" values in config-instance.yaml for dns_record_name and dns_zone_id,
-dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN plus the REPLACE_ME_WITH_TERRAFORM_BACKEND, eg. api-production-2024-08-21.geneontology.org
+dns_zone_id should be "Z04640331A23NHVPCC784" and dns_record_name is the FQDN plus the REPLACE_ME_WITH_TERRAFORM_BACKEND, eg. go-api-production-2024-08-21.geneontology.org
 * Location of SSH keys may need to be replaced after copying config-stack.yaml.sample
 * S3 credentials are placed in a file using the format described above
 * S3 uri if SSL is enabled. Location of SSL certs/key
@@ -217,7 +217,7 @@ emacs ./config-stack.yaml
 Change these in emacs:
 * `S3_BUCKET`: "go-service-logs-api" (as above)
 * `S3_SSL_CERTS_LOCATION`: "s3://go-service-lockbox/geneontology.org.tar.gz"; this is generally of the form: go-service-lockbox/_TLD_.tar.gz";
-* `fastapi_host`: "api-test.geneontology.org"; (must be a FQDN)
+* `fastapi_host_alias`: E.g. "go-api-production-2025-03-18.geneontology.org"; (must be a FQDN)
 * `fastapi_tag`: E.g. "0.2.0"; this should be the Dockerhub _tagged_ version of the API (which is how we deploy within the image), which is conincidentally the GitHub version of the API _sans the final "v"_. <- important point!
 
 Finally, get ansible ready:
@@ -279,7 +279,7 @@ docker inspect --format "{{json .State.Health }}" go-fastapi
 
 ```bash
 # Destroy Manually
-# Make sure you point to the correct workspace before destroying the stack.  
+# Make sure you point to the correct workspace before destroying the stack.
 # You need to be "in" the workspace you want to destroy.  You can use the following commands to help you.
 
 terraform -chdir=aws workspace list
@@ -288,7 +288,7 @@ terraform -chdir=aws workspace show # shows the name of the current workspace
 terraform -chdir=aws show           # shows the state you are about to destroy
 terraform -chdir=aws destroy        # You would need to type Yes to approve.
 
-# Now delete the workspace.  You need to not be in the workspace that was deleted to do this final removal.  We 
+# Now delete the workspace.  You need to not be in the workspace that was deleted to do this final removal.  We
 # pick the default workspace.
 
 terraform -chdir=aws workspace select default # change to default workspace
