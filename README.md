@@ -138,4 +138,4 @@ then calls several endpoints from the api-gorest-2021 codebase that return JSON 
 S3 bucket.  The Pipeline then spins down the local RDF endpoint and api-gorest-2021 codebase.  The api-gorest-2021 
 codebase is effectively obsolete (replaced by api-gorest-2023 and eventually by this API - the endpoints in 
 api-gorest-2021 and api-gorest-2023 are all replaced by endpoints recreated in this codebase, but as of 10/19/2023, the
-pipeline still depends on api-gorest-2021 to generate the JSON files for the GO-CAM models).  
+pipeline still depends on api-gorest-2021 to generate the JSON files for the GO-CAM models).
