@@ -28,7 +28,7 @@ go-deploy = ">=0.4.1"
 biothings-client = "^0.3.0"
 email-validator = "^2.0.0.post2"
 bmt = "^1.1.2"
-gocam = "^0.2.0"
+gocam = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.4.0"
