@@ -10,8 +10,8 @@ instance:
 
     # Set the fqdn if you want the record to be created  and make sure you have the right zone id. (See AWS console)
     # The created record will be of type A and will be populated with the public ip address of the aws instance
-    dns_record_name: ""  
-    dns_zone_id: ""
+    dns_record_name: "REPLACE_ME"
+    dns_zone_id: "REPLACE_ME" # see documentation for the zone id
 
     disk_size: 200
     open_ports:

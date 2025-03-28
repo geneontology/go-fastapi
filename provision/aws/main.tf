@@ -51,7 +51,7 @@ variable "dns_zone_id" {
 }
 
 module "base" {
-  source = "git::https://github.com/geneontology/devops-aws-go-instance.git?ref=V3.0"
+  source = "git::https://github.com/geneontology/devops-aws-go-instance.git?ref=V3.1"
   instance_type = var.instance_type
   ami = var.ami
   use_elastic_ip = var.use_elastic_ip 
@@ -61,6 +61,10 @@ module "base" {
   tags = var.tags
   open_ports = var.open_ports
   disk_size = var.disk_size
+}
+
+output "dns_records" {
+  value = module.base.dns_records
 }
 
 output "public_ip" {

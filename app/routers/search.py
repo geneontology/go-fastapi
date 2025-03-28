@@ -1,9 +1,11 @@
 """search router."""
+
 import logging
 from enum import Enum
 
 from fastapi import APIRouter, Path, Query
 
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.golr_utils import gu_run_solr_text_on
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
@@ -14,7 +16,6 @@ router = APIRouter()
 
 
 class AutocompleteCategory(str, Enum):
-
     """The category of items to retrieve, can be 'gene' or 'term'."""
 
     gene = "gene"
@@ -96,4 +97,6 @@ async def autocomplete_term(
         docs.append(auto_result)
 
     result = {"docs": docs}
+    if result.get("docs") is None:
+        raise DataNotFoundException(detail=f"No results found for {term}")
     return result

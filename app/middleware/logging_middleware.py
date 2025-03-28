@@ -1,4 +1,5 @@
 """Middleware to log requests."""
+
 import logging
 
 from fastapi import Request
@@ -12,7 +13,6 @@ logger.setLevel(logging.INFO)
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
-
     """Middleware to log requests."""
 
     async def dispatch(self, request: Request, call_next):

@@ -19,7 +19,6 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 
 class TestSearchAPI(unittest.TestCase):
-
     """test the search endpoints."""
 
     def test_golr_solr(self):
@@ -28,7 +27,7 @@ class TestSearchAPI(unittest.TestCase):
 
         :return: None
         """
-        self.assertEqual(ESOLR.GOLR.value, "https://golr-aux.geneontology.io/solr/")
+        self.assertEqual(ESOLR.GOLR.value, "https://golr.geneontology.org/solr/")
         self.assertEqual(ESOLRDoc.ONTOLOGY.value, "ontology_class")
 
     def test_search_entity_ssh(self):

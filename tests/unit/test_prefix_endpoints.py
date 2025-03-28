@@ -23,7 +23,6 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 
 
 class TestIdentifierAPI(unittest.TestCase):
-
     """Test the identifier/prefix API endpoints."""
 
     def test_expander_endpoint(self):

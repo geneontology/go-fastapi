@@ -1,4 +1,5 @@
 """bioentity router."""
+
 import logging
 from enum import Enum
 from typing import List
@@ -7,9 +8,11 @@ from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
 from ontobio.golr.golr_associations import search_associations
 
-from app.utils.golr_utils import gu_run_solr_text_on
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
+from app.utils.golr_utils import gu_run_solr_text_on, is_valid_bioentity
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
+from ..utils.ontology_utils import is_valid_goid
 from .slimmer import gene_to_uniprot_from_mygene
 
 INVOLVED_IN = "involved_in"
@@ -29,7 +32,6 @@ logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
-
     """
     Enumeration for Gene Ontology relationship types used for filtering associations.
 
@@ -78,6 +80,13 @@ async def get_bioentity_by_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    try:
+        is_valid_bioentity(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     if rows is None:
         rows = 100000
     # special case MGI, sigh
@@ -91,11 +100,12 @@ async def get_bioentity_by_id(
     # query_filters is translated to the qf solr parameter
     # boost fields %5E2 -> ^2, %5E1 -> ^1
     query_filters = "bioentity%5E2"
-    logger.info(id)
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
     # id here is passed to solr q parameter, query_filters go to the boost, fields are what's returned
     bioentity = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, query_filters, fields, optionals, False)
+    if not bioentity:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return bioentity
 
 
@@ -141,6 +151,13 @@ async def get_annotations_by_goterm_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    try:
+        is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     if rows is None:
         rows = 100000
     # dictates the fields to return, annotation_class,aspect
@@ -170,7 +187,8 @@ async def get_annotations_by_goterm_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
-
+    if not data:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
 
 
@@ -224,9 +242,16 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    try:
+        is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     if rows is None:
         rows = 100000
-    association_return = {}
+
     if relationship_type == ACTS_UPSTREAM_OF_OR_WITHIN:
         association_return = search_associations(
             subject_category="gene",
@@ -273,6 +298,7 @@ async def get_genes_by_goterm_id(
             url=ESOLR.GOLR,
             rows=rows,
         )
+
     return {"associations": association_return.get("associations")}
 
 
@@ -310,6 +336,13 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
+    try:
+        is_valid_goid(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     if rows is None:
         rows = 100000
     fields = "taxon,taxon_label"
@@ -342,7 +375,8 @@ async def get_taxon_by_goterm_id(
 
     optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
-
+    if not data:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return data
 
 
@@ -394,6 +428,13 @@ async def get_annotations_by_gene_id(
     scenes for querying.
 
     """
+    try:
+        is_valid_bioentity(id)
+    except DataNotFoundException as e:
+        raise DataNotFoundException(detail=str(e)) from e
+    except ValueError as e:
+        raise InvalidIdentifier(detail=str(e)) from e
+
     if rows is None:
         rows = 100000
 
@@ -410,8 +451,6 @@ async def get_annotations_by_gene_id(
         rows=rows,
         slim=slim,
     )
-    logger.info("should be null assocs")
-    logger.info(assocs)
     # If there are no associations for the given ID, try other IDs.
     # Note the AmiGO instance does *not* support equivalent IDs
     if len(assocs["associations"]) == 0:
@@ -435,6 +474,7 @@ async def get_annotations_by_gene_id(
                 num_found = num_found + pr_assocs.get("numFound")
             assocs["numFound"] = num_found
             for asc in pr_assocs["associations"]:
-                logger.info(asc)
                 assocs["associations"].append(asc)
+    if not assocs or assocs["associations"] == 0:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return {"associations": assocs.get("associations")}

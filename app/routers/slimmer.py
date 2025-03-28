@@ -1,4 +1,5 @@
 """slimmer router."""
+
 import logging
 from enum import Enum
 from typing import List
@@ -7,6 +8,7 @@ from biothings_client import get_client
 from fastapi import APIRouter, Query
 from ontobio.golr.golr_associations import map2slim
 
+from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.settings import ESOLR, get_user_agent
 
 INVOLVED_IN = "involved_in"
@@ -20,7 +22,6 @@ logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
-
     """Relationship type for slimmer."""
 
     acts_upstream_of_or_within = ACTS_UPSTREAM_OF_OR_WITHIN
@@ -95,7 +96,8 @@ async def slimmer_function(
                             checked[protein_id] = gene
                 else:
                     association["subject"]["id"] = checked[protein_id]
-
+    if not results:
+        raise DataNotFoundException(detail="No results found")
     return results
 
 
@@ -132,7 +134,8 @@ def gene_to_uniprot_from_mygene(id: str):
                         uniprot_ids.append(x)
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-
+    if not uniprot_ids:
+        raise DataNotFoundException(detail="No UniProtKB IDs found for {}".format(id))
     return uniprot_ids
 
 
@@ -152,5 +155,6 @@ def uniprot_to_gene_from_mygene(id: str):
                 gene_id = "HGNC:{}".format(gene_id)
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-
+    if not gene_id:
+        raise DataNotFoundException(detail="No HGNC IDs found for {}".format(id))
     return [gene_id]

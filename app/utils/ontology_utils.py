@@ -1,4 +1,5 @@
 """ontology utility functions."""
+
 import logging
 
 from linkml_runtime.utils.namespaces import Namespaces
@@ -9,7 +10,8 @@ from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
-from app.utils.golr_utils import gu_run_solr_text_on
+from app.exceptions.global_exceptions import DataNotFoundException
+from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.settings import get_golr_config, get_sparql_endpoint
 
 cfg = get_golr_config()
@@ -36,6 +38,8 @@ def batch_fetch_labels(ids):
         label = goont_fetch_label(id)
         if label is not None:
             m[id] = label
+        else:
+            raise DataNotFoundException(detail=f"Item with ID {id} not found")
     return m
 
 
@@ -55,6 +59,8 @@ def goont_fetch_label(id):
     si = SparqlImplementation(ont_r)
     query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
     bindings = si._sparql_query(query.query_str())
+    if not bindings:
+        return None
     rows = [r["label"]["value"] for r in bindings]
     return rows[0]
 
@@ -163,7 +169,7 @@ def get_ontology(id):
     handle = id
     for c in cfg["ontologies"]:
         if c["id"] == id:
-            print("getting handle for id: {} from cfg".format(id))
+            logger.info("getting handle for id: {} from cfg".format(id))
             handle = c["handle"]
 
     if handle not in omap:
@@ -173,7 +179,7 @@ def get_ontology(id):
     else:
         logging.info("Using cached for {}".format(handle))
 
-    print("handle: " + handle)
+    logger.info("handle: " + handle)
     return omap[handle]
 
 
@@ -351,3 +357,66 @@ def get_go_subsets_sparql_query(goid):
     }
     """
     )
+
+
+def is_valid_goid(goid) -> bool:
+    """
+    Check if the provided GO identifier is valid by querying the AmiGO Solr (GOLR) instance.
+
+    :param goid: The GO identifier to be checked.
+    :type goid: str
+    :return: True if the GO identifier is valid, False otherwise.
+    :rtype: bool
+    """
+    # Ensure the GO ID starts with the proper prefix
+    if not goid.startswith("GO:") and not goid.startswith("GO_"):
+        raise ValueError("Invalid GO ID format")
+
+    fields = ""
+
+    try:
+        data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, goid, fields)
+        if data:
+            return True
+    except DataNotFoundException as e:
+        # Log the exception if needed
+        logger.info(f"Exception occurred: {e}")
+        # Propagate the exception and return False
+        raise e
+
+    # Default return False if no data is found
+    return False
+
+
+def is_golr_recognized_curie(id) -> bool:
+    """
+    Check if the provided identifier is valid by querying the AmiGO Solr (GOLR) instance.
+
+    :param id: The GO identifier to be checked.
+    :type id: str
+    :return: True if the GO identifier is valid, False otherwise.
+    :rtype: bool
+    """
+    # Ensure the GO ID starts with the proper prefix
+    if ":" not in id and "_" not in id:
+        raise ValueError("Invalid CURIE format")
+
+    fields = ""
+
+    try:
+        data = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+        if data:
+            return True
+        else:
+            data = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, fields)
+            if data:
+                return True
+
+    except DataNotFoundException as e:
+        # Log the exception if needed
+        logger.info(f"Exception occurred: {e}")
+        # Propagate the exception and return False
+        raise e
+
+    # Default return False if no data is found
+    return False
