@@ -47,7 +47,7 @@ async def get_expand_curie(id: str = Path(..., description="identifier in CURIE 
     if not expanded:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
 
-    return converter.expand(id)
+    return expanded
 
 
 @router.get(
