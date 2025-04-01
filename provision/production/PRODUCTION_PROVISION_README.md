@@ -65,8 +65,8 @@ go-ssh
 3. Spin up the provided dockerized development environment:
 
 ```bash
-docker rm go-dev
-docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
+docker rm go-api-dev
+docker run --name go-api-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 cd /tmp
 git clone https://github.com/geneontology/go-fastapi.git
 cd go-fastapi/provision
@@ -77,8 +77,8 @@ cd go-fastapi/provision
 Copy the ssh keys from your docker host into the running docker image, in `/tmp`:
 
 ```
-docker cp go-ssh go-dev:/tmp
-docker cp go-ssh.pub go-dev:/tmp
+docker cp go-ssh go-api-dev:/tmp
+docker cp go-ssh.pub go-api-dev:/tmp
 ```
 You should now have the following in your image:
 ```
@@ -295,35 +295,35 @@ terraform -chdir=aws workspace select default # change to default workspace
 terraform -chdir=aws workspace delete <NAME_OF_WORKSPACE_THAT_IS_NOT_DEFAULT>  # delete workspace.
 ```
 
-### Helpful commands for the docker container used as a development environment (go-dev):
+### Helpful commands for the docker container used as a development environment (go-api-dev):
 
-1. start the docker container `go-dev` in interactive mode.
+1. start the docker container `go-api-dev` in interactive mode.
 
 ```bash
-docker run --rm --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
+docker run --rm --name go-api-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 ```
 
 In the command above we used the `--rm` option which means the container will be deleted when you exit.
 If that is not the intent, and you want to delete it later at your own convenience. Use the following `docker run` command.
 
 ```bash
-docker run --name go-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
+docker run --name go-api-dev -it geneontology/go-devops-base:tools-jammy-0.4.4  /bin/bash
 ```
 
 2. To exit or stop the container:
 
 ```bash
-docker stop go-dev                   # stop container with the intent of restarting it. This is equivalent to `exit` inside the container.
-docker start -ia go-dev              # restart and attach to the container.
-docker rm -f go-dev                  # remove it for good.
+docker stop go-api-dev                   # stop container with the intent of restarting it. This is equivalent to `exit` inside the container.
+docker start -ia go-api-dev              # restart and attach to the container.
+docker rm -f go-api-dev                  # remove it for good.
 ```
 
 3. Use `docker cp` to copy these credentials to /tmp:
 
 ```bash
-docker cp /tmp/go-aws-credentials go-dev:/tmp/
-docker cp /tmp/go-ssh go-dev:/tmp
-docker cp /tmp/go-ssh.pub go-dev:/tmp
+docker cp /tmp/go-aws-credentials go-api-dev:/tmp/
+docker cp /tmp/go-ssh go-api-dev:/tmp
+docker cp /tmp/go-ssh.pub go-api-dev:/tmp
 ```
 
 within the docker image:
