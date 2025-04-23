@@ -16,6 +16,7 @@ router = APIRouter()
 
 
 class AutocompleteCategory(str, Enum):
+
     """The category of items to retrieve, can be 'gene' or 'term'."""
 
     gene = "gene"
