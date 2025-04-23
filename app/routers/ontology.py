@@ -26,6 +26,7 @@ router = APIRouter()
 
 
 class GraphType(str, Enum):
+
     """Enum for the different types of graphs that can be returned."""
 
     topology_graph = "topology_graph"
@@ -327,6 +328,7 @@ async def get_go_term_detail_by_go_id(
 
 
 class GOHierarchyItem(BaseModel):
+
     """
     A GO Hierarchy return model.
 
