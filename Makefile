@@ -23,11 +23,13 @@ integration-tests:
 	poetry run pytest tests/integration/step_defs/*.py
 
 lint:
-	poetry run tox -e flake8
 	poetry run tox -e lint-fix
 
 spell:
 	poetry run tox -e codespell
+
+spell-fix:
+	poetry run tox -e codespell-write
 
 unit-tests:
 	poetry run pytest -v tests/unit/*.py

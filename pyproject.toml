@@ -32,7 +32,7 @@ bmt = "^1.1.2"
 gocam = "^0.4.0"
 
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = ">=7.4.0"
 pytest-bdd = "^6.1.1"
 Sphinx = "^5.0.2"
@@ -40,6 +40,10 @@ sphinx-rtd-theme = ">=1.2.2"
 sphinxcontrib-napoleon = "^0.7"
 tox = ">=4.6.4"
 httpx = ">=0.18.2"
+ruff = "^0.6.9"
+black = "^23.1.0"
+codespell = "^2.2.0"
+tomli = "^2.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
