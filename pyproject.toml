@@ -63,7 +63,7 @@ docs = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-mermaid"]
 
 [tool.black]
 line-length = 120
-target-version = ["py39", "py310"]
+target-version = ["py311", "py312"]
 
 [tool.ruff]
 extend-ignore = [
