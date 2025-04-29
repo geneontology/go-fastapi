@@ -9,7 +9,7 @@ from app.main import app
 
 test_client = TestClient(app)
 
-gene_ids = ["WB:WBGene00002147", "FB:FBgn0003731"]  # , "SGD:S000003407", "MGI:3588192"]
+gene_ids = ["WB:WBGene00002147", "FB:FBgn0003731", "SGD:S000001049"]  # , "SGD:S000003407", "MGI:3588192"]
 gene_not_found_ids = ["WB:not_real", "FB:fake", "SGD:FAKE", "MGI:MGI:FAKE"]
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
