@@ -1,7 +1,6 @@
 """Model API router."""
 
 import logging
-from http.client import HTTPException
 from pprint import pprint
 from typing import List
 
@@ -53,16 +52,28 @@ async def get_gocam_model_by_id_in_gocam_py_format(
         print(path_to_s3)
         try:
             response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-            print(response.json())
-            response.raise_for_status()
+            # Check for 403/404 first before trying to parse JSON or raise_for_status
             if response.status_code == 403 or response.status_code == 404:
                 raise DataNotFoundException("GO-CAM model not found.")
+
+            # Now try to raise_for_status for other error codes
+            response.raise_for_status()
+
+            # If we get here, we have a valid response
             data = response.json()
             gocam_reposnse = mw.minerva_object_to_model(data)  # convert minerva object to gocam model
             pprint(gocam_reposnse)
             return gocam_reposnse.model_dump()
+        except DataNotFoundException:
+            # Re-raise without modification to keep the 404 status
+            raise
+        except requests.exceptions.JSONDecodeError as json_err:
+            # Invalid JSON response
+            raise DataNotFoundException("GO-CAM model response was invalid") from json_err
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Unexpected error: {e}") from e
+            # Log the error for debugging but return a 404 for not found models
+            logger.error(f"Error retrieving model {stripped_id}: {str(e)}")
+            raise DataNotFoundException("GO-CAM model not found") from e
 
 
 @router.get("/api/models/go", tags=["models"], description="Returns go term details based on a GO-CAM model ID.")

@@ -163,6 +163,24 @@ class TestApp(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json().get("id"), "gomodel:" + id.replace("gomodel:", ""))
 
+    def test_get_model_details_by_model_id_json_gocam_py_failure(self):
+        """
+        Test the endpoint to retrieve model details by model ID in JSON format from the S3 bucket, check for 404 failures.
+
+        :return: None
+        """
+        # Test with a non-existent model ID
+        response = test_client.get("/api/gocam-model/67c10cc400005826")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json().get("detail"), "GO-CAM model not found.")
+
+        # Test with other invalid ID formats
+        invalid_ids = ["invalid-id", "12345", "not_a_valid_id"]
+        for invalid_id in invalid_ids:
+            response = test_client.get(f"/api/gocam-model/{invalid_id}")
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.json().get("detail"), "GO-CAM model not found.")
+
     def test_get_model_details_by_model_id_not_found_json(self):
         """
         Test the endpoint to retrieve model details by model ID in JSON format from the S3 bucket, check for success.
