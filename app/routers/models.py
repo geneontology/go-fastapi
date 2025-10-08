@@ -422,58 +422,31 @@ async def get_term_details_by_taxon_id(
     return collated_results
 
 
-
-
-@router.get("/api/users/{orcid}/models", tags=["models"])
-async def get_models_by_orcid(
-    orcid: str = Path(
-        ...,
-        description="The ORCID of the user (e.g. 0000-0003-1813-6857)",
-        example="0000-0003-1813-6857",
-    )
+@router.get(
+    "/api/pmid/{id}/models",
+    tags=["models"],
+    description="Returns models for a given publication identifier (PMID).",
+)
+async def get_model_details_by_pmid(
+    id: str = Path(..., description="A publication identifier (PMID) (e.g. 15314168 or 26954676)")
 ):
-    """Returns model details based on an orcid."""
-    mod_orcid = f"https://orcid.org/{orcid}"
-    print(mod_orcid)
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = (
-        """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX has_affiliation: <http://purl.obolibrary.org/obo/ERO_0000066>
-            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-            PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
-            PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-            PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-            PREFIX biomacromolecule: <http://purl.obolibrary.org/obo/CHEBI_33694>
-
-            SELECT distinct ?title ?contributor ?gocam
-            WHERE {
-                GRAPH ?gocam {
-                                ?gocam metago:graphType metago:noctuaCam ;
-                                dc:date ?date ;
-                                dc:title ?title ;
-                                dc:contributor ?contributor .
-
-
-                                # Contributor filter
-                                FILTER(?contributor = "%s")
-                }
-            }
-            """
-        % mod_orcid
-    )
-
-    results = si._sparql_query(query)
-
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {orcid} not found")
-    else:
-        collated_results = []
-        for result in results:
-            collated_results.append({"model_id": result["gocam"].get("value"), "title": result["title"].get("value")})
-        return collated_results
+    """Returns models for a given publication identifier (PMID)."""
+    from app.utils.settings import get_index_files
+    
+    pmid_key = id if id.startswith("PMID:") else f"PMID:{id}"
+    
+    source_index = get_index_files("gocam_source_index_file")
+    
+    if pmid_key not in source_index:
+        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+    
+    model_ids = source_index[pmid_key]
+    collated_results = []
+    for model_id in model_ids:
+        gocam_iri = f"http://model.geneontology.org/{model_id}"
+        collated_results.append({"gocam": gocam_iri})
+    
+    return collated_results
 
 
 @router.get(
