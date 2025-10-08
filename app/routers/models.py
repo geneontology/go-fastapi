@@ -239,70 +239,48 @@ async def get_pmid_by_model_id(
     )
 ):
     """Returns pubmed details based on a GO CAM id."""
-    stripped_ids = []
-    for model_id in gocams:
-        if model_id.startswith("gomodel:"):
-            model_id = model_id.replace("gomodel:", "")
-            stripped_ids.append(model_id)
-        else:
-            stripped_ids.append(model_id)
-    for stripped_id in stripped_ids:
-        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
-        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-        if response.status_code == 403 or response.status_code == 404:
-            raise DataNotFoundException("GO-CAM model not found.")
-
-    gocam = ""
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    if stripped_ids:
-        for model in stripped_ids:
-            if gocam == "":
-                gocam = "<http://model.geneontology.org/" + model + "> "
-            else:
-                gocam = gocam + "<http://model.geneontology.org/" + model + "> "
-        query = (
-            """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-
-        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="@|@") as ?sources)
-        WHERE
-        {
-            values ?gocam { %s }
-            GRAPH ?gocam {
-                ?s dc:source ?source .
-                BIND(REPLACE(?source, " ", "") AS ?source) .
-                FILTER((CONTAINS(?source, "PMID")))
-            }
-        }
-        GROUP BY ?gocam
-
-        """
-            % gocam
-        )
-    else:
-        query = """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-
-        SELECT  distinct ?gocam (GROUP_CONCAT(distinct ?source; separator="` + separator + `") as ?sources)
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?s dc:source ?source .
-                BIND(REPLACE(?source, " ", "") AS ?source) .
-                FILTER((CONTAINS(?source, "PMID")))
-            }
-        }
-        GROUP BY ?gocam
-        """
-    results = si._sparql_query(query)
+    import re
+    
     collated_results = []
-    for result in results:
-        collated = {"gocam": result["gocam"].get("value"), "sources": result["sources"].get("value")}
-        collated_results.append(collated)
+    
+    for model_id in gocams:
+        pmids = set()
+        
+        model_data = await get_model_details_by_model_id_json(model_id)
+        gocam_id = model_data.get("id", "")
+        
+        for ann in model_data.get("annotations", []):
+            value = ann.get("value", "")
+            if "PMID" in value:
+                matches = re.findall(r"PMID:\s*\d+", value)
+                for match in matches:
+                    pmids.add(match.replace(" ", ""))
+        
+        for ind in model_data.get("individuals", []):
+            for ann in ind.get("annotations", []):
+                if ann.get("key", "") == "source":
+                    value = ann.get("value", "")
+                    if "PMID" in value:
+                        matches = re.findall(r"PMID:\s*\d+", value)
+                        for match in matches:
+                            pmids.add(match.replace(" ", ""))
+        
+        for fact in model_data.get("facts", []):
+            for ann in fact.get("annotations", []):
+                if ann.get("key", "") == "source":
+                    value = ann.get("value", "")
+                    if "PMID" in value:
+                        matches = re.findall(r"PMID:\s*\d+", value)
+                        for match in matches:
+                            pmids.add(match.replace(" ", ""))
+        
+        if pmids:
+            sources = "@|@".join(sorted(pmids))
+            collated_results.append({"gocam": gocam_id, "sources": sources})
+    
+    if not collated_results:
+        raise DataNotFoundException("GO-CAM model not found.")
+    
     return collated_results
 
 
