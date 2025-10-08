@@ -85,116 +85,55 @@ async def get_goterms_by_model_id(
     )
 ):
     """Returns go term details based on a GO-CAM model ID."""
-    stripped_ids = []
-    for model_id in gocams:
-        if model_id.startswith("gomodel:"):
-            model_id = id.replace("gomodel:", "")
-            stripped_ids.append(model_id)
-        else:
-            stripped_ids.append(model_id)
-    for stripped_id in stripped_ids:
-        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
-        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-        if response.status_code == 403 or response.status_code == 404:
-            raise DataNotFoundException("GO-CAM model not found.")
-
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    gocam = ""
-    if stripped_ids:
-        for model in stripped_ids:
-            if gocam == "":
-                gocam = "<http://model.geneontology.org/" + model + "> "
-            else:
-                gocam = gocam + "<http://model.geneontology.org/" + model + "> "
-        query = (
-            """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
-            PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
-            PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-            PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-            SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
-            WHERE
-            {
-                VALUES ?gocam { %s }
-                GRAPH ?gocam {
-                    ?entity rdf:type owl:NamedIndividual .
-                    ?entity rdf:type ?goids
-                }
-
-                VALUES ?goclasses { BP: MF: CC:  } .
-                ?goids rdfs:subClassOf+ ?goclasses .
-                ?goids rdfs:label ?gonames .
-                ?goids definition: ?definitions .
-            }
-            ORDER BY DESC(?gocam)
-        """
-            % gocam
-        )
-    else:
-        query = """
-
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
-        PREFIX BP: <http://purl.obolibrary.org/obo/GO_0008150>
-        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-        PREFIX CC: <http://purl.obolibrary.org/obo/GO_0005575>
-
-		SELECT distinct ?gocam ?goclasses ?goids ?gonames ?definitions
-        WHERE
-        {
-
-  		    GRAPH ?gocam {
-    			?gocam metago:graphType metago:noctuaCam  .
-                ?entity rdf:type owl:NamedIndividual .
-    			?entity rdf:type ?goids
-            }
-
-            VALUES ?goclasses { BP: MF: CC:  } .
-            # rdf:type faster then subClassOf+ but require filter
-            # ?goids rdfs:subClassOf+ ?goclasses .
-    		?entity rdf:type ?goclasses .
-
-  			# Filtering out the root BP, MF & CC terms
-			filter(?goids != MF: )
-  			filter(?goids != BP: )
-		  	filter(?goids != CC: )
-
-  			# then getting their definitions
-    		?goids rdfs:label ?gonames .
-  		    ?goids definition: ?definitions .
-        }
-		ORDER BY DESC(?gocam)
-        """
-
-    results = si._sparql_query(query)
-    summary_gocam = ""
-    collated = {}
+    GO_ROOTS = {
+        "http://purl.obolibrary.org/obo/GO_0008150": "BP",
+        "http://purl.obolibrary.org/obo/GO_0003674": "MF",
+        "http://purl.obolibrary.org/obo/GO_0005575": "CC",
+    }
+    
     collated_results = []
-    for result in results:
-        if summary_gocam == "":
-            collated["goclasses"] = [result["goclasses"].get("value")]
-            collated["goids"] = [result["goids"].get("value")]
-            collated["gonames"] = [result["gonames"].get("value")]
-            collated["definitions"] = [result["definitions"].get("value")]
-            collated["gocam"] = result["gocam"].get("value")
-            summary_gocam = result["gocam"].get("value")
-        elif summary_gocam == result["gocam"].get("value"):
-            collated["goclasses"].append(result["goclasses"].get("value"))
-            collated["goids"].append(result["goids"].get("value"))
-            collated["gonames"].append(result["gonames"].get("value"))
-            collated["definitions"].append(result["definitions"].get("value"))
-        else:
-            collated_results.append(collated)
-            collated = {}
-            summary_gocam = result["gocam"].get("value")
-            collated["goclasses"] = [result["goclasses"].get("value")]
-            collated["goids"] = [result["goids"].get("value")]
-            collated["gonames"] = [result["gonames"].get("value")]
-            collated["definitions"] = [result["definitions"].get("value")]
-            collated["gocam"] = result["gocam"].get("value")
-    collated_results.append(collated)
+    
+    for model_id in gocams:
+        go_terms = {}
+        
+        model_data = await get_model_details_by_model_id_json(model_id)
+        gocam_id = model_data.get("id", "")
+        
+        for individual in model_data.get("individuals", []):
+            for type_item in individual.get("type", []):
+                go_id = type_item.get("id", "")
+                
+                if go_id.startswith("GO:"):
+                    go_iri = f"http://purl.obolibrary.org/obo/{go_id.replace(':', '_')}"
+                    
+                    if go_iri not in GO_ROOTS and go_id not in go_terms:
+                        root_type = individual.get("root-type", [])
+                        go_class = "unknown"
+                        for root in root_type:
+                            root_id = root.get("id", "")
+                            if root_id.startswith("GO:"):
+                                root_iri = f"http://purl.obolibrary.org/obo/{root_id.replace(':', '_')}"
+                                if root_iri in GO_ROOTS:
+                                    go_class = GO_ROOTS[root_iri]
+                                    break
+                        
+                        go_terms[go_id] = {
+                            "goid": go_iri,
+                            "goname": type_item.get("label", ""),
+                            "goclass": go_class,
+                        }
+        
+        if go_terms:
+            collated_results.append({
+                "gocam": gocam_id,
+                "goclasses": [term["goclass"] for term in go_terms.values()],
+                "goids": [term["goid"] for term in go_terms.values()],
+                "gonames": [term["goname"] for term in go_terms.values()],
+            })
+    
+    if not collated_results:
+        raise DataNotFoundException("GO-CAM model not found.")
+    
     return collated_results
 
 
