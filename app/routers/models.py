@@ -7,13 +7,10 @@ from typing import List
 import requests
 from fastapi import APIRouter, Path, Query
 from gocam.translation.minerva_wrapper import MinervaWrapper
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils import ontology_utils
-from app.utils.settings import get_sparql_endpoint, get_user_agent
-from app.utils.sparql_utils import transform_array
+from app.utils.settings import get_user_agent
 
 USER_AGENT = get_user_agent()
 router = APIRouter()
@@ -432,262 +429,18 @@ async def get_model_details_by_pmid(
 ):
     """Returns models for a given publication identifier (PMID)."""
     from app.utils.settings import get_index_files
-    
+
     pmid_key = id if id.startswith("PMID:") else f"PMID:{id}"
-    
+
     source_index = get_index_files("gocam_source_index_file")
-    
+
     if pmid_key not in source_index:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
-    
+
     model_ids = source_index[pmid_key]
     collated_results = []
     for model_id in model_ids:
         gocam_iri = f"http://model.geneontology.org/{model_id}"
         collated_results.append({"gocam": gocam_iri})
-    
+
     return collated_results
-
-
-@router.get(
-    "/api/models",
-    tags=["models"],
-    deprecated=True,
-    description="Returns metadata of GO-CAM models, e.g. 59a6110e00000067.",
-)
-async def get_gocam_models(
-    start: int = Query(None, description="start"),
-    size: int = Query(None, description="Number of models to look for"),
-    last: int = Query(None, description="last"),
-    group: str = Query(None, description="group"),
-    user: str = Query(None, description="user"),
-    pmid: str = Query(None, description="pmid"),
-    causalmf: bool = Query(
-        False,
-        description="The model has a chain of at least three functions connected "
-        "by at least two consecutive causal relation edges.  One of these functions is enabled_by "
-        "this input gene",
-    ),
-):
-    """Returns metadata of GO-CAM models, e.g. 59a6110e00000067."""
-    if last:
-        start = 0
-        size = last
-
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-
-    # support how the model endpoint currently works, better to have one param that controlled user group or pmid
-    # since this is effectively is an OR at the moment.
-    by_param = ""
-    if group:
-        by_param = group
-    if user:
-        by_param = user
-
-    if by_param is not None:
-        query = (
-            """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX providedBy: <http://purl.org/pav/providedBy>
-
-            SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-            WHERE
-            {
-                {
-                    BIND(" %s " as ?groupName) .
-                    GRAPH ?gocam {
-                        ?gocam metago:graphType metago:noctuaCam .
-                        ?gocam dc:title ?title ;
-                        dc:date ?date ;
-                        dc:contributor ?orcid ;
-                        providedBy: ?providedBy .
-
-                    BIND( IRI(?orcid) AS ?orcidIRI ).
-                    BIND( IRI(?providedBy) AS ?providedByIRI ).
-                }
-
-                optional {
-                    ?providedByIRI rdfs:label ?providedByLabel .
-                }
-
-                filter(?providedByLabel = ?groupName )
-                optional { ?orcidIRI rdfs:label ?name }
-                BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-            }
-
-        }
-        GROUP BY ?gocam ?date ?title
-        ORDER BY DESC(?date)
-
-        """
-            % by_param
-        )
-
-    elif pmid is not None:
-        if not pmid.startswith("PMID:"):
-            pmid = "PMID:" + pmid
-        query = (
-            """
-
-            PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX providedBy: <http://purl.org/pav/providedBy>
-
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-
-        WHERE
-        {
-          GRAPH ?gocam {
-            ?gocam metago:graphType metago:noctuaCam .
-
-            ?gocam dc:title ?title ;
-                   dc:date ?date ;
-                   dc:contributor ?orcid ;
-                   providedBy: ?providedBy .
-
-            BIND( IRI(?orcid) AS ?orcidIRI ).
-            BIND( IRI(?providedBy) AS ?providedByIRI ).
-
-            ?s dc:source ?source .
-            BIND(REPLACE(?source, " ", "") AS ?source) .
-            FILTER(SAMETERM(?source, "%s"^^xsd:string))
-          }
-
-          optional {
-            ?providedByIRI rdfs:label ?providedByLabel .
-          }
-
-          optional {
-            ?orcidIRI rdfs:label ?name
-          }
-          BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-
-        }
-        GROUP BY ?gocam ?date ?title
-        ORDER BY DESC(?date)
-
-        """
-            % pmid
-        )
-
-    elif causalmf is not None:
-        query = """
-        PREFIX pr: <http://purl.org/ontology/prv/core#>
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX providedBy: <http://purl.org/pav/providedBy>
-
-        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-
-        PREFIX causally_upstream_of_or_within: <http://purl.obolibrary.org/obo/RO_0002418>
-        PREFIX causally_upstream_of_or_within_negative_effect: <http://purl.obolibrary.org/obo/RO_0004046>
-        PREFIX causally_upstream_of_or_within_positive_effect: <http://purl.obolibrary.org/obo/RO_0004047>
-
-        PREFIX causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002411>
-        PREFIX causally_upstream_of_negative_effect: <http://purl.obolibrary.org/obo/RO_0002305>
-        PREFIX causally_upstream_of_positive_effect: <http://purl.obolibrary.org/obo/RO_0002304>
-
-        PREFIX regulates: <http://purl.obolibrary.org/obo/RO_0002211>
-        PREFIX negatively_regulates: <http://purl.obolibrary.org/obo/RO_0002212>
-        PREFIX positively_regulates: <http://purl.obolibrary.org/obo/RO_0002213>
-
-        PREFIX directly_regulates: <http://purl.obolibrary.org/obo/RO_0002578>
-        PREFIX directly_positively_regulates: <http://purl.obolibrary.org/obo/RO_0002629>
-        PREFIX directly_negatively_regulates: <http://purl.obolibrary.org/obo/RO_0002630>
-
-        PREFIX directly_activates: <http://purl.obolibrary.org/obo/RO_0002406>
-        PREFIX indirectly_activates: <http://purl.obolibrary.org/obo/RO_0002407>
-
-        PREFIX directly_inhibits: <http://purl.obolibrary.org/obo/RO_0002408>
-        PREFIX indirectly_inhibits: <http://purl.obolibrary.org/obo/RO_0002409>
-
-        PREFIX transitively_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002414>
-        PREFIX immediately_causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002412>
-        PREFIX directly_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002413>
-
-        SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-
-        WHERE
-        {
-          ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-          ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-          {
-            GRAPH ?gocam {
-              ?gocam metago:graphType metago:noctuaCam .
-              ?gocam dc:date ?date .
-              ?gocam dc:title ?title .
-              ?gocam dc:contributor ?orcid .
-              ?gocam providedBy: ?providedBy .
-              BIND( IRI(?orcid) AS ?orcidIRI ).
-              BIND( IRI(?providedBy) AS ?providedByIRI ).
-              ?ind1 ?causal1 ?ind2 .
-              ?ind2 ?causal2 ?ind3
-            }
-            ?ind1 rdf:type MF: .
-            ?ind2 rdf:type MF: .
-            ?ind3 rdf:type MF: .
-            optional {
-                ?providedByIRI rdfs:label ?providedByLabel .
-            }
-
-            optional { ?orcidIRI rdfs:label ?name }
-            BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-          }
-        }
-        GROUP BY ?gocam ?date ?title
-        ORDER BY ?gocam
-        """
-    else:
-        query = """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX providedBy: <http://purl.org/pav/providedBy>
-
-            SELECT  ?gocam ?date ?title (GROUP_CONCAT(distinct ?orcid; separator="@|@") AS ?orcids)
-                                    (GROUP_CONCAT(distinct ?name; separator="@|@") AS ?names)
-                                    (GROUP_CONCAT(distinct ?providedBy; separator="@|@") AS ?groupids)
-                                    (GROUP_CONCAT(distinct ?providedByLabel; separator="@|@") AS ?groupnames)
-            WHERE
-            {
-                {
-                    GRAPH ?gocam {
-                        ?gocam metago:graphType metago:noctuaCam .
-                        ?gocam dc:title ?title ;
-                        dc:date ?date ;
-                        dc:contributor ?orcid ;
-                        providedBy: ?providedBy .
-
-                        BIND( IRI(?orcid) AS ?orcidIRI ).
-                        BIND( IRI(?providedBy) AS ?providedByIRI ).
-                    }
-
-                    optional {
-                        ?providedByIRI rdfs:label ?providedByLabel .
-                    }
-                    optional { ?orcidIRI rdfs:label ?name }
-                    BIND(IF(bound(?name), ?name, ?orcid) as ?name) .
-                }
-
-            }
-            GROUP BY ?gocam ?date ?title
-            ORDER BY DESC(?date)
-        """
-    if size:
-        query += "\nLIMIT " + str(size)
-    if start:
-        query += "\nOFFSET " + str(start)
-    results = si._sparql_query(query)
-    transformed_results = transform_array(results, ["orcids", "names", "groupids", "groupnames"])
-    logger.info(transformed_results)
-    return transform_array(results, ["orcids", "names", "groupids", "groupnames"])
