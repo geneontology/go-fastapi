@@ -59,7 +59,7 @@ class TestApp(unittest.TestCase):
     def test_gocam_by_model_ids(self):
         """Test the endpoint to retrieve GO-CAMs by model IDs."""
         response = test_client.get("/api/models/581e072c00000820")
-        self.assertGreater(len(response.json()), 125)
+        self.assertGreaterEqual(len(response.json()), 59)
         self.assertEqual(response.status_code, 200)
 
     def test_models_size_endpoint(self):

@@ -16,7 +16,6 @@ from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
 
 USER_AGENT = get_user_agent()
-SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 logger = logging.getLogger()
@@ -90,22 +89,22 @@ async def get_goterms_by_model_id(
         "http://purl.obolibrary.org/obo/GO_0003674": "MF",
         "http://purl.obolibrary.org/obo/GO_0005575": "CC",
     }
-    
+
     collated_results = []
-    
+
     for model_id in gocams:
         go_terms = {}
-        
+
         model_data = await get_model_details_by_model_id_json(model_id)
         gocam_id = model_data.get("id", "")
-        
+
         for individual in model_data.get("individuals", []):
             for type_item in individual.get("type", []):
                 go_id = type_item.get("id", "")
-                
+
                 if go_id.startswith("GO:"):
                     go_iri = f"http://purl.obolibrary.org/obo/{go_id.replace(':', '_')}"
-                    
+
                     if go_iri not in GO_ROOTS and go_id not in go_terms:
                         root_type = individual.get("root-type", [])
                         go_class = "unknown"
@@ -116,13 +115,13 @@ async def get_goterms_by_model_id(
                                 if root_iri in GO_ROOTS:
                                     go_class = GO_ROOTS[root_iri]
                                     break
-                        
+
                         go_terms[go_id] = {
                             "goid": go_iri,
                             "goname": type_item.get("label", ""),
                             "goclass": go_class,
                         }
-        
+
         if go_terms:
             collated_results.append({
                 "gocam": gocam_id,
@@ -130,10 +129,10 @@ async def get_goterms_by_model_id(
                 "goids": [term["goid"] for term in go_terms.values()],
                 "gonames": [term["goname"] for term in go_terms.values()],
             })
-    
+
     if not collated_results:
         raise DataNotFoundException("GO-CAM model not found.")
-    
+
     return collated_results
 
 
@@ -151,83 +150,48 @@ async def get_geneproducts_by_model_id(
     :param gocams: A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369
     :return: gene product details based on a GO-CAM model ID.
     """
-    stripped_ids = []
+    EXCLUDED_PREFIXES = ("GO:", "ECO:", "CHEBI:", "gomodel:")
+    
+    collated_results = []
+    
     for model_id in gocams:
-        if model_id.startswith("gomodel:"):
-            model_id = model_id.replace("gomodel:", "")
-            stripped_ids.append(model_id)
-        else:
-            stripped_ids.append(model_id)
-    for stripped_id in stripped_ids:
-        path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % stripped_id
-        response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-        if response.status_code == 403 or response.status_code == 404:
-            raise DataNotFoundException("GO-CAM model not found.")
-
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    gocam = ""
-    if stripped_ids:
-        for model in stripped_ids:
-            if gocam == "":
-                gocam = "<http://model.geneontology.org/" + model + "> "
-            else:
-                gocam = gocam + "<http://model.geneontology.org/" + model + "> "
-        query = (
-            """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-            PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
-            SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier; separator="@|@") as ?gpids)
-                            (GROUP_CONCAT(distinct ?name; separator="@|@") as ?gpnames)
-            WHERE
-            {
-                VALUES ?gocam { %s }
-
-                GRAPH ?gocam {
-                    ?s enabled_by: ?gpnode .
-                    ?gpnode rdf:type ?identifier .
-                    FILTER(?identifier != owl:NamedIndividual) .
-                }
-                optional {
-                    GRAPH <http://purl.obolibrary.org/obo/go/extensions/go-graphstore.owl> {
-                        ?identifier rdfs:label ?name
-                    }
-                }
-            }
-            GROUP BY ?gocam
-        """
-            % gocam
-        )
-    else:
-        query = """
-        PREFIX metago: <http://model.geneontology.org/>
-
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
-
-        SELECT ?gocam   (GROUP_CONCAT(distinct ?identifier; separator="@|@") as ?gpids)
-			        	(GROUP_CONCAT(distinct ?name; separator="@|@") as ?gpnames)
-
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?s enabled_by: ?gpnode .
-                ?gpnode rdf:type ?identifier .
-                FILTER(?identifier != owl:NamedIndividual) .
-                FILTER(!contains(str(?gocam), "_inferred"))
-            }
-            optional {
-                ?identifier rdfs:label ?name
-            }
-            BIND(IF(bound(?name), ?name, ?identifier) as ?name)
-        }
-        GROUP BY ?gocam
-        """
-    results = si._sparql_query(query)
-    results = transform_array(results, ["gpids", "gpnames"])
-    return results
+        model_data = await get_model_details_by_model_id_json(model_id)
+        gocam_id = model_data.get("id", "")
+        
+        individual_map = {}
+        for ind in model_data.get("individuals", []):
+            ind_id = ind.get("id", "")
+            for type_item in ind.get("type", []):
+                gp_id = type_item.get("id", "")
+                gp_label = type_item.get("label", "")
+                if gp_id and not any(gp_id.startswith(prefix) for prefix in EXCLUDED_PREFIXES):
+                    if ind_id not in individual_map:
+                        individual_map[ind_id] = []
+                    individual_map[ind_id].append({"id": gp_id, "label": gp_label})
+        
+        gene_products = {}
+        for fact in model_data.get("facts", []):
+            if fact.get("property") == "RO:0002333":
+                obj_id = fact.get("object", "")
+                if obj_id in individual_map:
+                    for gp in individual_map[obj_id]:
+                        gp_id = gp["id"]
+                        if gp_id not in gene_products:
+                            gene_products[gp_id] = gp["label"]
+        
+        if gene_products:
+            gpids = "@|@".join(gene_products.keys())
+            gpnames = "@|@".join(gene_products.values())
+            collated_results.append({
+                "gocam": gocam_id,
+                "gpids": gpids,
+                "gpnames": gpnames,
+            })
+    
+    if not collated_results:
+        raise DataNotFoundException("GO-CAM model not found.")
+    
+    return collated_results
 
 
 @router.get("/api/models/pmid", tags=["models"], description="Returns PMID details based on a GO CAM ID.")
@@ -240,22 +204,22 @@ async def get_pmid_by_model_id(
 ):
     """Returns pubmed details based on a GO CAM id."""
     import re
-    
+
     collated_results = []
-    
+
     for model_id in gocams:
         pmids = set()
-        
+
         model_data = await get_model_details_by_model_id_json(model_id)
         gocam_id = model_data.get("id", "")
-        
+
         for ann in model_data.get("annotations", []):
             value = ann.get("value", "")
             if "PMID" in value:
                 matches = re.findall(r"PMID:\s*\d+", value)
                 for match in matches:
                     pmids.add(match.replace(" ", ""))
-        
+
         for ind in model_data.get("individuals", []):
             for ann in ind.get("annotations", []):
                 if ann.get("key", "") == "source":
@@ -264,7 +228,7 @@ async def get_pmid_by_model_id(
                         matches = re.findall(r"PMID:\s*\d+", value)
                         for match in matches:
                             pmids.add(match.replace(" ", ""))
-        
+
         for fact in model_data.get("facts", []):
             for ann in fact.get("annotations", []):
                 if ann.get("key", "") == "source":
@@ -273,14 +237,14 @@ async def get_pmid_by_model_id(
                         matches = re.findall(r"PMID:\s*\d+", value)
                         for match in matches:
                             pmids.add(match.replace(" ", ""))
-        
+
         if pmids:
             sources = "@|@".join(sorted(pmids))
             collated_results.append({"gocam": gocam_id, "sources": sources})
-    
+
     if not collated_results:
         raise DataNotFoundException("GO-CAM model not found.")
-    
+
     return collated_results
 
 
@@ -327,41 +291,102 @@ async def get_term_details_by_model_id(
     )
 ):
     """Returns model details based on a GO-CAM model ID."""
-    if id.startswith("gomodel:"):
-        replaced_id = id.replace("gomodel:", "")
-    else:
-        replaced_id = id
-
-    path_to_s3 = "https://go-public.s3.amazonaws.com/files/go-cam/%s.json" % replaced_id
-    response = requests.get(path_to_s3, timeout=30, headers={"User-Agent": USER_AGENT})
-    if response.status_code == 403 or response.status_code == 404:
-        raise DataNotFoundException("GO-CAM model not found.")
-
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = (
-        """
-        PREFIX metago: <http://model.geneontology.org/>
-
-        SELECT ?subject ?predicate ?object
-        WHERE
-        {
-            GRAPH metago:%s {
-                ?subject ?predicate ?object
-            }
-        }
-    """
-        % id
-    )
-    results = si._sparql_query(query)
+    model_data = await get_model_details_by_model_id_json(id)
+    
     collated_results = []
-    for result in results:
-        collated = {
-            "subject": result["subject"].get("value"),
-            "predicate": result["predicate"].get("value"),
-            "object": result["object"].get("value"),
-        }
-        collated_results.append(collated)
+    
+    model_id = model_data.get("id", "")
+    
+    for ind in model_data.get("individuals", []):
+        ind_id = ind.get("id", "")
+        
+        for type_item in ind.get("type", []):
+            collated_results.append({
+                "subject": ind_id,
+                "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                "object": type_item.get("id", ""),
+            })
+        
+        for ann in ind.get("annotations", []):
+            key = ann.get("key", "")
+            value = ann.get("value", "")
+            if key == "contributor":
+                predicate = "http://purl.org/dc/elements/1.1/contributor"
+            elif key == "date":
+                predicate = "http://purl.org/dc/elements/1.1/date"
+            elif key == "source":
+                predicate = "http://purl.org/dc/elements/1.1/source"
+            elif key == "providedBy":
+                predicate = "http://purl.org/pav/providedBy"
+            elif key == "with":
+                predicate = "http://geneontology.org/lego/evidence-with"
+            else:
+                predicate = f"http://geneontology.org/lego/{key}"
+            
+            collated_results.append({
+                "subject": ind_id,
+                "predicate": predicate,
+                "object": value,
+            })
+    
+    for fact in model_data.get("facts", []):
+        subject = fact.get("subject", "")
+        prop = fact.get("property", "")
+        obj = fact.get("object", "")
+        
+        if prop:
+            prop_iri = f"http://purl.obolibrary.org/obo/{prop.replace(':', '_')}" if ":" in prop else prop
+            collated_results.append({
+                "subject": subject,
+                "predicate": prop_iri,
+                "object": obj,
+            })
+        
+        for ann in fact.get("annotations", []):
+            key = ann.get("key", "")
+            value = ann.get("value", "")
+            fact_id = f"{subject}-{prop}-{obj}"
+            
+            if key == "contributor":
+                predicate = "http://purl.org/dc/elements/1.1/contributor"
+            elif key == "date":
+                predicate = "http://purl.org/dc/elements/1.1/date"
+            elif key == "source":
+                predicate = "http://purl.org/dc/elements/1.1/source"
+            elif key == "providedBy":
+                predicate = "http://purl.org/pav/providedBy"
+            else:
+                predicate = f"http://geneontology.org/lego/{key}"
+            
+            collated_results.append({
+                "subject": fact_id,
+                "predicate": predicate,
+                "object": value,
+            })
+    
+    for ann in model_data.get("annotations", []):
+        key = ann.get("key", "")
+        value = ann.get("value", "")
+        
+        if key == "title":
+            predicate = "http://purl.org/dc/elements/1.1/title"
+        elif key == "contributor":
+            predicate = "http://purl.org/dc/elements/1.1/contributor"
+        elif key == "date":
+            predicate = "http://purl.org/dc/elements/1.1/date"
+        elif key == "providedBy":
+            predicate = "http://purl.org/pav/providedBy"
+        elif key == "state":
+            predicate = "http://geneontology.org/lego/modelstate"
+        else:
+            predicate = f"http://geneontology.org/lego/{key}"
+        
+        collated_results.append({
+            "subject": model_id,
+            "predicate": predicate,
+            "object": value,
+        })
+    
     return collated_results
 
 
