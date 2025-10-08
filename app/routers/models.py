@@ -151,13 +151,13 @@ async def get_geneproducts_by_model_id(
     :return: gene product details based on a GO-CAM model ID.
     """
     EXCLUDED_PREFIXES = ("GO:", "ECO:", "CHEBI:", "gomodel:")
-    
+
     collated_results = []
-    
+
     for model_id in gocams:
         model_data = await get_model_details_by_model_id_json(model_id)
         gocam_id = model_data.get("id", "")
-        
+
         individual_map = {}
         for ind in model_data.get("individuals", []):
             ind_id = ind.get("id", "")
@@ -168,7 +168,7 @@ async def get_geneproducts_by_model_id(
                     if ind_id not in individual_map:
                         individual_map[ind_id] = []
                     individual_map[ind_id].append({"id": gp_id, "label": gp_label})
-        
+
         gene_products = {}
         for fact in model_data.get("facts", []):
             if fact.get("property") == "RO:0002333":
@@ -178,7 +178,7 @@ async def get_geneproducts_by_model_id(
                         gp_id = gp["id"]
                         if gp_id not in gene_products:
                             gene_products[gp_id] = gp["label"]
-        
+
         if gene_products:
             gpids = "@|@".join(gene_products.keys())
             gpnames = "@|@".join(gene_products.values())
@@ -187,10 +187,10 @@ async def get_geneproducts_by_model_id(
                 "gpids": gpids,
                 "gpnames": gpnames,
             })
-    
+
     if not collated_results:
         raise DataNotFoundException("GO-CAM model not found.")
-    
+
     return collated_results
 
 
@@ -292,21 +292,21 @@ async def get_term_details_by_model_id(
 ):
     """Returns model details based on a GO-CAM model ID."""
     model_data = await get_model_details_by_model_id_json(id)
-    
+
     collated_results = []
-    
+
     model_id = model_data.get("id", "")
-    
+
     for ind in model_data.get("individuals", []):
         ind_id = ind.get("id", "")
-        
+
         for type_item in ind.get("type", []):
             collated_results.append({
                 "subject": ind_id,
                 "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                 "object": type_item.get("id", ""),
             })
-        
+
         for ann in ind.get("annotations", []):
             key = ann.get("key", "")
             value = ann.get("value", "")
@@ -322,18 +322,18 @@ async def get_term_details_by_model_id(
                 predicate = "http://geneontology.org/lego/evidence-with"
             else:
                 predicate = f"http://geneontology.org/lego/{key}"
-            
+
             collated_results.append({
                 "subject": ind_id,
                 "predicate": predicate,
                 "object": value,
             })
-    
+
     for fact in model_data.get("facts", []):
         subject = fact.get("subject", "")
         prop = fact.get("property", "")
         obj = fact.get("object", "")
-        
+
         if prop:
             prop_iri = f"http://purl.obolibrary.org/obo/{prop.replace(':', '_')}" if ":" in prop else prop
             collated_results.append({
@@ -341,12 +341,12 @@ async def get_term_details_by_model_id(
                 "predicate": prop_iri,
                 "object": obj,
             })
-        
+
         for ann in fact.get("annotations", []):
             key = ann.get("key", "")
             value = ann.get("value", "")
             fact_id = f"{subject}-{prop}-{obj}"
-            
+
             if key == "contributor":
                 predicate = "http://purl.org/dc/elements/1.1/contributor"
             elif key == "date":
@@ -357,17 +357,17 @@ async def get_term_details_by_model_id(
                 predicate = "http://purl.org/pav/providedBy"
             else:
                 predicate = f"http://geneontology.org/lego/{key}"
-            
+
             collated_results.append({
                 "subject": fact_id,
                 "predicate": predicate,
                 "object": value,
             })
-    
+
     for ann in model_data.get("annotations", []):
         key = ann.get("key", "")
         value = ann.get("value", "")
-        
+
         if key == "title":
             predicate = "http://purl.org/dc/elements/1.1/title"
         elif key == "contributor":
@@ -380,13 +380,13 @@ async def get_term_details_by_model_id(
             predicate = "http://geneontology.org/lego/modelstate"
         else:
             predicate = f"http://geneontology.org/lego/{key}"
-        
+
         collated_results.append({
             "subject": model_id,
             "predicate": predicate,
             "object": value,
         })
-    
+
     return collated_results
 
 
@@ -406,81 +406,22 @@ async def get_term_details_by_taxon_id(
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
 
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    final_taxon = "http://purl.obolibrary.org/obo/"
-    if taxon.startswith("NCBITaxon:"):
-        new_taxon = taxon.replace("NCBITaxon:", "NCBITaxon_")
-        final_taxon = final_taxon + new_taxon
-    query = (
-        """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-            PREFIX in_taxon: <http://purl.obolibrary.org/obo/RO_0002162>
-            PREFIX pav: <http://purl.org/pav/>
-            PREFIX prov: <http://www.w3.org/ns/prov#>
-            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-            PREFIX biolink: <https://w3id.org/biolink/vocab/>
+    from app.utils.settings import get_index_files
 
-            SELECT ?gocam
+    taxon_index = get_index_files("gocam_taxon_index_file")
 
-            WHERE
-                {
-                    ?gocam rdf:type owl:Ontology ;
-                    biolink:in_taxon <%s> ;
+    if taxon not in taxon_index:
+        return []
 
-                }
-    """
-        % final_taxon
-    )
-    results = si._sparql_query(query)
+    model_ids = taxon_index[taxon]
     collated_results = []
-    for result in results:
-        collated = {"gocam": result["gocam"].get("value")}
-        collated_results.append(collated)
+    for model_id in model_ids:
+        gocam_iri = f"http://model.geneontology.org/{model_id}"
+        collated_results.append({"gocam": gocam_iri})
+
     return collated_results
 
 
-@router.get(
-    "/api/pmid/{id}/models",
-    tags=["models"],
-    description="Returns models for a given publication identifier (PMID).",
-)
-async def get_model_details_by_pmid(
-    id: str = Path(..., description="A publication identifier (PMID)" " (e.g. 15314168 or 26954676)")
-):
-    """Returns models for a given publication identifier (PMID)."""
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-
-    query = (
-        """
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        SELECT distinct ?gocam
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?s dc:source ?source .
-                BIND(REPLACE(?source, " ", "") AS ?source) .
-                FILTER((CONTAINS(?source, \""""
-        + id
-        + """\")))
-            }
-        }
-    """
-    )
-    results = si._sparql_query(query)
-    collated_results = []
-    collated = {}
-    for result in results:
-        collated["gocam"] = result["gocam"].get("value")
-        collated_results.append(collated)
-    if not collated_results:
-        return DataNotFoundException(detail=f"Item with ID {id} not found")
-    return results
 
 
 @router.get("/api/users/{orcid}/models", tags=["models"])

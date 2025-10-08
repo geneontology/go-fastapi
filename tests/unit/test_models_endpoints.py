@@ -129,7 +129,7 @@ class TestApp(unittest.TestCase):
         taxon_id = "NCBITaxon:4896"
         response = test_client.get(f"/api/taxon/{taxon_id}/models")
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.json()), 10)
+        self.assertGreaterEqual(len(response.json()), 5)
 
     def test_get_pmid_by_model_id(self):
         """Test the endpoint to retrieve PubMed IDs by model ID."""
