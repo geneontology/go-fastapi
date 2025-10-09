@@ -450,29 +450,43 @@ async def get_gocam_models_by_go_id(
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
 
+    import asyncio
+    import httpx
+    from app.utils.settings import get_index_files, get_user_agent
+
+    entity_index = get_index_files("gocam_entity_index_file")
+
     cmaps = get_prefixes("go")
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
-    id = converter.expand(id)
-    query = (
-        """
-        PREFIX metago: <http://model.geneontology.org/>
-        SELECT distinct ?gocam ?title
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?entity rdf:type owl:NamedIndividual .
-                ?entity rdf:type ?goid .
-                ?gocam dc:title ?title .
-                FILTER(?goid = <%s>)
-            }
-        }
-    """
-        % id
-    )
-    logger.info(query)
-    results = si._sparql_query(query)
-    transformed_results = transform_array(results)
-    return transformed_results
+    id_iri = converter.expand(id)
+
+    model_ids = set()
+    if id in entity_index:
+        model_ids.update(entity_index[id])
+    if id_iri in entity_index:
+        model_ids.update(entity_index[id_iri])
+
+    if not model_ids:
+        return []
+
+    async def fetch_model_title(client, model_id):
+        path_to_s3 = f"https://go-public.s3.amazonaws.com/files/go-cam/{model_id}.json"
+        try:
+            response = await client.get(path_to_s3, timeout=30.0)
+            if response.status_code == 200:
+                data = response.json()
+                title = ""
+                for ann in data.get("annotations", []):
+                    if ann.get("key") == "title":
+                        title = ann.get("value", "")
+                        break
+                return {"gocam": f"http://model.geneontology.org/{model_id}", "title": title}
+        except Exception:
+            pass
+        return {"gocam": f"http://model.geneontology.org/{model_id}", "title": ""}
+
+    async with httpx.AsyncClient(headers={"User-Agent": get_user_agent()}) as client:
+        tasks = [fetch_model_title(client, model_id) for model_id in sorted(model_ids)]
+        collated_results = await asyncio.gather(*tasks)
+
+    return collated_results
