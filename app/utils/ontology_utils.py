@@ -45,24 +45,30 @@ def batch_fetch_labels(ids):
 
 def goont_fetch_label(id):
     """
-    Fetch all rdfs:label assertions for a URI.
+    Fetch label for a given ID using GOLR.
 
-    :param id: The URI for which the label is to be fetched.
+    :param id: The ID for which the label is to be fetched.
     :type id: str
-    :return: List of labels for the given URI.
-    :rtype: list
+    :return: Label for the given ID.
+    :rtype: str
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
-    iri = ns.uri_for(id)
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
-    bindings = si._sparql_query(query.query_str())
-    if not bindings:
-        return None
-    rows = [r["label"]["value"] for r in bindings]
-    return rows[0]
+    try:
+        fields = "annotation_class_label,bioentity_label"
+        doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+        if doc and doc.get("annotation_class_label"):
+            return doc.get("annotation_class_label")
+    except Exception:
+        pass
+    
+    try:
+        fields = "bioentity_label"
+        doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, fields)
+        if doc and doc.get("bioentity_label"):
+            return doc.get("bioentity_label")
+    except Exception:
+        pass
+    
+    return None
 
 
 def get_ontology_subsets_by_id(id: str):
