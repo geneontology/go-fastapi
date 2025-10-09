@@ -217,8 +217,8 @@ async def get_ancestors_shared_between_two_terms(
         raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Validation failed, continuing anyway: {e}")
 
     fields = "isa_partof_closure,isa_partof_closure_label"
     logger.info(relation)
