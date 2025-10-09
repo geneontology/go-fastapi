@@ -1,9 +1,6 @@
 solr_url:
   url: "https://golr.geneontology.org/solr/"
   timeout: 30
-sparql_url:
-  url: "https://rdf.geneontology.org/blazegraph/sparql"
-  timeout: 30
 ontologies:
   - id: go
     handle: go
