@@ -53,17 +53,17 @@ def goont_fetch_label(id):
         doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
         if doc and doc.get("annotation_class_label"):
             return doc.get("annotation_class_label")
-    except Exception:
-        pass
-    
+    except Exception as e:
+        logger.error(f"Failed to fetch label from ONTOLOGY for {id}: {e}")
+
     try:
         fields = "bioentity_label"
         doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, fields)
         if doc and doc.get("bioentity_label"):
             return doc.get("bioentity_label")
-    except Exception:
-        pass
-    
+    except Exception as e:
+        logger.error(f"Failed to fetch label from BIOENTITY for {id}: {e}")
+
     return None
 
 

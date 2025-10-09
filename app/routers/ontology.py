@@ -14,6 +14,7 @@ from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdent
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
+
 logger = logging.getLogger()
 
 
@@ -395,14 +396,16 @@ async def get_go_hierarchy_go_id(
 
     query_term_iri = converter.expand(id)
 
-    for i, (parent_id, parent_label) in enumerate(
-        zip(doc.get("isa_partof_closure", []), doc.get("isa_partof_closure_label", []))
+    for parent_id, parent_label in zip(
+        doc.get("isa_partof_closure", []), doc.get("isa_partof_closure_label", []), strict=False
     ):
         if parent_id != id:
             parent_iri = converter.expand(parent_id)
             collated_results.append({"GO": parent_iri, "label": parent_label, "hierarchy": "parent"})
 
-    collated_results.append({"GO": query_term_iri, "label": doc.get("annotation_class_label", ""), "hierarchy": "query"})
+    collated_results.append(
+        {"GO": query_term_iri, "label": doc.get("annotation_class_label", ""), "hierarchy": "query"}
+    )
 
     query_filters = ""
     where_statement = "*:*&fq=isa_partof_closure:" + '"' + id + '"'
@@ -447,7 +450,9 @@ async def get_gocam_models_by_go_id(
         raise InvalidIdentifier(detail=str(e)) from e
 
     import asyncio
+
     import httpx
+
     from app.utils.settings import get_index_files, get_user_agent
 
     entity_index = get_index_files("gocam_entity_index_file")
@@ -477,8 +482,8 @@ async def get_gocam_models_by_go_id(
                         title = ann.get("value", "")
                         break
                 return {"gocam": f"http://model.geneontology.org/{model_id}", "title": title}
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to fetch model title for {model_id}: {e}")
         return {"gocam": f"http://model.geneontology.org/{model_id}", "title": ""}
 
     async with httpx.AsyncClient(headers={"User-Agent": get_user_agent()}) as client:

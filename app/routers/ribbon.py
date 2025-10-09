@@ -42,15 +42,15 @@ async def get_subsets_by_term(
 
     fields = "subset"
     doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
-    
+
     subsets = doc.get("subset", [])
     if not subsets:
         return []
-    
+
     results = []
     for subset in subsets:
         results.append({"subset": subset, "label": ""})
-    
+
     return results
 
 

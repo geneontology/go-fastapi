@@ -1,6 +1,8 @@
 """The users and groups endpoints."""
 import logging
+
 from fastapi import APIRouter, Path
+
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.settings import get_index_files, get_user_agent
 

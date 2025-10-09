@@ -18,7 +18,8 @@ logger = logging.getLogger()
 
 
 def get_index_files(file_key: str = None) -> dict:
-    """Retrieve JSON index file(s) from either a URL or local path.
+    """
+    Retrieve JSON index file(s) from either a URL or local path.
 
     Automatically detects whether the configured path is a URL (http/https) or local file path.
     For URLs, download the file using the configured timeout.
