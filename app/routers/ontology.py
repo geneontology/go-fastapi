@@ -7,17 +7,13 @@ from typing import List
 
 from curies import Converter
 from fastapi import APIRouter, Path, Query
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
 from pydantic import BaseModel
 
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
-from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
-from app.utils.sparql_utils import transform, transform_array
-
+from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 logger = logging.getLogger()
 
 
@@ -314,7 +310,7 @@ async def get_go_term_detail_by_go_id(
 
     :param id: A GO-Term CURIE (e.g. GO:0008150)
     :return: GO term metadata including goid, label, definition, synonyms, alternativeIds, xrefs, subsets
-    
+
     Note: This endpoint was migrated from the GO-CAM service API and may not be
     supported in its current form in the future.
     """
