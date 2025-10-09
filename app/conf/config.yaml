@@ -5,9 +5,6 @@ ontologies:
   - id: go
     handle: go
     pre_load: false
-sparql_url:
-  url: "https://rdf.geneontology.org/sparql"
-  timeout: 60
 gocam_provided_by_index_file:
     #url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/providedBy_index.json"
     timeout: 30
