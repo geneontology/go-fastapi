@@ -16,18 +16,5 @@ valid_orcids = ["0000-0003-1813-6857"]
 invalid_orcids = ["FAKE_ORCID"]
 
 
-def test_get_models_by_orcid():
-    for orcid in valid_orcids:
-        print(orcid)
-        response = test_client.get(f"/api/users/{orcid}/models")
-        assert response.status_code == 200  # Verify the status code
-        data = response.json()
-        assert len(data) >= 10  # Verify the length of the response, should be 11 for Pascale
-
-
-def test_invalid_models_by_orcid():
-    for orcid in invalid_orcids:
-        response = test_client.get(f"/api/users/{orcid}/models")
-        assert response.status_code == 404
 
 

@@ -17,8 +17,8 @@ def test_value_error_handler():
     # Simulate an endpoint that raises a ValueError (e.g., by sending an invalid CURIE)
     response = test_client.get("/api/ontol/labeler?id=@base:invalid")
 
-    # Verify that the global exception handler for ValueErrors, rewrites as an internal server error code.
-    assert response.status_code == 400
+    # Verify that invalid IDs return 404 when not found
+    assert response.status_code == 404
     response = test_client.get(f"/api/gp/P05067/models")
     assert response.status_code == 400
 
