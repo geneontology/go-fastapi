@@ -90,6 +90,7 @@ def gu_run_solr_text_on(
 
     try:
         response = requests.get(query, timeout=timeout_seconds)
+        response.raise_for_status()
 
         # solr returns matching text in the field "highlighting", but it is not included in the response.
         # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document
@@ -113,9 +114,14 @@ def gu_run_solr_text_on(
             return return_doc
             # Process the response here
     except requests.Timeout:
-        logger.info("Request timed out")
+        logger.error("Request timed out")
+        return []
+    except requests.exceptions.JSONDecodeError as e:
+        logger.error(f"Request error: {e}")
+        return []
     except requests.RequestException as e:
-        logger.info(f"Request error: {e}")
+        logger.error(f"Request error: {e}")
+        return []
 
 
 def is_valid_bioentity(entity_id) -> bool:
