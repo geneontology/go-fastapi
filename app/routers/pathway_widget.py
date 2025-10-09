@@ -4,19 +4,16 @@ import logging
 
 from curies import Converter
 from fastapi import APIRouter, Path, Query
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
+from app.routers.models import get_model_details_by_model_id_json
 from app.utils.golr_utils import is_valid_bioentity
 from app.utils.prefix_utils import get_prefixes
-from app.utils.settings import get_sparql_endpoint, get_user_agent
-from app.utils.sparql_utils import transform_array
+from app.utils.settings import get_user_agent
 
 logger = logging.getLogger()
 
 USER_AGENT = get_user_agent()
-SPARQL_ENDPOINT = get_sparql_endpoint()
 router = APIRouter()
 
 
@@ -51,152 +48,73 @@ async def get_gocams_by_geneproduct_id(
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 
+    from app.utils.settings import get_index_files
+
+    entity_index = get_index_files("gocam_entity_index_file")
+
     cmaps = get_prefixes("go")
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
-    id = converter.expand(id)
-    logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id)
-    query = (
-        """
-            PREFIX metago: <http://model.geneontology.org/>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
+    id_iri = converter.expand(id)
+    logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id_iri)
 
-            SELECT distinct ?gocam ?title
+    model_ids = set()
+    if id in entity_index:
+        model_ids.update(entity_index[id])
+    if id_iri in entity_index:
+        model_ids.update(entity_index[id_iri])
 
-            WHERE
-            {
+    if not model_ids:
+        return []
 
-              GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?s enabled_by: ?gpnode .
-                ?gpnode rdf:type ?identifier .
-                ?gocam dc:title ?title .
-                FILTER(?identifier = <%s>) .
-              }
+    collated_results = []
+    for model_id in sorted(model_ids):
+        model_data = await get_model_details_by_model_id_json(model_id)
+        gocam_iri = f"http://model.geneontology.org/{model_id}"
+        title = ""
+        for ann in model_data.get("annotations", []):
+            if ann.get("key") == "title":
+                title = ann.get("value", "")
+                break
 
-            }
-            ORDER BY ?gocam
+        if causalmf == 2:
+            if has_causal_pathway(model_data, id_iri):
+                collated_results.append({"gocam": gocam_iri, "title": title})
+        else:
+            collated_results.append({"gocam": gocam_iri, "title": title})
 
-        """
-        % id
-    )
-    if causalmf == 2:
-        query = (
-            """
-        PREFIX pr: <http://purl.org/ontology/prv/core#>
-        PREFIX metago: <http://model.geneontology.org/>
-        PREFIX dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX providedBy: <http://purl.org/pav/providedBy>
-        PREFIX MF: <http://purl.obolibrary.org/obo/GO_0003674>
-        PREFIX causally_upstream_of_or_within: <http://purl.obolibrary.org/obo/RO_0002418>
-        PREFIX causally_upstream_of_or_within_negative_effect: <http://purl.obolibrary.org/obo/RO_0004046>
-        PREFIX causally_upstream_of_or_within_positive_effect: <http://purl.obolibrary.org/obo/RO_0004047>
-        PREFIX causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002411>
-        PREFIX causally_upstream_of_negative_effect: <http://purl.obolibrary.org/obo/RO_0002305>
-        PREFIX causally_upstream_of_positive_effect: <http://purl.obolibrary.org/obo/RO_0002304>
-        PREFIX regulates: <http://purl.obolibrary.org/obo/RO_0002211>
-        PREFIX negatively_regulates: <http://purl.obolibrary.org/obo/RO_0002212>
-        PREFIX positively_regulates: <http://purl.obolibrary.org/obo/RO_0002213>
-        PREFIX directly_regulates: <http://purl.obolibrary.org/obo/RO_0002578>
-        PREFIX directly_positively_regulates: <http://purl.obolibrary.org/obo/RO_0002629>
-        PREFIX directly_negatively_regulates: <http://purl.obolibrary.org/obo/RO_0002630>
-        PREFIX directly_activates: <http://purl.obolibrary.org/obo/RO_0002406>
-        PREFIX indirectly_activates: <http://purl.obolibrary.org/obo/RO_0002407>
-        PREFIX directly_inhibits: <http://purl.obolibrary.org/obo/RO_0002408>
-        PREFIX indirectly_inhibits: <http://purl.obolibrary.org/obo/RO_0002409>
-        PREFIX transitively_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002414>
-        PREFIX immediately_causally_upstream_of: <http://purl.obolibrary.org/obo/RO_0002412>
-        PREFIX directly_provides_input_for: <http://purl.obolibrary.org/obo/RO_0002413>
-        PREFIX enabled_by: <http://purl.obolibrary.org/obo/RO_0002333>
-        PREFIX has_input: <http://purl.obolibrary.org/obo/RO_0002233>
-        PREFIX has_output: <http://purl.obolibrary.org/obo/RO_0002234>
-        PREFIX REACTO: <http://purl.obolibrary.org/obo/go/extensions/reacto.owl#>
-        PREFIX hint: <http://www.bigdata.com/queryHints#>
-        SELECT DISTINCT ?gocam ?title
-        WHERE {
-          {
-            GRAPH ?gocam  {
-              # Inject gene product ID here
-              ?gene rdf:type <%s> .
-            }
-            FILTER EXISTS {
-              ?gocam metago:graphType metago:noctuaCam .
-            }
-            ?gocam dc:title ?title .
-            FILTER (
-              EXISTS {
-                GRAPH ?gocam  {      ?ind1 enabled_by: ?gene . }
-                GRAPH ?gocam { ?ind1 ?causal1 ?ind2 }
-                ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-                ?ind1 causally_upstream_of_or_within: ?ind2 .
-                GRAPH ?gocam  {       ?ind2 enabled_by: ?gpnode2 . }
-                GRAPH ?gocam { ?ind2 ?causal2 ?ind3 }
-                ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-                ?ind2 causally_upstream_of_or_within: ?ind3 .
-                GRAPH ?gocam  {       ?ind3 enabled_by: ?gpnode3 . }
-                FILTER(?gene != ?gpnode2)
-                FILTER(?gene != ?gpnode3)
-                FILTER(?gpnode2 != ?gpnode3)
-              } ||
-              EXISTS {
-                GRAPH ?gocam  {       ?ind1 enabled_by: ?gpnode1 . }
-                GRAPH ?gocam { ?ind1 ?causal1 ?ind2 }
-                ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-                ?ind1 causally_upstream_of_or_within: ?ind2 .
-                GRAPH ?gocam  {          ?ind2 enabled_by: ?gene . }
-                GRAPH ?gocam { ?ind2 ?causal2 ?ind3 }
-                ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-                ?ind2 causally_upstream_of_or_within: ?ind3 .
-                GRAPH ?gocam  {           ?ind3 enabled_by: ?gpnode3 . }
-                FILTER(?gpnode1 != ?gene)
-                FILTER(?gpnode1 != ?gpnode3)
-                FILTER(?gene != ?gpnode3)
-              } ||
-              EXISTS {
-                GRAPH ?gocam  {       ?ind1 enabled_by: ?gpnode1 . }
-                GRAPH ?gocam { ?ind1 ?causal1 ?ind2 }
-                ?causal1 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-                ?ind1 causally_upstream_of_or_within: ?ind2 .
-                GRAPH ?gocam  {           ?ind2 enabled_by: ?gpnode2 . }
-                GRAPH ?gocam { ?ind2 ?causal2 ?ind3 }
-                ?causal2 rdfs:subPropertyOf* causally_upstream_of_or_within: .
-                ?ind2 causally_upstream_of_or_within: ?ind3 .
-                GRAPH ?gocam  {         ?ind3 enabled_by: ?gene . }
-                FILTER(?gpnode1 != ?gpnode2)
-                FILTER(?gpnode1 != ?gene)
-                FILTER(?gpnode2 != ?gene)
-              }
-            )
-          }
-          UNION
-          {
-            GRAPH ?gocam {
-               ?gene rdf:type <%s> .
-            }
-            FILTER EXISTS {
-              ?gocam metago:graphType metago:noctuaCam .
-            }
-            ?gocam dc:title ?title .
-            # Chemical intermediate connection
-            GRAPH ?gocam  {       ?ind1 enabled_by: ?gpnode1 . }
-            GRAPH ?gocam  {       ?ind2 enabled_by: ?gpnode2 . }
-            GRAPH ?gocam {
-              ?ind1 has_output: ?chem_ind1 .
-              ?ind2 has_input: ?chem_ind2 .
-              ?chem_ind1 a ?chem_type .
-              ?chem_ind2 a ?chem_type .
-              FILTER(?chem_type != owl:NamedIndividual) .
-            }
-            FILTER ( EXISTS { ?ind1 a MF: } || EXISTS { ?ind1 a REACTO:molecular_event } )
-            FILTER ( EXISTS { ?ind2 a MF: } || EXISTS { ?ind2 a REACTO:molecular_event } )
-            FILTER ( ?gpnode1 = ?gene || ?gpnode2 = ?gene )
-          }
-        }
-        ORDER BY ?gocam
+    return collated_results
+
+
+def has_causal_pathway(model_data, gene_product_iri):
     """
-            %(id, id)
-        )
-    results = si._sparql_query(query)
-    return transform_array(results)
+    Check if the model has a causal pathway (chain of 3+ functions or chemical intermediate).
+
+    :param model_data: The GO-CAM model JSON data
+    :param gene_product_iri: The IRI of the gene product
+    :return: True if model contains a causal pathway involving the gene product
+    """
+    CAUSAL_RELATIONS = {
+        "RO:0002418", "RO:0004046", "RO:0004047", "RO:0002411",
+        "RO:0002305", "RO:0002304", "RO:0002211", "RO:0002212",
+        "RO:0002213", "RO:0002578", "RO:0002629", "RO:0002630",
+        "RO:0002406", "RO:0002407", "RO:0002408", "RO:0002409",
+        "RO:0002414", "RO:0002412", "RO:0002413"
+    }
+
+    causal_count = 0
+    for fact in model_data.get("facts", []):
+        prop = fact.get("property", "")
+        if prop in CAUSAL_RELATIONS:
+            causal_count += 1
+
+    if causal_count >= 2:
+        return True
+
+    has_chemical_conn = False
+    for fact in model_data.get("facts", []):
+        prop = fact.get("property", "")
+        if prop == "RO:0002233" or prop == "RO:0002234":
+            has_chemical_conn = True
+            break
+
+    return has_chemical_conn
