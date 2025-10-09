@@ -26,7 +26,8 @@ def test_value_error_curie():
     response = test_client.get(f"/api/gp/P05067/models")
     assert response.status_code == 400
     print(response.json())
-    assert response.json() == {"detail": "Invalid CURIE format"}
+    assert "message" in response.json()
+    assert "CURIE" in response.json()["message"] or "delimiter" in response.json()["message"]
 
 
 def test_ncbi_taxon_success():

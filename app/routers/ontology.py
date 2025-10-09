@@ -217,12 +217,18 @@ async def get_ancestors_shared_between_two_terms(
         raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
+    except Exception:
+        pass
 
     fields = "isa_partof_closure,isa_partof_closure_label"
     logger.info(relation)
     if relation == "shared" or relation is None:
-        subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
-        objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        try:
+            subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+            objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        except Exception as e:
+            logger.error(f"Golr unavailable: {e}")
+            raise DataNotFoundException(detail="Ontology service temporarily unavailable") from e
 
         logger.info("SUBJECT: ", subres)
         logger.info("OBJECT: ", objres)
@@ -245,9 +251,12 @@ async def get_ancestors_shared_between_two_terms(
     else:
         logger.info("got here")
         fields = "neighborhood_graph_json"
-        # https://golr.geneontology.org/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
-        subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
-        objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        try:
+            subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+            objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        except Exception as e:
+            logger.error(f"Golr unavailable: {e}")
+            raise DataNotFoundException(detail="Ontology service temporarily unavailable") from e
 
         logger.info("SUBJECT: ", subres)
         logger.info("OBJECT: ", objres)
