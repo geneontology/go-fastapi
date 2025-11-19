@@ -1,19 +1,20 @@
-c"""Wrappers for external library functions that need rate limiting."""
+"""Wrappers for external library functions that need rate limiting."""
 
 import time
 from typing import Any, Dict, List, Optional
-from ontobio.golr.golr_associations import search_associations as _search_associations
-from ontobio.golr.golr_associations import map2slim as _map2slim
 
+from ontobio.golr.golr_associations import map2slim as _map2slim
+from ontobio.golr.golr_associations import search_associations as _search_associations
+
+from app.utils.network_utils import get_network_info
 from app.utils.rate_limiter import rate_limit_golr
 from app.utils.settings import logger
-from app.utils.network_utils import get_network_info
 
 
 def retry_on_golr_server_error(max_retries=3, delay=2):
     """
     Decorator to retry ontobio GOLr calls on server errors.
-    
+
     :param max_retries: Maximum number of retry attempts
     :param delay: Delay in seconds between retries
     :return: Decorated function
@@ -27,16 +28,19 @@ def retry_on_golr_server_error(max_retries=3, delay=2):
                 except Exception as e:
                     error_str = str(e)
                     error_type = type(e).__name__
-                    
+
                     # Check for server errors in the error message
-                    server_errors = ['502', '522', '503', '504', '400', 'bad gateway', 'server error', 
+                    server_errors = ['502', '522', '503', '504', '400', 'bad gateway', 'server error',
                                    'connection', 'timeout', 'solrerror', 'read timeout', 'readtimeout',
                                    'timed out']
-                    
+
                     if any(err in error_str.lower() for err in server_errors) or \
                        'solrerror' in error_type.lower():
                         last_exception = e
-                        logger.info(f"GOLr server error on attempt {attempt + 1}/{max_retries}: {error_type}: {error_str}")
+                        logger.info(
+                            f"GOLr server error on attempt {attempt + 1}/{max_retries}: "
+                            f"{error_type}: {error_str}"
+                        )
                         if attempt == 0:  # Log network info on first failure
                             network_info = get_network_info()
                             logger.info(f"Network diagnostics: {network_info}")
@@ -76,7 +80,7 @@ def search_associations(
 ) -> Dict[str, Any]:
     """
     Rate-limited wrapper for ontobio's search_associations function.
-    
+
     This wrapper adds rate limiting to prevent hitting GOLr API limits.
     All parameters are passed through to the original function.
     """
@@ -117,7 +121,7 @@ def map2slim(
 ) -> List[Dict[str, Any]]:
     """
     Rate-limited wrapper for ontobio's map2slim function.
-    
+
     This wrapper adds rate limiting to prevent hitting GOLr API limits.
     All parameters are passed through to the original function.
     """

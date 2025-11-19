@@ -1,21 +1,21 @@
 """golr utils."""
 
-from zipfile import error
 import time
+from zipfile import error
 
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.routers.slimmer import gene_to_uniprot_from_mygene
-from app.utils.settings import ESOLR, ESOLRDoc, logger
-from app.utils.rate_limiter import rate_limit_golr
 from app.utils.network_utils import get_network_info
+from app.utils.rate_limiter import rate_limit_golr
+from app.utils.settings import ESOLR, ESOLRDoc, logger
 
 
 def retry_on_server_error(max_retries=3, delay=2):
     """
     Decorator to retry GOLr calls on server errors.
-    
+
     :param max_retries: Maximum number of retry attempts
     :param delay: Delay in seconds between retries
     :return: Decorated function
@@ -28,12 +28,12 @@ def retry_on_server_error(max_retries=3, delay=2):
                     return func(*args, **kwargs)
                 except Exception as e:
                     error_str = str(e)
-                    
+
                     # Check for server errors in the error message
-                    server_errors = ['502', '522', '503', '504', '400', 'bad gateway', 'server error', 
+                    server_errors = ['502', '522', '503', '504', '400', 'bad gateway', 'server error',
                                    'connection', 'timeout', 'read timeout', 'readtimeout',
                                    'timed out']
-                    
+
                     if any(err in error_str.lower() for err in server_errors):
                         last_exception = e
                         logger.info(f"GOLr server error on attempt {attempt + 1}/{max_retries}: {error_str}")
