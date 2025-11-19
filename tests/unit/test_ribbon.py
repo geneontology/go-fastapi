@@ -67,6 +67,23 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 165)
             self.assertTrue(subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations") >= 38)
         self.assertTrue(response.status_code == 200)
+    
+    def test_human_pcna_ribbon(self):
+        """Test the ontology ribbon for human PCNA (HGNC:8729)."""
+        data = {"subset": "goslim_agr", "subject": ["HGNC:8729"]}
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.json().get("subjects")) > 0)
+        for subject in response.json().get("subjects"):
+            self.assertEqual(subject.get("label"), "PCNA")
+            self.assertEqual(subject.get("taxon_label"), "Homo sapiens")
+            self.assertTrue(subject.get("groups").get("GO:0003674"))
+            self.assertTrue(subject.get("groups").get("GO:0008150"))
+            self.assertTrue(subject.get("groups").get("GO:0005575"))
+            # Check that we have annotations in these categories
+            self.assertGreater(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 0)
+            self.assertGreater(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 0)
+            self.assertGreater(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 0)
 
     def test_sars_cov2_ribbon(self):
         """Test sars_cov2_ribbon."""
