@@ -22,7 +22,6 @@ logger = logging.getLogger()
 
 
 class RelationshipType(str, Enum):
-
     """Relationship type for slimmer."""
 
     acts_upstream_of_or_within = ACTS_UPSTREAM_OF_OR_WITHIN
@@ -57,10 +56,15 @@ async def slimmer_function(
     slimmer_subjects = []
     for s in subject:
         if "HGNC:" in s or "NCBIGene:" in s or "ENSEMBL:" in s:
-            prots = gene_to_uniprot_from_mygene(s)
-            if len(prots) == 0:
-                prots = [s]
-            slimmer_subjects += prots
+            try:
+                prots = gene_to_uniprot_from_mygene(s)
+                if len(prots) == 0:
+                    prots = [s]
+                slimmer_subjects += prots
+            except DataNotFoundException:
+                # If no UniProt IDs found for the gene, use the original identifier
+                logger.info("No UniProt IDs found for %s, using original identifier", s)
+                slimmer_subjects.append(s)
         elif "MGI:MGI:" in s:
             slimmer_subjects.append(s.replace("MGI:MGI:", "MGI:"))
         elif "WormBase:" in s:
