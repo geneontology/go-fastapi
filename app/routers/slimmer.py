@@ -61,8 +61,8 @@ async def slimmer_function(
                 if len(prots) == 0:
                     prots = [s]
                 slimmer_subjects += prots
-            except DataNotFoundException:
-                # If no UniProt IDs found for the gene, use the original identifier
+            except (DataNotFoundException, ConnectionError):
+                # If no UniProt IDs found for the gene or connection error, use the original identifier
                 logger.info("No UniProt IDs found for %s, using original identifier", s)
                 slimmer_subjects.append(s)
         elif "MGI:MGI:" in s:
