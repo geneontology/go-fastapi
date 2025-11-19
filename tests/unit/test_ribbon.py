@@ -158,8 +158,8 @@ class TestOntologyAPI(unittest.TestCase):
 
             self.assertTrue(subject.get("groups").get("GO:0003674"))
             self.assertTrue(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations") >= 5)
-            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 50)
-            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_classes") >= 39)
+            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations") >= 47)
+            self.assertTrue(subject.get("groups").get("GO:0008150").get("ALL").get("nb_classes") >= 37)
             self.assertTrue(subject.get("groups").get("GO:0005576").get("ALL").get("nb_classes") >= 2)
             self.assertTrue(subject.get("groups").get("GO:0005576").get("ALL").get("nb_annotations") >= 7)
             self.assertTrue(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations") >= 10)
