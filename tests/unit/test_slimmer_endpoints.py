@@ -11,6 +11,7 @@ logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, fo
 logger = logging.getLogger()
 
 gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192", "MGI:MGI:3588192"]
+hgnc_ids = ["HGNC:8725", "HGNC:8729"]  # Working and test HGNC IDs
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]

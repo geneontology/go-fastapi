@@ -90,12 +90,18 @@ async def slimmer_function(
             protein_id = association["subject"]["id"]
             if taxon == "NCBITaxon:9606" and protein_id.startswith("UniProtKB:"):
                 if protein_id not in checked:
-                    genes = uniprot_to_gene_from_mygene(protein_id)
-                    for gene in genes:
-                        if gene.startswith("HGNC"):
-                            association["subject"]["id"] = gene
-                            checked[protein_id] = gene
-                else:
+                    try:
+                        genes = uniprot_to_gene_from_mygene(protein_id)
+                        for gene in genes:
+                            if gene.startswith("HGNC"):
+                                association["subject"]["id"] = gene
+                                checked[protein_id] = gene
+                                break
+                    except DataNotFoundException:
+                        # If we can't find HGNC ID, keep the original UniProt ID
+                        logger.info(f"Could not find HGNC ID for {protein_id}, keeping original")
+                        checked[protein_id] = protein_id
+                elif checked[protein_id] != protein_id:  # Only update if we found an HGNC ID
                     association["subject"]["id"] = checked[protein_id]
     if not results:
         raise DataNotFoundException(detail="No results found")
@@ -148,14 +154,36 @@ def uniprot_to_gene_from_mygene(id: str):
 
     mg = get_client("gene")
     try:
-        results = mg.query(id, fields="HGNC")
+        # Query specifically in the uniprot fields to avoid false matches
+        results = mg.query(f"uniprot.Swiss-Prot:{id} OR uniprot.TrEMBL:{id}", 
+                          fields="HGNC,symbol,uniprot")
         if results["hits"]:
-            hit = results["hits"][0]
-            gene_id = hit["HGNC"]
-            if not gene_id.startswith("HGNC"):
-                gene_id = "HGNC:{}".format(gene_id)
+            # Verify the hit actually contains our UniProt ID
+            for hit in results["hits"]:
+                if "uniprot" in hit:
+                    uniprot_data = hit["uniprot"]
+                    # Check Swiss-Prot
+                    has_id = False
+                    if "Swiss-Prot" in uniprot_data:
+                        swiss_prot = uniprot_data["Swiss-Prot"]
+                        if (isinstance(swiss_prot, str) and swiss_prot == id) or \
+                           (isinstance(swiss_prot, list) and id in swiss_prot):
+                            has_id = True
+                    # Check TrEMBL if not found
+                    if not has_id and "TrEMBL" in uniprot_data:
+                        trembl = uniprot_data["TrEMBL"]
+                        if (isinstance(trembl, str) and trembl == id) or \
+                           (isinstance(trembl, list) and id in trembl):
+                            has_id = True
+
+                    if has_id and "HGNC" in hit:
+                        gene_id = hit["HGNC"]
+                        if not gene_id.startswith("HGNC"):
+                            gene_id = "HGNC:{}".format(gene_id)
+                        break
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
+    
     if not gene_id:
         raise DataNotFoundException(detail="No HGNC IDs found for {}".format(id))
     return [gene_id]
