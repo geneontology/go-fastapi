@@ -1,18 +1,29 @@
 """Unit tests for the endpoints in the ribbon module."""
+
+import logging
 import unittest
 
 from fastapi.testclient import TestClient
 
 from app.main import app
-import logging
 
 test_client = TestClient(app)
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72"]
-ortho_gene_ids = ["WB:WBGene00002147", "HGNC:3449", "HGNC:16942",
-                  "MGI:1930134", "MGI:1349436", "RGD:1559716",
-                  "RGD:1308743", "Xenbase:XB-GENE-4594134", "ZFIN:ZDB-GENE-050522-431",
-                  "ZFIN:ZDB-GENE-090312-15", "FB:FBgn0261984", "SGD:S000001121"]
+gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72", "HGNC:8725", "HGNC:8729"]
+ortho_gene_ids = [
+    "WB:WBGene00002147",
+    "HGNC:3449",
+    "HGNC:16942",
+    "MGI:1930134",
+    "MGI:1349436",
+    "RGD:1559716",
+    "RGD:1308743",
+    "Xenbase:XB-GENE-4594134",
+    "ZFIN:ZDB-GENE-050522-431",
+    "ZFIN:ZDB-GENE-090312-15",
+    "FB:FBgn0261984",
+    "SGD:S000001121",
+]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
@@ -20,6 +31,7 @@ shared_ancestors = [("GO:0006259", "GO:0046483")]
 uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 
 logger = logging.getLogger()
+
 
 class TestOntologyAPI(unittest.TestCase):
     """Test the ribbon API endpoints."""
@@ -164,18 +176,24 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations") >= 10)
         self.assertTrue(response.status_code == 200)
 
-
     def test_mgi_ortho_ribbon_calls(self):
         """Test MGI ortholog ribbon annotations."""
-        data = {"subset": "goslim_agr", "subject": ["MGI:88469","Xenbase:XB-GENE-994160",
-                                                    "HGNC:2227","RGD:2378",
-                                                    "ZFIN:ZDB-GENE-060606-1","FB:FBgn003185"],
-                 "exclude_PB":"true",
-                 "exclude_IBA":"false",
-                 "cross_aspect":"false"
-                }
+        data = {
+            "subset": "goslim_agr",
+            "subject": [
+                "MGI:88469",
+                "Xenbase:XB-GENE-994160",
+                "HGNC:2227",
+                "RGD:2378",
+                "ZFIN:ZDB-GENE-060606-1",
+                "FB:FBgn003185",
+            ],
+            "exclude_PB": "true",
+            "exclude_IBA": "false",
+            "cross_aspect": "false",
+        }
         response = test_client.get("/api/ontology/ribbon/", params=data)
-        self.assertGreater(len(response.json().get("subjects")),  0)
+        self.assertGreater(len(response.json().get("subjects")), 0)
         self.assertIn("MGI:88469", [subject.get("id") for subject in response.json().get("subjects")])
         self.assertEqual(response.status_code, 200)
 
@@ -193,14 +211,20 @@ class TestOntologyAPI(unittest.TestCase):
 
     def test_ribbon_with_many_subjects(self):
         """Test the ontology ribbon with many subjects."""
-        data = {"subset": "goslim_agr", "subject": ortho_gene_ids,
-                "exclude_PB":True, "exclude_IBA":False, "cross_aspect":False}
+        data = {
+            "subset": "goslim_agr",
+            "subject": ortho_gene_ids,
+            "exclude_PB": True,
+            "exclude_IBA": False,
+            "cross_aspect": False,
+        }
         response = test_client.get("/api/ontology/ribbon/", params=data)
         data = response.json()
         for subject in data.get("subjects"):
             print(subject.get("id"))
             self.assertFalse(subject.get("id").startswith("MGI:MGI:"))
         self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()
