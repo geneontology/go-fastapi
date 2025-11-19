@@ -6,7 +6,7 @@ from typing import List
 
 from biothings_client import get_client
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_associations import map2slim
+from app.utils.golr_wrappers import map2slim
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.settings import ESOLR, get_user_agent
