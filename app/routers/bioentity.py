@@ -6,9 +6,9 @@ from typing import List
 
 from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
-from ontobio.golr.golr_associations import search_associations
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
+from app.utils.golr_wrappers import search_associations
 from app.utils.golr_utils import gu_run_solr_text_on, is_valid_bioentity
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 

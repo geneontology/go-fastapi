@@ -6,10 +6,10 @@ from typing import List
 
 from biothings_client import get_client
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_associations import map2slim
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.settings import ESOLR, get_user_agent
+from app.utils.golr_wrappers import map2slim
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"

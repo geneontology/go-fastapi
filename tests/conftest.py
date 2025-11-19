@@ -14,6 +14,11 @@ def pytest_configure(config):
     instead of the paths configured in config.yaml.
     """
     from app.utils.settings import set_index_file_override
+    from app.utils.rate_limiter import get_rate_limiter
+    
+    # Set up slower rate limiting for tests to avoid hitting GOLr API limits
+    # This will ensure at least 2 seconds between each GOLr API call
+    golr_limiter = get_rate_limiter("golr", calls_per_second=0.5)
 
     # Get the path to the fixtures directory
     fixtures_dir = Path(__file__).parent / "fixtures"

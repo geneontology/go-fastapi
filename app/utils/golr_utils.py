@@ -7,9 +7,11 @@ import requests
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.routers.slimmer import gene_to_uniprot_from_mygene
 from app.utils.settings import ESOLR, ESOLRDoc, logger
+from app.utils.rate_limiter import rate_limit_golr
 
 
 # Respect the method name for run_sparql_on with enums
+@rate_limit_golr
 def run_solr_on(solr_instance, category, id, fields):
     """Return the result of a Solr query."""
     query = (
@@ -49,6 +51,7 @@ def run_solr_on(solr_instance, category, id, fields):
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
+@rate_limit_golr
 def gu_run_solr_text_on(
     solr_instance, category: str, q: str, qf: str, fields: str, optionals: str, highlight: bool = False
 ):
