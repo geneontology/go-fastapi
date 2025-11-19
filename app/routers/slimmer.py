@@ -150,10 +150,13 @@ def uniprot_to_gene_from_mygene(id: str):
     try:
         results = mg.query(id, fields="HGNC")
         if results["hits"]:
-            hit = results["hits"][0]
-            gene_id = hit["HGNC"]
-            if not gene_id.startswith("HGNC"):
-                gene_id = "HGNC:{}".format(gene_id)
+            # Search through all hits to find one with HGNC field
+            for hit in results["hits"]:
+                if "HGNC" in hit:
+                    gene_id = hit["HGNC"]
+                    if not gene_id.startswith("HGNC"):
+                        gene_id = "HGNC:{}".format(gene_id)
+                    break
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
     if not gene_id:

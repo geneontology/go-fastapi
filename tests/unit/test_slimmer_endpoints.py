@@ -10,7 +10,7 @@ test_client = TestClient(app)
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192", "MGI:MGI:3588192"]
+gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192", "MGI:MGI:3588192", "HGNC:8729"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]
@@ -98,6 +98,30 @@ class TestSlimmerEndpoint(unittest.TestCase):
         response = test_client.get(endpoint, params=data)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.json()), 0)
+
+    def test_slimmer_endpoint_hgnc(self):
+        """
+        Test the slimmer endpoint for HGNC:8729 gene.
+
+        :return: None
+        """
+        endpoint = "/api/bioentityset/slimmer/function"
+        data = {
+            "subject": "HGNC:8729",
+            "slim": ["GO:0003674", "GO:0008150", "GO:0005575"],
+        }
+        response = test_client.get(endpoint, params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.json()), 0)
+        for item in response.json():
+            self.assertIn(item.get("slim"), ["GO:0003674", "GO:0008150", "GO:0005575"])
+            # The subject at top level is UniProtKB ID, but inside assocs it should be HGNC
+            self.assertEqual(item.get("subject"), "UniProtKB:P12004")
+            self.assertTrue(item.get("assocs"))
+            # Check that the associations have been updated to use HGNC ID
+            for assoc in item.get("assocs"):
+                self.assertEqual(assoc.get("subject", {}).get("id"), "HGNC:8729")
+                self.assertTrue(assoc.get("evidence"))
 
 
 if __name__ == "__main__":
