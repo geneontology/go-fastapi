@@ -1,56 +1,17 @@
 """golr utils."""
 
-import time
 from zipfile import error
 
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.routers.slimmer import gene_to_uniprot_from_mygene
-from app.utils.rate_limiter import rate_limit_golr
+from app.utils.rate_limiter import rate_limit_golr, retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
 
 
-def retry_on_server_error(max_retries=3, delay=2):
-    """
-    Decorator to retry GOLr calls on server errors.
-
-    :param max_retries: Maximum number of retry attempts
-    :param delay: Delay in seconds between retries
-    :return: Decorated function
-    """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            last_exception = None
-            for attempt in range(max_retries):
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    error_str = str(e)
-
-                    # Check for server errors in the error message
-                    server_errors = ['502', '522', '503', '504', '400', 'bad gateway', 'server error',
-                                   'connection', 'timeout', 'read timeout', 'readtimeout',
-                                   'timed out']
-
-                    if any(err in error_str.lower() for err in server_errors):
-                        last_exception = e
-                        logger.info(f"GOLr server error on attempt {attempt + 1}/{max_retries}: {error_str}")
-                        if attempt < max_retries - 1:
-                            logger.info(f"Retrying in {delay} seconds...")
-                            time.sleep(delay)
-                            continue
-                    raise
-            # If we get here, all retries failed
-            if last_exception:
-                logger.error(f"All {max_retries} GOLr attempts failed, raising last exception")
-                raise last_exception
-        return wrapper
-    return decorator
-
-
 # Respect the method name for run_sparql_on with enums
-@retry_on_server_error(max_retries=3, delay=2)
+@retry_on_golr_error(max_retries=3, delay=2)
 @rate_limit_golr
 def run_solr_on(solr_instance, category, id, fields):
     """Return the result of a Solr query."""
@@ -91,7 +52,7 @@ def run_solr_on(solr_instance, category, id, fields):
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
-@retry_on_server_error(max_retries=3, delay=2)
+@retry_on_golr_error(max_retries=3, delay=2)
 @rate_limit_golr
 def gu_run_solr_text_on(
     solr_instance, category: str, q: str, qf: str, fields: str, optionals: str, highlight: bool = False
