@@ -80,25 +80,46 @@ def search_associations(
     This wrapper adds rate limiting to prevent hitting GOLr API limits.
     All parameters are passed through to the original function.
     """
-    return _search_associations(
-        subject_category=subject_category,
-        object_category=object_category,
-        subject=subject,
-        object=object,
-        subject_taxon=subject_taxon,
-        relation=relation,
-        evidence=evidence,
-        slim=slim,
-        use_compact_associations=use_compact_associations,
-        fq=fq,
-        user_agent=user_agent,
-        url=url,
-        start=start,
-        rows=rows,
-        facet_fields=facet_fields,
-        facet_limit=facet_limit,
-        **kwargs
-    )
+    # Build kwargs dynamically to exclude None values
+    call_kwargs = {}
+    
+    if subject_category is not None:
+        call_kwargs['subject_category'] = subject_category
+    if object_category is not None:
+        call_kwargs['object_category'] = object_category
+    if subject is not None:
+        call_kwargs['subject'] = subject
+    if object is not None:
+        call_kwargs['object'] = object
+    if subject_taxon is not None:
+        call_kwargs['subject_taxon'] = subject_taxon
+    if relation is not None:
+        call_kwargs['relation'] = relation
+    if evidence is not None:
+        call_kwargs['evidence'] = evidence
+    if slim is not None:
+        call_kwargs['slim'] = slim
+    if use_compact_associations is not None:
+        call_kwargs['use_compact_associations'] = use_compact_associations
+    if fq is not None:
+        call_kwargs['fq'] = fq
+    if user_agent is not None:
+        call_kwargs['user_agent'] = user_agent
+    if url is not None:
+        call_kwargs['url'] = url
+    if start is not None:
+        call_kwargs['start'] = start
+    if rows is not None:
+        call_kwargs['rows'] = rows
+    if facet_fields is not None:
+        call_kwargs['facet_fields'] = facet_fields
+    if facet_limit is not None:
+        call_kwargs['facet_limit'] = facet_limit
+    
+    # Add any additional kwargs
+    call_kwargs.update(kwargs)
+    
+    return _search_associations(**call_kwargs)
 
 
 @retry_on_golr_server_error(max_retries=3, delay=2)

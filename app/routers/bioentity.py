@@ -296,8 +296,11 @@ async def get_genes_by_goterm_id(
             subject_taxon=taxon,
             invert_subject_object=True,
             user_agent=USER_AGENT,
+            slim=slim,
+            relation=relation,
             url=ESOLR.GOLR,
             rows=rows,
+            start=start,
         )
 
     return {"associations": association_return.get("associations")}
