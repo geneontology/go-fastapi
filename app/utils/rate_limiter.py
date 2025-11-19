@@ -82,7 +82,7 @@ def rate_limit_golr(func: Callable) -> Callable:
     return rate_limit(service="golr", calls_per_second=0.33)(func)
 
 
-def retry_on_golr_error(max_retries: int = 3, delay: float = 2.0) -> Callable:
+def retry_on_golr_error(max_retries: int = 3, delay: float = 1.0) -> Callable:
     """
     Decorator to retry GOLr/Solr calls on server errors.
 
