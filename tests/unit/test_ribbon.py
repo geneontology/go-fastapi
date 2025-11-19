@@ -8,8 +8,9 @@ import logging
 
 test_client = TestClient(app)
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72"]
-ortho_gene_ids = ["WB:WBGene00002147", "HGNC:3449", "HGNC:16942",
+gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72", 
+             "HGNC:8725", "HGNC:8729"]
+ortho_gene_ids = ["WB:WBGene00002147", "HGNC:3449", "HGNC:16942", "HGNC:8725", "HGNC:8729",
                   "MGI:1930134", "MGI:1349436", "RGD:1559716",
                   "RGD:1308743", "Xenbase:XB-GENE-4594134", "ZFIN:ZDB-GENE-050522-431",
                   "ZFIN:ZDB-GENE-090312-15", "FB:FBgn0261984", "SGD:S000001121"]
