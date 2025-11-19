@@ -8,9 +8,57 @@ from app.exceptions.global_exceptions import DataNotFoundException
 from app.routers.slimmer import gene_to_uniprot_from_mygene
 from app.utils.settings import ESOLR, ESOLRDoc, logger
 from app.utils.rate_limiter import rate_limit_golr
+from app.utils.network_utils import get_network_info
+import time
+
+
+def retry_on_server_error(max_retries=3, delay=2):
+    """
+    Decorator to retry GOLr requests on server errors (502, 522, etc.).
+    
+    :param max_retries: Maximum number of retry attempts
+    :param delay: Delay in seconds between retries
+    :return: Decorated function
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except requests.HTTPError as e:
+                    error_code = str(e.response.status_code) if hasattr(e, 'response') and e.response else str(e)
+                    if any(code in error_code for code in ['400', '502', '522', '503', '504']):
+                        last_exception = e
+                        logger.info(f"Server error {error_code} on attempt {attempt + 1}/{max_retries}")
+                        if attempt == 0:  # Log network info on first failure
+                            network_info = get_network_info()
+                            logger.info(f"Network diagnostics: {network_info}")
+                        if attempt < max_retries - 1:
+                            logger.info(f"Retrying in {delay} seconds...")
+                            time.sleep(delay)
+                            continue
+                    raise
+                except requests.RequestException as e:
+                    error_str = str(e)
+                    if any(code in error_str for code in ['400', '502', '522', '503', '504', 'timeout', 'timed out']):
+                        last_exception = e
+                        logger.info(f"Server error on attempt {attempt + 1}/{max_retries}: {error_str}")
+                        if attempt < max_retries - 1:
+                            logger.info(f"Retrying in {delay} seconds...")
+                            time.sleep(delay)
+                            continue
+                    raise
+            # If we get here, all retries failed
+            if last_exception:
+                logger.error(f"All {max_retries} attempts failed, raising last exception")
+                raise last_exception
+        return wrapper
+    return decorator
 
 
 # Respect the method name for run_sparql_on with enums
+@retry_on_server_error(max_retries=3, delay=2)
 @rate_limit_golr
 def run_solr_on(solr_instance, category, id, fields):
     """Return the result of a Solr query."""
@@ -51,6 +99,7 @@ def run_solr_on(solr_instance, category, id, fields):
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
+@retry_on_server_error(max_retries=3, delay=2)
 @rate_limit_golr
 def gu_run_solr_text_on(
     solr_instance, category: str, q: str, qf: str, fields: str, optionals: str, highlight: bool = False
