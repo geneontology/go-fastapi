@@ -7,7 +7,6 @@ import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.routers.slimmer import gene_to_uniprot_from_mygene
-from app.utils.network_utils import get_network_info
 from app.utils.rate_limiter import rate_limit_golr
 from app.utils.settings import ESOLR, ESOLRDoc, logger
 
@@ -37,9 +36,6 @@ def retry_on_server_error(max_retries=3, delay=2):
                     if any(err in error_str.lower() for err in server_errors):
                         last_exception = e
                         logger.info(f"GOLr server error on attempt {attempt + 1}/{max_retries}: {error_str}")
-                        if attempt == 0:  # Log network info on first failure
-                            network_info = get_network_info()
-                            logger.info(f"Network diagnostics: {network_info}")
                         if attempt < max_retries - 1:
                             logger.info(f"Retrying in {delay} seconds...")
                             time.sleep(delay)

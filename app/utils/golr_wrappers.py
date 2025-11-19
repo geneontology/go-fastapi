@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 from ontobio.golr.golr_associations import map2slim as _map2slim
 from ontobio.golr.golr_associations import search_associations as _search_associations
 
-from app.utils.network_utils import get_network_info
 from app.utils.rate_limiter import rate_limit_golr
 from app.utils.settings import logger
 
@@ -41,9 +40,6 @@ def retry_on_golr_server_error(max_retries=3, delay=2):
                             f"GOLr server error on attempt {attempt + 1}/{max_retries}: "
                             f"{error_type}: {error_str}"
                         )
-                        if attempt == 0:  # Log network info on first failure
-                            network_info = get_network_info()
-                            logger.info(f"Network diagnostics: {network_info}")
                         if attempt < max_retries - 1:
                             logger.info(f"Retrying in {delay} seconds...")
                             time.sleep(delay)
