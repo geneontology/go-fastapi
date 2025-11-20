@@ -32,7 +32,11 @@ def run_solr_on(solr_instance, category, id, fields):
     try:
         response = requests.get(query, timeout=timeout_seconds)
         response.raise_for_status()  # Raise an error for non-2xx responses
-        response_json = response.json()
+        try:
+            response_json = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response from GOLr: {e}")
+            raise ValueError(f"Invalid JSON response from GOLr server: {e}") from e
         logger.info("Solr response JSON:", response_json)
 
         docs = response_json.get("response", {}).get("docs", [])
@@ -96,7 +100,11 @@ def gu_run_solr_text_on(
     try:
         response = requests.get(query, timeout=timeout_seconds)
         response.raise_for_status()  # Raise an error for non-2xx responses
-        response_json = response.json()
+        try:
+            response_json = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response from GOLr: {e}")
+            raise ValueError(f"Invalid JSON response from GOLr server: {e}") from e
 
         # solr returns matching text in the field "highlighting", but it is not included in the response.
         # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document

@@ -128,6 +128,9 @@ def retry_on_golr_error(max_retries: int = 3, delay: float = 1.0) -> Callable:
             if last_exception:
                 logger.error(f"All {max_retries} GOLr attempts failed, raising last exception")
                 raise last_exception
+            else:
+                # This should never happen, but ensures no implicit None return
+                raise RuntimeError(f"All {max_retries} attempts failed without capturing an exception")
 
         return wrapper
     return decorator

@@ -92,11 +92,17 @@ async def slimmer_function(
                 if protein_id not in checked:
                     try:
                         genes = uniprot_to_gene_from_mygene(protein_id)
+                        found_hgnc = False
                         for gene in genes:
                             if gene.startswith("HGNC"):
                                 association["subject"]["id"] = gene
                                 checked[protein_id] = gene
+                                found_hgnc = True
                                 break
+                        # If no HGNC ID was found in the results, keep the original UniProt ID
+                        if not found_hgnc:
+                            logger.info(f"No HGNC ID found in results for {protein_id}, keeping original")
+                            checked[protein_id] = protein_id
                     except DataNotFoundException:
                         # If we can't map the UniProt back to HGNC, keep the UniProt ID
                         logger.warning("Could not map UniProt %s back to HGNC, keeping original ID", protein_id)
