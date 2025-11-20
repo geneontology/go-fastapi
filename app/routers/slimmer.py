@@ -96,6 +96,10 @@ async def slimmer_function(
         else:
             subject_mapping[original_subject] = original_subject
 
+    # Log the converted subjects
+    logger.info(f"Original subjects: {subject}")
+    logger.info(f"Converted subjects for GOLr: {slimmer_subjects}")
+    
     # Use local implementation to avoid timeout issues
     results = local_map2slim(
         subjects=slimmer_subjects,
@@ -194,6 +198,8 @@ def local_map2slim(subjects, slim_terms,
 
         # Make the request with 60-second timeout
         try:
+            logger.info(f"Querying GOLr for subject: {subject_id}")
+            logger.info(f"Query params - q: {q}, qf: {qf}, fq: {fq}")
             # gu_run_solr_text_on expects enum objects, not strings
             annotations = gu_run_solr_text_on(
                 ESOLR.GOLR,
