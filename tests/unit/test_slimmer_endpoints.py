@@ -11,7 +11,7 @@ logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, fo
 logger = logging.getLogger()
 
 gene_ids = [
-    "ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", 
+    "ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8",
     "MGI:3588192", "MGI:MGI:3588192", "HGNC:8725", "HGNC:8729"
 ]
 go_ids = ["GO:0008150"]
@@ -102,130 +102,91 @@ class TestSlimmerEndpoint(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.json()), 0)
 
-    def test_hgnc_8725_slimmer_function(self):
-        """Test slimmer function endpoint returns results for HGNC:8725."""
-        endpoint = "/api/bioentityset/slimmer/function"
-        data = {
-            "subject": ["HGNC:8725"],
-            "slim": ["GO:0008150", "GO:0003674", "GO:0005575"],
-        }
-        response = test_client.get(endpoint, params=data)
-        self.assertEqual(response.status_code, 200)
-        
-        response_data = response.json()
-        self.assertIsInstance(response_data, list)
-        self.assertGreater(len(response_data), 0)
-        
-        # Verify response structure and that we have results for our subject
-        found_subject = False
-        for item in response_data:
-            self.assertIn("subject", item)
-            self.assertIn("slim", item)
-            self.assertIn("assocs", item)
-            if item.get("subject") == "HGNC:8725":
-                found_subject = True
-                self.assertIn(item.get("slim"), ["GO:0008150", "GO:0003674", "GO:0005575"])
-                self.assertIsInstance(item.get("assocs"), list)
-                self.assertGreater(len(item.get("assocs", [])), 0, "HGNC:8725 should have annotations")
-        
-        self.assertTrue(found_subject, "Should find results for HGNC:8725")
+    def test_hgnc_slimmer_function(self):
+        """Test slimmer function endpoint returns results for HGNC IDs."""
+        hgnc_test_ids = ["HGNC:8725", "HGNC:8729"]
+        for hgnc_id in hgnc_test_ids:
+            endpoint = "/api/bioentityset/slimmer/function"
+            data = {
+                "subject": [hgnc_id],
+                "slim": ["GO:0008150", "GO:0003674", "GO:0005575"],
+            }
+            response = test_client.get(endpoint, params=data)
+            self.assertEqual(response.status_code, 200)
 
-    def test_hgnc_8729_slimmer_function(self):
-        """Test slimmer function endpoint returns results for HGNC:8729."""
-        endpoint = "/api/bioentityset/slimmer/function"
-        data = {
-            "subject": ["HGNC:8729"],
-            "slim": ["GO:0008150", "GO:0003674", "GO:0005575"],
-        }
-        response = test_client.get(endpoint, params=data)
-        self.assertEqual(response.status_code, 200)
-        
-        response_data = response.json()
-        self.assertIsInstance(response_data, list)
-        self.assertGreater(len(response_data), 0)
-        
-        # Verify response structure and that we have results for our subject
-        found_subject = False
-        for item in response_data:
-            self.assertIn("subject", item)
-            self.assertIn("slim", item)
-            self.assertIn("assocs", item)
-            if item.get("subject") == "HGNC:8729":
-                found_subject = True
-                self.assertIn(item.get("slim"), ["GO:0008150", "GO:0003674", "GO:0005575"])
-                self.assertIsInstance(item.get("assocs"), list)
-                self.assertGreater(len(item.get("assocs", [])), 0, "HGNC:8729 should have annotations")
-        
-        self.assertTrue(found_subject, "Should find results for HGNC:8729")
+            response_data = response.json()
+            self.assertIsInstance(response_data, list)
+            self.assertGreater(len(response_data), 0)
 
-    def test_hgnc_8725_and_8729_slimmer_function(self):
-        """Test slimmer function endpoint returns results for both HGNC:8725 and HGNC:8729."""
+            found_subject = False
+            for item in response_data:
+                self.assertIn("subject", item)
+                self.assertIn("slim", item)
+                self.assertIn("assocs", item)
+                if item.get("subject") == hgnc_id:
+                    found_subject = True
+                    self.assertIn(item.get("slim"), ["GO:0008150", "GO:0003674", "GO:0005575"])
+                    self.assertIsInstance(item.get("assocs"), list)
+                    self.assertGreater(len(item.get("assocs", [])), 0, f"{hgnc_id} should have annotations")
+
+            self.assertTrue(found_subject, f"Should find results for {hgnc_id}")
+
+    def test_hgnc_slimmer_function_multiple(self):
+        """Test slimmer function endpoint returns results for multiple HGNC IDs."""
+        hgnc_test_ids = ["HGNC:8725", "HGNC:8729"]
         endpoint = "/api/bioentityset/slimmer/function"
         data = {
-            "subject": ["HGNC:8725", "HGNC:8729"],
+            "subject": hgnc_test_ids,
             "slim": ["GO:0008150", "GO:0003674", "GO:0005575"],
         }
         response = test_client.get(endpoint, params=data)
         self.assertEqual(response.status_code, 200)
-        
+
         response_data = response.json()
         self.assertIsInstance(response_data, list)
         self.assertGreater(len(response_data), 0)
-        
+
         # Verify we get results for both subjects
         found_subjects = set()
         for item in response_data:
             self.assertIn("subject", item)
             self.assertIn("slim", item)
             self.assertIn("assocs", item)
-            
+
             subject_id = item.get("subject")
-            if subject_id in ["HGNC:8725", "HGNC:8729"]:
+            if subject_id in hgnc_test_ids:
                 found_subjects.add(subject_id)
                 self.assertIn(item.get("slim"), ["GO:0008150", "GO:0003674", "GO:0005575"])
                 self.assertIsInstance(item.get("assocs"), list)
                 self.assertGreater(len(item.get("assocs", [])), 0, f"{subject_id} should have annotations")
-        
-        self.assertIn("HGNC:8725", found_subjects, "Should find results for HGNC:8725")
-        self.assertIn("HGNC:8729", found_subjects, "Should find results for HGNC:8729")
 
-    def test_hgnc_8725_slimmer_specific_slim(self):
-        """Test slimmer function with HGNC:8725 and specific GO slim terms."""
-        endpoint = "/api/bioentityset/slimmer/function"
-        data = {
-            "subject": ["HGNC:8725"],
-            "slim": ["GO:0008150"],  # biological_process
-        }
-        response = test_client.get(endpoint, params=data)
-        self.assertEqual(response.status_code, 200)
-        
-        response_data = response.json()
-        self.assertIsInstance(response_data, list)
-        
-        # Check that we get specific results for the requested slim
-        for item in response_data:
-            if item.get("subject") == "HGNC:8725":
-                self.assertEqual(item.get("slim"), "GO:0008150")
-                self.assertIsInstance(item.get("assocs"), list)
+        for hgnc_id in hgnc_test_ids:
+            self.assertIn(hgnc_id, found_subjects, f"Should find results for {hgnc_id}")
 
-    def test_hgnc_8729_slimmer_specific_slim(self):
-        """Test slimmer function with HGNC:8729 and specific GO slim terms."""
-        endpoint = "/api/bioentityset/slimmer/function"
-        data = {
-            "subject": ["HGNC:8729"],
-            "slim": ["GO:0003674"],  # molecular_function
-        }
-        response = test_client.get(endpoint, params=data)
-        self.assertEqual(response.status_code, 200)
+    def test_hgnc_slimmer_specific_slim(self):
+        """Test slimmer function with HGNC IDs and specific GO slim terms."""
+        test_cases = [
+            ("HGNC:8725", "GO:0008150"),  # biological_process
+            ("HGNC:8729", "GO:0003674"),  # molecular_function
+        ]
         
-        response_data = response.json()
-        self.assertIsInstance(response_data, list)
-        
-        # Check that we get specific results for the requested slim
-        for item in response_data:
-            if item.get("subject") == "HGNC:8729":
-                self.assertEqual(item.get("slim"), "GO:0003674")
-                self.assertIsInstance(item.get("assocs"), list)
+        for hgnc_id, slim_id in test_cases:
+            endpoint = "/api/bioentityset/slimmer/function"
+            data = {
+                "subject": [hgnc_id],
+                "slim": [slim_id],
+            }
+            response = test_client.get(endpoint, params=data)
+            self.assertEqual(response.status_code, 200)
+
+            response_data = response.json()
+            self.assertIsInstance(response_data, list)
+
+            # Check that we get specific results for the requested slim
+            for item in response_data:
+                if item.get("subject") == hgnc_id:
+                    self.assertEqual(item.get("slim"), slim_id)
+                    self.assertIsInstance(item.get("assocs"), list)
 
 
 if __name__ == "__main__":

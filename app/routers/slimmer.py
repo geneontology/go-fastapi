@@ -6,9 +6,9 @@ from typing import List
 
 from biothings_client import get_client
 from fastapi import APIRouter, Query
+from ontobio.golr.golr_associations import map2slim
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.utils.golr_wrappers import map2slim
 from app.utils.settings import ESOLR, get_user_agent
 
 INVOLVED_IN = "involved_in"
@@ -39,12 +39,12 @@ async def slimmer_function(
     subject: List[str] = Query(
         ...,
         description="example: ZFIN:ZDB-GENE-980526-388, MGI:3588192",
-        examples=[{"value": ["ZFIN:ZDB-GENE-980526-388", "MGI:3588192"]}],
+        example=["ZFIN:ZDB-GENE-980526-388", "MGI:3588192"],
     ),
     slim: List[str] = Query(
         ...,
         description="a set of GO term ids to use as the slim, example: GO:0008150, GO:0003674, GO:0005575",
-        examples=[{"value": ["GO:0008150", "GO:0003674", "GO:0005575"]}],
+        example=["GO:0008150", "GO:0003674", "GO:0005575"],
     ),
     exclude_automatic_assertions: bool = False,
     rows: int = Query(default=-1, description="Number of rows to return, -1 for all"),
@@ -98,10 +98,10 @@ async def slimmer_function(
                                 checked[protein_id] = gene
                                 break
                     except DataNotFoundException:
-                        # If we can't find HGNC ID, keep the original UniProt ID
-                        logger.info(f"Could not find HGNC ID for {protein_id}, keeping original")
+                        # If we can't map the UniProt back to HGNC, keep the UniProt ID
+                        logger.warning("Could not map UniProt %s back to HGNC, keeping original ID", protein_id)
                         checked[protein_id] = protein_id
-                elif checked[protein_id] != protein_id:  # Only update if we found an HGNC ID
+                else:
                     association["subject"]["id"] = checked[protein_id]
     if not results:
         raise DataNotFoundException(detail="No results found")
@@ -155,7 +155,7 @@ def uniprot_to_gene_from_mygene(id: str):
     mg = get_client("gene")
     try:
         # Query specifically in the uniprot fields to avoid false matches
-        results = mg.query(f"uniprot.Swiss-Prot:{id} OR uniprot.TrEMBL:{id}",
+        results = mg.query(f"uniprot.Swiss-Prot:{id} OR uniprot.TrEMBL:{id}", 
                           fields="HGNC,symbol,uniprot")
         if results["hits"]:
             # Verify the hit actually contains our UniProt ID
@@ -183,7 +183,7 @@ def uniprot_to_gene_from_mygene(id: str):
                         break
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-
+    
     if not gene_id:
         raise DataNotFoundException(detail="No HGNC IDs found for {}".format(id))
     return [gene_id]
