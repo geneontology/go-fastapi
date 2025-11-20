@@ -54,8 +54,7 @@ def search_associations(
         call_kwargs['evidence'] = evidence
     if slim is not None:
         call_kwargs['slim'] = slim
-    if use_compact_associations is not None:
-        call_kwargs['use_compact_associations'] = use_compact_associations
+    call_kwargs['use_compact_associations'] = use_compact_associations
     if fq is not None:
         call_kwargs['fq'] = fq
     if user_agent is not None:
