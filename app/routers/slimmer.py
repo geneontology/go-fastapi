@@ -155,7 +155,7 @@ def uniprot_to_gene_from_mygene(id: str):
     mg = get_client("gene")
     try:
         # Query specifically in the uniprot fields to avoid false matches
-        results = mg.query(f"uniprot.Swiss-Prot:{id} OR uniprot.TrEMBL:{id}", 
+        results = mg.query(f"uniprot.Swiss-Prot:{id} OR uniprot.TrEMBL:{id}",
                           fields="HGNC,symbol,uniprot")
         if results["hits"]:
             # Verify the hit actually contains our UniProt ID
@@ -183,7 +183,7 @@ def uniprot_to_gene_from_mygene(id: str):
                         break
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-    
+
     if not gene_id:
         raise DataNotFoundException(detail="No HGNC IDs found for {}".format(id))
     return [gene_id]
