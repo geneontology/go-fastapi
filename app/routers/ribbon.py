@@ -72,7 +72,8 @@ async def get_subset_by_id(
     description="Fetch the summary of annotations for a given gene or set of genes.",
 )
 async def get_ribbon_results(
-    subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)", examples="goslim_agr"),
+    subset: str = Query(None,
+                        description="Name of the subset to map GO terms (e.g. goslim_agr)", examples="goslim_agr"),
     subject: List[str] = Query(
         None,
         description="List of Gene ids (e.g. MGI:98214, RGD:620474)",
