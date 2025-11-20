@@ -61,8 +61,12 @@ async def slimmer_function(
             if len(prots) == 0:
                 prots = [s]
             slimmer_subjects += prots
-        elif "MGI:MGI:" in s:
-            slimmer_subjects.append(s.replace("MGI:MGI:", "MGI:"))
+        elif "MGI:" in s:
+            # GOLr expects MGI identifiers in MGI:MGI: format
+            if not s.startswith("MGI:MGI:"):
+                slimmer_subjects.append(s.replace("MGI:", "MGI:MGI:"))
+            else:
+                slimmer_subjects.append(s)
         elif "WormBase:" in s:
             slimmer_subjects.append(s.replace("WormBase:", "WB:"))
         else:
@@ -79,9 +83,13 @@ async def slimmer_function(
             else:
                 for prot in prots:
                     subject_mapping[prot] = original_subject
-        elif "MGI:MGI:" in original_subject:
-            converted = original_subject.replace("MGI:MGI:", "MGI:")
-            subject_mapping[converted] = original_subject
+        elif "MGI:" in original_subject:
+            # We converted MGI: to MGI:MGI: for GOLr
+            if not original_subject.startswith("MGI:MGI:"):
+                converted = original_subject.replace("MGI:", "MGI:MGI:")
+                subject_mapping[converted] = original_subject
+            else:
+                subject_mapping[original_subject] = original_subject
         elif "WormBase:" in original_subject:
             converted = original_subject.replace("WormBase:", "WB:")
             subject_mapping[converted] = original_subject
