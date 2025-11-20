@@ -142,7 +142,7 @@ def gene_to_uniprot_from_mygene(id: str):
 
 def uniprot_to_gene_from_mygene(id: str):
     """Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene."""
-    gene_id = None
+    gene_ids = []
     if id.startswith("UniProtKB"):
         id = id.split(":", 1)[1]
 
@@ -150,12 +150,23 @@ def uniprot_to_gene_from_mygene(id: str):
     try:
         results = mg.query(id, fields="HGNC")
         if results["hits"]:
-            hit = results["hits"][0]
-            gene_id = hit["HGNC"]
-            if not gene_id.startswith("HGNC"):
-                gene_id = "HGNC:{}".format(gene_id)
+            # Iterate through all hits to find HGNC IDs
+            for hit in results["hits"]:
+                if "HGNC" in hit:
+                    gene_id = hit["HGNC"]
+                    if isinstance(gene_id, list):
+                        # Handle case where HGNC field is a list
+                        for gid in gene_id:
+                            if not gid.startswith("HGNC"):
+                                gid = "HGNC:{}".format(gid)
+                            gene_ids.append(gid)
+                    else:
+                        # Handle case where HGNC field is a string
+                        if not gene_id.startswith("HGNC"):
+                            gene_id = "HGNC:{}".format(gene_id)
+                        gene_ids.append(gene_id)
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-    if not gene_id:
+    if not gene_ids:
         raise DataNotFoundException(detail="No HGNC IDs found for {}".format(id))
-    return [gene_id]
+    return gene_ids
