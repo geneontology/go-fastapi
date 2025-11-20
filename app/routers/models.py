@@ -31,7 +31,7 @@ async def get_gocam_model_by_id_in_gocam_py_format(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="581e072c00000295",
+        examples=["581e072c00000295"],
     )
 ) -> dict:
     """
@@ -406,7 +406,7 @@ async def get_term_details_by_model_id(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="581e072c00000295",
+        examples=["581e072c00000295"],
     )
 ):
     """Returns model details based on a GO-CAM model ID."""
