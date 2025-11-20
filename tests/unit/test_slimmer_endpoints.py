@@ -23,7 +23,7 @@ uris = ["http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FGO_0008150"]
 class TestSlimmerEndpoint(unittest.TestCase):
     """test the slimmer endpoints."""
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_slimmer_endpoint_fgf8a(self):
         """
         Test the slimmer endpoint for FGF8A gene.
@@ -46,7 +46,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
             for assoc in item.get("assocs"):
                 self.assertTrue(assoc.get("evidence"))
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_slimmer_endpoint_shha(self):
         """
         Test the slimmer endpoint for SHHA gene.
@@ -68,7 +68,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
                 self.assertTrue(assoc.get("evidence"))
         self.assertGreater(len(response.json()), 0)
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_slimmer_endpoint_mgimgi(self):
         """
         Test the slimmer endpoint for MGI gene.
@@ -81,12 +81,15 @@ class TestSlimmerEndpoint(unittest.TestCase):
             "slim": ["GO:0005575"],
         }
         response = test_client.get(endpoint, params=data)
-        for subject in response.json().get("subjects"):
-            print(subject)
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.json()), 0)
+        response_data = response.json()
+        self.assertIsInstance(response_data, list)
+        self.assertGreater(len(response_data), 0)
+        # Check that we have results for the MGI subject
+        found_mgi = any(item.get("subject") in ["MGI:MGI:3588192", "MGI:3588192"] for item in response_data)
+        self.assertTrue(found_mgi, "Should find results for MGI gene")
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_slimmer_endpoint_mgi(self):
         """
         Test the slimmer endpoint for MGI gene.
@@ -102,7 +105,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.json()), 0)
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_hgnc_slimmer_function(self):
         """Test slimmer function endpoint returns results for HGNC IDs."""
         hgnc_test_ids = ["HGNC:8725", "HGNC:8729"]
@@ -119,6 +122,9 @@ class TestSlimmerEndpoint(unittest.TestCase):
             self.assertIsInstance(response_data, list)
             self.assertGreater(len(response_data), 0)
 
+            # Log the response to debug
+            logger.info(f"Response for {hgnc_id}: {response_data}")
+            
             found_subject = False
             for item in response_data:
                 self.assertIn("subject", item)
@@ -132,7 +138,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
 
             self.assertTrue(found_subject, f"Should find results for {hgnc_id}")
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_hgnc_slimmer_function_multiple(self):
         """Test slimmer function endpoint returns results for multiple HGNC IDs."""
         hgnc_test_ids = ["HGNC:8725", "HGNC:8729"]
@@ -165,7 +171,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
         for hgnc_id in hgnc_test_ids:
             self.assertIn(hgnc_id, found_subjects, f"Should find results for {hgnc_id}")
 
-    @unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
+    #@unittest.skip("Endpoint not available")  # To skip the test since the endpoint is not available
     def test_hgnc_slimmer_specific_slim(self):
         """Test slimmer function with HGNC IDs and specific GO slim terms."""
         test_cases = [

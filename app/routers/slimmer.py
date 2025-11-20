@@ -68,6 +68,26 @@ async def slimmer_function(
         else:
             slimmer_subjects.append(s)
 
+    # Create mapping from converted subjects back to original subjects
+    subject_mapping = {}
+    for i, original_subject in enumerate(subject):
+        if "HGNC:" in original_subject or "NCBIGene:" in original_subject or "ENSEMBL:" in original_subject:
+            # These were converted to UniProt IDs
+            prots = gene_to_uniprot_from_mygene(original_subject)
+            if len(prots) == 0:
+                subject_mapping[original_subject] = original_subject
+            else:
+                for prot in prots:
+                    subject_mapping[prot] = original_subject
+        elif "MGI:MGI:" in original_subject:
+            converted = original_subject.replace("MGI:MGI:", "MGI:")
+            subject_mapping[converted] = original_subject
+        elif "WormBase:" in original_subject:
+            converted = original_subject.replace("WormBase:", "WB:")
+            subject_mapping[converted] = original_subject
+        else:
+            subject_mapping[original_subject] = original_subject
+
     # Use local implementation to avoid timeout issues
     results = local_map2slim(
         subjects=slimmer_subjects,
@@ -75,6 +95,11 @@ async def slimmer_function(
         relationship_type=relationship_type.value,
         exclude_automatic_assertions=exclude_automatic_assertions,
     )
+    
+    # Map subjects back to original IDs in results
+    for result in results:
+        if result["subject"] in subject_mapping:
+            result["subject"] = subject_mapping[result["subject"]]
 
     # To the fullest extent possible return HGNC ids
     checked = {}
@@ -104,6 +129,7 @@ async def slimmer_function(
                 else:
                     association["subject"]["id"] = checked[protein_id]
     if not results:
+        logger.warning(f"No slim results found for subjects: {slimmer_subjects}")
         raise DataNotFoundException(detail="No results found")
     return results
 
@@ -160,12 +186,14 @@ def local_map2slim(subjects, slim_terms,
 
         # Make the request with 60-second timeout
         try:
+            # gu_run_solr_text_on expects enum objects, not strings
             annotations = gu_run_solr_text_on(
                 ESOLR.GOLR,
-                ESOLRDoc.ANNOTATION.value,
+                ESOLRDoc.ANNOTATION,
                 q, qf, fields, fq,
                 highlight=False
             )
+            logger.info(f"Found {len(annotations)} annotations for {subject_id}")
         except Exception as e:
             logger.error(f"Error fetching annotations for {subject_id}: {e}")
             continue
