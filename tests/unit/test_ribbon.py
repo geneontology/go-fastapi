@@ -203,5 +203,89 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertFalse(subject.get("id").startswith("MGI:MGI:"))
         self.assertEqual(response.status_code, 200)
 
+    def test_hgnc_8725_ribbon(self):
+        """Test ribbon endpoint returns annotations for HGNC:8725."""
+        data = {"subset": "goslim_agr", "subject": ["HGNC:8725"]}
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertEqual(response.status_code, 200)
+        
+        response_data = response.json()
+        self.assertIsInstance(response_data, dict)
+        self.assertIn("subjects", response_data)
+        self.assertGreater(len(response_data.get("subjects", [])), 0)
+        
+        # Verify the response contains our subject
+        subject_ids = [subject.get("id") for subject in response_data.get("subjects", [])]
+        self.assertIn("HGNC:8725", subject_ids)
+        
+        # Verify annotations are returned
+        for subject in response_data.get("subjects", []):
+            if subject.get("id") == "HGNC:8725":
+                self.assertIsNotNone(subject.get("groups"))
+                # Check that at least one GO category has annotations
+                groups = subject.get("groups", {})
+                has_annotations = any(
+                    group.get("ALL", {}).get("nb_annotations", 0) > 0 
+                    for group in groups.values() 
+                    if isinstance(group, dict)
+                )
+                self.assertTrue(has_annotations, "HGNC:8725 should have annotations")
+
+    def test_hgnc_8729_ribbon(self):
+        """Test ribbon endpoint returns annotations for HGNC:8729."""
+        data = {"subset": "goslim_agr", "subject": ["HGNC:8729"]}
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertEqual(response.status_code, 200)
+        
+        response_data = response.json()
+        self.assertIsInstance(response_data, dict)
+        self.assertIn("subjects", response_data)
+        self.assertGreater(len(response_data.get("subjects", [])), 0)
+        
+        # Verify the response contains our subject
+        subject_ids = [subject.get("id") for subject in response_data.get("subjects", [])]
+        self.assertIn("HGNC:8729", subject_ids)
+        
+        # Verify annotations are returned
+        for subject in response_data.get("subjects", []):
+            if subject.get("id") == "HGNC:8729":
+                self.assertIsNotNone(subject.get("groups"))
+                # Check that at least one GO category has annotations
+                groups = subject.get("groups", {})
+                has_annotations = any(
+                    group.get("ALL", {}).get("nb_annotations", 0) > 0 
+                    for group in groups.values() 
+                    if isinstance(group, dict)
+                )
+                self.assertTrue(has_annotations, "HGNC:8729 should have annotations")
+
+    def test_hgnc_8725_and_8729_ribbon_together(self):
+        """Test ribbon endpoint returns annotations for both HGNC:8725 and HGNC:8729 together."""
+        data = {"subset": "goslim_agr", "subject": ["HGNC:8725", "HGNC:8729"]}
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertEqual(response.status_code, 200)
+        
+        response_data = response.json()
+        self.assertIsInstance(response_data, dict)
+        self.assertIn("subjects", response_data)
+        subjects = response_data.get("subjects", [])
+        
+        # Should have results for both genes
+        subject_ids = [subject.get("id") for subject in subjects]
+        self.assertIn("HGNC:8725", subject_ids)
+        self.assertIn("HGNC:8729", subject_ids)
+        
+        # Both should have annotations
+        for subject in subjects:
+            if subject.get("id") in ["HGNC:8725", "HGNC:8729"]:
+                self.assertIsNotNone(subject.get("groups"))
+                groups = subject.get("groups", {})
+                has_annotations = any(
+                    group.get("ALL", {}).get("nb_annotations", 0) > 0 
+                    for group in groups.values() 
+                    if isinstance(group, dict)
+                )
+                self.assertTrue(has_annotations, f"{subject.get('id')} should have annotations")
+
 if __name__ == "__main__":
     unittest.main()
