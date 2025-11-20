@@ -62,7 +62,7 @@ async def get_gp_models_by_orcid(
     orcid: str = Path(
         ...,
         description="The ORCID of the user (e.g. 0000-0002-7285-027X)",
-        example="0000-0002-7285-027X",
+        examples="0000-0002-7285-027X",
     )
 ):
     """Returns GO-CAM model identifiers for a particular contributor orcid."""
@@ -234,7 +234,7 @@ async def get_go_cam_models_by_orcid(
     orcid: str = Path(
         ...,
         description="The ORCID of the user (e.g. 0000-0002-7285-027X)",
-        example="0000-0002-7285-027X",
+        examples="0000-0002-7285-027X",
     )
 ):
     """Returns GO-CAM model identifiers for a particular contributor orcid."""

@@ -30,7 +30,7 @@ aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 )
 async def get_subsets_by_term(
     id: str = Path(
-        ..., description="The ID of the term to extract the subsets from, e.g. GO:0003677", example="GO:0003677"
+        ..., description="The ID of the term to extract the subsets from, e.g. GO:0003677", examples="GO:0003677"
     )
 ):
     """Returns subsets (slims) associated to an ontology term."""
@@ -57,7 +57,7 @@ async def get_subsets_by_term(
     description="Returns a subset (slim) by its id which is usually a name. (e.g. goslim_agr)",
 )
 async def get_subset_by_id(
-    id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr")
+    id: str = Path(..., description="Name of the subset to map GO terms (e.g. goslim_agr)", examples="goslim_agr")
 ):
     """Returns a subset (slim) by its id which is usually a name."""
     result = ontology_utils.get_ontology_subsets_by_id(id=id)
@@ -72,16 +72,16 @@ async def get_subset_by_id(
     description="Fetch the summary of annotations for a given gene or set of genes.",
 )
 async def get_ribbon_results(
-    subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)", example="goslim_agr"),
+    subset: str = Query(None, description="Name of the subset to map GO terms (e.g. goslim_agr)", examples="goslim_agr"),
     subject: List[str] = Query(
         None,
         description="List of Gene ids (e.g. MGI:98214, RGD:620474)",
-        example=["ZFIN:ZDB-GENE-990415-44", "RGD:620474"],
+        examples=["ZFIN:ZDB-GENE-990415-44", "RGD:620474"],
     ),
     ecodes: List[str] = Query(
         None,
         description="List of Evidence Codes to include (e.g. EXP, IDA). Has priority over exclude_IBA",
-        example=["EXP", "IDA"],
+        examples=["EXP", "IDA"],
     ),
     exclude_IBA: bool = Query(False, description="If true, excludes IBA annotations"),
     exclude_PB: bool = Query(False, description="If true, excludes direct annotations to protein binding"),
