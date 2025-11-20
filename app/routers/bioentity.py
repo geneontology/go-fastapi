@@ -394,7 +394,7 @@ async def get_annotations_by_gene_id(
         ...,
         description="The CURIE identifier of the gene for which GO term associations are retrieved."
         "(e.g., ZFIN:ZDB-GENE-050417-357)",
-        example="ZFIN:ZDB-GENE-050417-357",
+        examples=["ZFIN:ZDB-GENE-050417-357"],
     ),
     slim: List[str] = Query(
         default=None,

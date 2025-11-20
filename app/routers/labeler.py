@@ -19,7 +19,7 @@ logger = logging.getLogger()
     "/api/ontol/labeler", tags=["ontol/labeler"], description="Fetches a map from IDs to labels e.g. GO:0003677."
 )
 async def expand_curie(
-    id: List[str] = Query(..., description="IDs to fetch labels for.", example=["GO:0003677", "GO:0008150"])
+    id: List[str] = Query(..., description="IDs to fetch labels for.", examples=["GO:0003677", "GO:0008150"])
 ):
     """Fetches a map from IDs to labels e.g. GO:0003677."""
     logger.info("fetching labels for IDs")
