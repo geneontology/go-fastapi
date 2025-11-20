@@ -5,7 +5,7 @@ from zipfile import error
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.routers.slimmer import gene_to_uniprot_from_mygene
+from app.utils.mygene_utils import gene_to_uniprot_from_mygene
 from app.utils.rate_limiter import rate_limit_golr, retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
 
