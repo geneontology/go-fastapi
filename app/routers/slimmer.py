@@ -74,7 +74,7 @@ async def slimmer_function(
 
     # Create mapping from converted subjects back to original subjects
     subject_mapping = {}
-    for i, original_subject in enumerate(subject):
+    for _i, original_subject in enumerate(subject):
         if "HGNC:" in original_subject or "NCBIGene:" in original_subject or "ENSEMBL:" in original_subject:
             # These were converted to UniProt IDs
             prots = gene_to_uniprot_from_mygene(original_subject)
@@ -99,7 +99,7 @@ async def slimmer_function(
     # Log the converted subjects
     logger.info(f"Original subjects: {subject}")
     logger.info(f"Converted subjects for GOLr: {slimmer_subjects}")
-    
+
     # Use local implementation to avoid timeout issues
     results = local_map2slim(
         subjects=slimmer_subjects,
@@ -107,7 +107,7 @@ async def slimmer_function(
         relationship_type=relationship_type.value,
         exclude_automatic_assertions=exclude_automatic_assertions,
     )
-    
+
     # Map subjects back to original IDs in results
     for result in results:
         if result["subject"] in subject_mapping:
