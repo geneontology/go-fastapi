@@ -30,7 +30,7 @@ class RateLimiter:
             if time_since_last_call < self.min_interval:
                 sleep_time = self.min_interval - time_since_last_call
                 time.sleep(sleep_time)
-                self.last_call_time = time.time()
+                self.last_call_time = current_time + self.min_interval
             else:
                 self.last_call_time = current_time
 
