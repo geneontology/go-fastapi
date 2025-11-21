@@ -4,12 +4,12 @@ import logging
 from enum import Enum
 from typing import List
 
-from biothings_client import get_client
 from fastapi import APIRouter, Query
-from ontobio.golr.golr_associations import map2slim
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.utils.settings import ESOLR, get_user_agent
+from app.utils.golr_utils import gu_run_solr_text_on
+from app.utils.mygene_utils import gene_to_uniprot_from_mygene, uniprot_to_gene_from_mygene
+from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -39,12 +39,12 @@ async def slimmer_function(
     subject: List[str] = Query(
         ...,
         description="example: ZFIN:ZDB-GENE-980526-388, MGI:3588192",
-        example=["ZFIN:ZDB-GENE-980526-388", "MGI:3588192"],
+        examples=["ZFIN:ZDB-GENE-980526-388", "MGI:3588192"],
     ),
     slim: List[str] = Query(
         ...,
         description="a set of GO term ids to use as the slim, example: GO:0008150, GO:0003674, GO:0005575",
-        example=["GO:0008150", "GO:0003674", "GO:0005575"],
+        examples=["GO:0008150", "GO:0003674", "GO:0005575"],
     ),
     exclude_automatic_assertions: bool = False,
     rows: int = Query(default=-1, description="Number of rows to return, -1 for all"),
@@ -61,26 +61,62 @@ async def slimmer_function(
             if len(prots) == 0:
                 prots = [s]
             slimmer_subjects += prots
-        elif "MGI:MGI:" in s:
-            slimmer_subjects.append(s.replace("MGI:MGI:", "MGI:"))
+        elif "MGI:" in s:
+            # GOLr expects MGI identifiers in MGI:MGI: format
+            if not s.startswith("MGI:MGI:"):
+                slimmer_subjects.append(s.replace("MGI:", "MGI:MGI:"))
+            else:
+                slimmer_subjects.append(s)
         elif "WormBase:" in s:
             slimmer_subjects.append(s.replace("WormBase:", "WB:"))
         else:
             slimmer_subjects.append(s)
 
-    results = map2slim(
+    # Create mapping from converted subjects back to original subjects
+    subject_mapping = {}
+    for _i, original_subject in enumerate(subject):
+        if "HGNC:" in original_subject or "NCBIGene:" in original_subject or "ENSEMBL:" in original_subject:
+            # These were converted to UniProt IDs
+            prots = gene_to_uniprot_from_mygene(original_subject)
+            if len(prots) == 0:
+                subject_mapping[original_subject] = original_subject
+            else:
+                for prot in prots:
+                    subject_mapping[prot] = original_subject
+        elif "MGI:" in original_subject:
+            # We converted MGI: to MGI:MGI: for GOLr
+            if not original_subject.startswith("MGI:MGI:"):
+                converted = original_subject.replace("MGI:", "MGI:MGI:")
+                subject_mapping[converted] = original_subject
+            else:
+                subject_mapping[original_subject] = original_subject
+        elif "WormBase:" in original_subject:
+            converted = original_subject.replace("WormBase:", "WB:")
+            subject_mapping[converted] = original_subject
+        else:
+            subject_mapping[original_subject] = original_subject
+
+    # Log the converted subjects
+    logger.info(f"Original subjects: {subject}")
+    logger.info(f"Converted subjects for GOLr: {slimmer_subjects}")
+
+    # Use local implementation to avoid timeout issues
+    results = local_map2slim(
         subjects=slimmer_subjects,
-        slim=slim,
-        object_category="function",
-        user_agent=USER_AGENT,
-        url=ESOLR.GOLR,
+        slim_terms=slim,
         relationship_type=relationship_type.value,
         exclude_automatic_assertions=exclude_automatic_assertions,
-        # rows=-1 sets row limit to 100000 (max_rows set in GolrQuery) and also iterates
-        # through results via GolrQuery method.
-        rows=rows,
-        start=start,
     )
+
+    # Map subjects back to original IDs in results
+    for result in results:
+        if result["subject"] in subject_mapping:
+            result["subject"] = subject_mapping[result["subject"]]
+
+        # Also map the subject IDs within associations
+        for association in result.get("assocs", []):
+            if association["subject"]["id"] in subject_mapping:
+                association["subject"]["id"] = subject_mapping[association["subject"]["id"]]
 
     # To the fullest extent possible return HGNC ids
     checked = {}
@@ -90,72 +126,154 @@ async def slimmer_function(
             protein_id = association["subject"]["id"]
             if taxon == "NCBITaxon:9606" and protein_id.startswith("UniProtKB:"):
                 if protein_id not in checked:
-                    genes = uniprot_to_gene_from_mygene(protein_id)
-                    for gene in genes:
-                        if gene.startswith("HGNC"):
-                            association["subject"]["id"] = gene
-                            checked[protein_id] = gene
+                    try:
+                        genes = uniprot_to_gene_from_mygene(protein_id)
+                        found_hgnc = False
+                        for gene in genes:
+                            if gene.startswith("HGNC"):
+                                association["subject"]["id"] = gene
+                                checked[protein_id] = gene
+                                found_hgnc = True
+                                break
+                        # If no HGNC ID was found in the results, keep the original UniProt ID
+                        if not found_hgnc:
+                            logger.info(f"No HGNC ID found in results for {protein_id}, keeping original")
+                            checked[protein_id] = protein_id
+                    except DataNotFoundException:
+                        # If we can't map the UniProt back to HGNC, keep the UniProt ID
+                        logger.warning("Could not map UniProt %s back to HGNC, keeping original ID", protein_id)
+                        checked[protein_id] = protein_id
                 else:
                     association["subject"]["id"] = checked[protein_id]
     if not results:
+        logger.warning(f"No slim results found for subjects: {slimmer_subjects}")
         raise DataNotFoundException(detail="No results found")
     return results
 
 
-def gene_to_uniprot_from_mygene(id: str):
-    """Query MyGeneInfo with a gene and get its corresponding UniProt ID."""
-    uniprot_ids = []
-    mg = get_client("gene")
-    if id.startswith("NCBIGene:"):
-        # MyGeneInfo uses 'entrezgene' prefix instead of 'NCBIGene'
-        id = id.replace("NCBIGene", "entrezgene")
-    try:
-        results = mg.query(id, fields="uniprot")
-        logger.info("results from mygene for %s: %s", id, results["hits"])
-        if results["hits"]:
-            for hit in results["hits"]:
-                if "uniprot" not in hit:
-                    continue
-                if "Swiss-Prot" in hit["uniprot"]:
-                    uniprot_id = hit["uniprot"]["Swiss-Prot"]
-                    if isinstance(uniprot_id, str):
-                        if not uniprot_id.startswith("UniProtKB"):
-                            uniprot_id = "UniProtKB:{}".format(uniprot_id)
-                        uniprot_ids.append(uniprot_id)
-                    else:
-                        for x in uniprot_id:
-                            if not x.startswith("UniProtKB"):
-                                x = "UniProtKB:{}".format(x)
-                            uniprot_ids.append(x)
-                else:
-                    trembl_ids = hit["uniprot"]["TrEMBL"]
-                    for x in trembl_ids:
-                        if not x.startswith("UniProtKB"):
-                            x = "UniProtKB:{}".format(x)
-                        uniprot_ids.append(x)
-    except ConnectionError:
-        logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-    if not uniprot_ids:
-        raise DataNotFoundException(detail="No UniProtKB IDs found for {}".format(id))
-    return uniprot_ids
+def local_map2slim(subjects, slim_terms,
+                   relationship_type="acts_upstream_of_or_within",
+                   exclude_automatic_assertions=False):
+    """
+    Local implementation of map2slim using gu_run_solr_text_on.
 
+    This avoids the timeout issues with the ontobio map2slim by:
+    1. Using gu_run_solr_text_on with 60-second timeout
+    2. Requesting only necessary fields
+    3. Processing the slimming logic locally
+    """
+    # Convert single slim term to list if needed
+    if isinstance(slim_terms, str):
+        slim_terms = [slim_terms]
 
-def uniprot_to_gene_from_mygene(id: str):
-    """Query MyGeneInfo with a UniProtKB id and get its corresponding HGNC gene."""
-    gene_id = None
-    if id.startswith("UniProtKB"):
-        id = id.split(":", 1)[1]
+    # Clean up slim terms - handle comma-separated strings
+    cleaned_slim_terms = []
+    for term in slim_terms:
+        if ',' in term:
+            cleaned_slim_terms.extend([t.strip() for t in term.split(',')])
+        else:
+            cleaned_slim_terms.append(term.strip())
+    slim_terms = cleaned_slim_terms
 
-    mg = get_client("gene")
-    try:
-        results = mg.query(id, fields="HGNC")
-        if results["hits"]:
-            hit = results["hits"][0]
-            gene_id = hit["HGNC"]
-            if not gene_id.startswith("HGNC"):
-                gene_id = "HGNC:{}".format(gene_id)
-    except ConnectionError:
-        logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
-    if not gene_id:
-        raise DataNotFoundException(detail="No HGNC IDs found for {}".format(id))
-    return [gene_id]
+    results = []
+
+    for subject_id in subjects:
+        # Build the query
+        q = "*:*"
+        qf = ""
+        fq = f'&fq=bioentity:"{subject_id}"'
+
+        # Only request necessary fields for slimming
+        fields = ("id,bioentity,bioentity_label,annotation_class,annotation_class_label,"
+                  "regulates_closure,aspect,evidence_type,evidence_type_label,"
+                  "taxon,taxon_label,assigned_by,reference")
+
+        # Apply evidence filters
+        if exclude_automatic_assertions:
+            fq += '&fq=!evidence_type:("IEA")'
+
+        # Apply relationship type filter if not default
+        if relationship_type == "involved_in":
+            # For involved_in, we only want direct annotations
+            fq += '&fq=qualifier:"involved_in"'
+        # For acts_upstream_of_or_within, we want all relationships
+
+        # Set rows to fetch all annotations for this subject
+        fq += "&rows=100000"
+
+        # Make the request with 60-second timeout
+        try:
+            logger.info(f"Querying GOLr for subject: {subject_id}")
+            logger.info(f"Query params - q: {q}, qf: {qf}, fq: {fq}")
+            # gu_run_solr_text_on expects enum objects, not strings
+            annotations = gu_run_solr_text_on(
+                ESOLR.GOLR,
+                ESOLRDoc.ANNOTATION,
+                q, qf, fields, fq,
+                highlight=False
+            )
+            logger.info(f"Found {len(annotations)} annotations for {subject_id}")
+        except Exception as e:
+            logger.error(f"Error fetching annotations for {subject_id}: {e}")
+            continue
+
+        # Process annotations into slim groups
+        slim_map = {}
+        subject_info = None
+
+        for annot in annotations:
+            # Get subject info from first annotation
+            if subject_info is None:
+                subject_info = {
+                    "id": annot.get("bioentity", ""),
+                    "label": annot.get("bioentity_label", ""),
+                    "taxon": {
+                        "id": annot.get("taxon", ""),
+                        "label": annot.get("taxon_label", "")
+                    }
+                }
+
+            # Get the regulates_closure (object_closure)
+            regulates_closure = annot.get("regulates_closure", [])
+            if isinstance(regulates_closure, str):
+                regulates_closure = [regulates_closure]
+
+            # Find which slim terms this annotation maps to
+            for slim_term in slim_terms:
+                if slim_term in regulates_closure:
+                    if slim_term not in slim_map:
+                        slim_map[slim_term] = []
+
+                    # Create association object matching map2slim format
+                    assoc = {
+                        "id": annot.get("id", ""),
+                        "subject": subject_info,
+                        "object": {
+                            "id": annot.get("annotation_class", ""),
+                            "label": annot.get("annotation_class_label", "")
+                        },
+                        "relation": {
+                            "id": relationship_type,
+                            "label": relationship_type.replace("_", " ")
+                        },
+                        "evidence": [
+                            {
+                                "id": annot.get("evidence_type", ""),
+                                "label": annot.get("evidence_type_label", "")
+                            }
+                        ],
+                        "provided_by": [annot.get("assigned_by", "")] if annot.get("assigned_by") else [],
+                        "publications": [annot.get("reference", "")] if annot.get("reference") else []
+                    }
+                    slim_map[slim_term].append(assoc)
+
+        # Format results to match map2slim output
+        for slim_term, assocs in slim_map.items():
+            result = {
+                "subject": subject_id,
+                "slim": slim_term,
+                "assocs": assocs
+            }
+            results.append(result)
+
+    return results

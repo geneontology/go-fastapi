@@ -31,7 +31,7 @@ async def get_gocam_model_by_id_in_gocam_py_format(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="581e072c00000295",
+        examples=["581e072c00000295"],
     )
 ) -> dict:
     """
@@ -81,7 +81,7 @@ async def get_goterms_by_model_id(
     gocams: List[str] = Query(
         None,
         description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
-        example=["581e072c00000295", "SYNGO_369"],
+        examples=["581e072c00000295", "SYNGO_369"],
     )
 ):
     """Returns go term details based on a GO-CAM model ID."""
@@ -203,7 +203,7 @@ async def get_geneproducts_by_model_id(
     gocams: List[str] = Query(
         None,
         description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
-        example=["581e072c00000295", "SYNGO_369"],
+        examples=["581e072c00000295", "SYNGO_369"],
     )
 ):
     """
@@ -296,7 +296,7 @@ async def get_pmid_by_model_id(
     gocams: List[str] = Query(
         None,
         description="A list of GO-CAM IDs separated by a comma, e.g. 59a6110e00000067,SYNGO_369",
-        example=["581e072c00000295", "SYNGO_369"],
+        examples=["581e072c00000295", "SYNGO_369"],
     )
 ):
     """Returns pubmed details based on a GO CAM id."""
@@ -374,7 +374,7 @@ async def get_model_details_by_model_id_json(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="gomodel:66187e4700001573",
+        examples=["gomodel:66187e4700001573"],
     )
 ):
     """
@@ -406,7 +406,7 @@ async def get_term_details_by_model_id(
     id: str = Path(
         ...,
         description="A GO-CAM identifier (e.g. 581e072c00000820, 581e072c00000295, 5900dc7400000968)",
-        example="581e072c00000295",
+        examples=["581e072c00000295"],
     )
 ):
     """Returns model details based on a GO-CAM model ID."""
@@ -453,7 +453,7 @@ async def get_term_details_by_taxon_id(
     taxon: str = Path(
         ...,
         description="A taxon identifier (e.g. NCBITaxon:9606, NCBITaxon:10090, NCBITaxon:10116)",
-        example="NCBITaxon:9606",
+        examples=["NCBITaxon:9606"],
     )
 ):
     """Returns model details based on a NCBI Taxon ID."""
@@ -546,7 +546,7 @@ async def get_models_by_orcid(
     orcid: str = Path(
         ...,
         description="The ORCID of the user (e.g. 0000-0003-1813-6857)",
-        example="0000-0003-1813-6857",
+        examples=["0000-0003-1813-6857"],
     )
 ):
     """Returns model details based on an orcid."""

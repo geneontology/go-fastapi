@@ -5,11 +5,14 @@ from zipfile import error
 import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.routers.slimmer import gene_to_uniprot_from_mygene
+from app.utils.mygene_utils import gene_to_uniprot_from_mygene
+from app.utils.rate_limiter import rate_limit_golr, retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
 
 
 # Respect the method name for run_sparql_on with enums
+@retry_on_golr_error(max_retries=3, delay=2)
+@rate_limit_golr
 def run_solr_on(solr_instance, category, id, fields):
     """Return the result of a Solr query."""
     query = (
@@ -29,7 +32,11 @@ def run_solr_on(solr_instance, category, id, fields):
     try:
         response = requests.get(query, timeout=timeout_seconds)
         response.raise_for_status()  # Raise an error for non-2xx responses
-        response_json = response.json()
+        try:
+            response_json = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response from GOLr: {e}")
+            raise ValueError(f"Invalid JSON response from GOLr server: {e}") from e
         logger.info("Solr response JSON:", response_json)
 
         docs = response_json.get("response", {}).get("docs", [])
@@ -49,6 +56,8 @@ def run_solr_on(solr_instance, category, id, fields):
 
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
+@retry_on_golr_error(max_retries=3, delay=2)
+@rate_limit_golr
 def gu_run_solr_text_on(
     solr_instance, category: str, q: str, qf: str, fields: str, optionals: str, highlight: bool = False
 ):
@@ -90,14 +99,20 @@ def gu_run_solr_text_on(
 
     try:
         response = requests.get(query, timeout=timeout_seconds)
+        response.raise_for_status()  # Raise an error for non-2xx responses
+        try:
+            response_json = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response from GOLr: {e}")
+            raise ValueError(f"Invalid JSON response from GOLr server: {e}") from e
 
         # solr returns matching text in the field "highlighting", but it is not included in the response.
         # We add it to the response here to make it easier to use. Highlighting is keyed by the id of the document
         if highlight:
             highlight_added = []
-            for doc in response.json()["response"]["docs"]:
-                if doc.get("id") is not None and doc.get("id") in response.json()["highlighting"]:
-                    doc["highlighting"] = response.json()["highlighting"][doc["id"]]
+            for doc in response_json["response"]["docs"]:
+                if doc.get("id") is not None and doc.get("id") in response_json["highlighting"]:
+                    doc["highlighting"] = response_json["highlighting"][doc["id"]]
                     if doc.get("id").startswith("MGI:"):
                         doc["id"] = doc["id"].replace("MGI:MGI:", "MGI:")
                 else:
@@ -106,16 +121,18 @@ def gu_run_solr_text_on(
             return highlight_added
         else:
             return_doc = []
-            for doc in response.json()["response"]["docs"]:
+            for doc in response_json["response"]["docs"]:
                 if doc.get("id") is not None and doc.get("id").startswith("MGI:"):
                     doc["id"] = doc["id"].replace("MGI:MGI:", "MGI:")
                 return_doc.append(doc)
             return return_doc
             # Process the response here
-    except requests.Timeout:
-        logger.info("Request timed out")
+    except requests.Timeout as e:
+        logger.error(f"Request timed out: {e}")
+        raise
     except requests.RequestException as e:
-        logger.info(f"Request error: {e}")
+        logger.error(f"Request error: {e}")
+        raise
 
 
 def is_valid_bioentity(entity_id) -> bool:

@@ -169,13 +169,13 @@ class TestApp(unittest.TestCase):
 
         :return: None
         """
-        # Test with a non-existent model ID
-        response = test_client.get("/api/gocam-model/67c10cc400005826")
+        # Test with a non-existent model ID (using a format that definitely won't exist)
+        response = test_client.get("/api/gocam-model/nonexistent00000000")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json().get("detail"), "GO-CAM model not found.")
 
         # Test with other invalid ID formats
-        invalid_ids = ["invalid-id", "12345", "not_a_valid_id"]
+        invalid_ids = ["invalid-id", "12345", "not_a_valid_id", "zzz999999999zzzz"]
         for invalid_id in invalid_ids:
             response = test_client.get(f"/api/gocam-model/{invalid_id}")
             self.assertEqual(response.status_code, 404)
