@@ -112,7 +112,7 @@ async def slimmer_function(
     for result in results:
         if result["subject"] in subject_mapping:
             result["subject"] = subject_mapping[result["subject"]]
-        
+
         # Also map the subject IDs within associations
         for association in result.get("assocs", []):
             if association["subject"]["id"] in subject_mapping:
