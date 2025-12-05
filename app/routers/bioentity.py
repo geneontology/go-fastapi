@@ -6,10 +6,10 @@ from typing import List
 
 from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
-from ontobio.golr.golr_associations import search_associations
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on, is_valid_bioentity
+from app.utils.golr_wrappers import search_associations
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from ..utils.ontology_utils import is_valid_goid
@@ -54,7 +54,7 @@ async def get_bioentity_by_id(
     id: str = Path(
         ...,
         description="The CURIE of the gene to be retrieved. (e.g. ZFIN:ZDB-GENE-990415-44)",
-        example="ZFIN:ZDB-GENE-990415-44",
+        examples=[{"value": "ZFIN:ZDB-GENE-990415-44"}],
     ),
     start: int = Query(0, description="The starting index for pagination."),
     rows: int = Query(100, description="The number of results per page."),
@@ -119,7 +119,7 @@ async def get_annotations_by_goterm_id(
     id: str = Path(
         ...,
         description="The CURIE of the GO term to be used for annotation retrieval. (e.g. GO:0044598)",
-        example="GO:0044598",
+        examples=[{"value": "GO:0044598"}],
     ),
     evidence: List[str] = Query(None),
     start: int = Query(0, description="The starting index for pagination."),
@@ -202,12 +202,12 @@ async def get_genes_by_goterm_id(
     id: str = Path(
         ...,
         description="The CURIE of the GO term to be used for gene retrieval. (e.g. GO:0044598)",
-        example="GO:0044598",
+        examples=[{"value": "GO:0044598"}],
     ),
     taxon: List[str] = Query(
         default=None,
         description="One or more taxon CURIE to filter associations by subject taxon",
-        example=["NCBITaxon:7955", "NCBITaxon:9606"],
+        examples=[{"value": ["NCBITaxon:7955", "NCBITaxon:9606"]}],
     ),
     relationship_type: RelationshipType = Query(
         default=RelationshipType.INVOLVED_IN,
@@ -296,8 +296,11 @@ async def get_genes_by_goterm_id(
             subject_taxon=taxon,
             invert_subject_object=True,
             user_agent=USER_AGENT,
+            slim=slim,
+            relation=relation,
             url=ESOLR.GOLR,
             rows=rows,
+            start=start,
         )
 
     return {"associations": association_return.get("associations")}
@@ -312,7 +315,7 @@ async def get_taxon_by_goterm_id(
     id: str = Path(
         ...,
         description="The CURIE of the GO term to be used for taxon retrieval. (e.g. GO:0044598)",
-        example="GO:0044598",
+        examples=[{"value": "GO:0044598"}],
     ),
     evidence: List[str] = Query(
         default=None,
@@ -391,7 +394,7 @@ async def get_annotations_by_gene_id(
         ...,
         description="The CURIE identifier of the gene for which GO term associations are retrieved."
         "(e.g., ZFIN:ZDB-GENE-050417-357)",
-        example="ZFIN:ZDB-GENE-050417-357",
+        examples=["ZFIN:ZDB-GENE-050417-357"],
     ),
     slim: List[str] = Query(
         default=None,

@@ -24,7 +24,7 @@ router = APIRouter()
     "(e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).",
 )
 async def get_gocams_by_geneproduct_id(
-    id: str = Path(..., description="The CURIE of the gene product, e.g. MGI:3588192", example="MGI:3588192"),
+    id: str = Path(..., description="The CURIE of the gene product, e.g. MGI:3588192", examples="MGI:3588192"),
     causalmf: int = Query(
         None,
         deprecated=True,

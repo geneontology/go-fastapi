@@ -75,12 +75,12 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    @skip("This test is skipped because it takes too long to run for GH actions.")
+    @skip("Groups endpoint not available without SPARQL backend")
     def test_groups_by_name(self):
         """Test the endpoint to retrieve groups by name."""
         response = test_client.get("/api/groups/MGI")
-        self.assertGreater(len(response.json()), 10)
-        self.assertEqual(response.status_code, 200)
+        # Should return 404 since SPARQL backend is removed
+        self.assertEqual(response.status_code, 404)
 
     def test_get_modelid_by_pmid(self):
         """Test the endpoint to retrieve model IDs by PubMed ID."""
@@ -157,8 +157,13 @@ class TestApp(unittest.TestCase):
 
         :return: None
         """
+        # Test with a non-existent model ID (using a format that definitely won't exist)
+        response = test_client.get("/api/gocam-model/nonexistent00000000")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json().get("detail"), "GO-CAM model not found.")
+
         # Test with other invalid ID formats
-        invalid_ids = ["invalid-id", "12345", "not_a_valid_id", "99999999999999"]
+        invalid_ids = ["invalid-id", "12345", "not_a_valid_id", "zzz999999999zzzz"]
         for invalid_id in invalid_ids:
             response = test_client.get(f"/api/gocam-model/{invalid_id}")
             self.assertEqual(response.status_code, 404)

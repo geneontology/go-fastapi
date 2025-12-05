@@ -126,7 +126,7 @@ def term_in_slim(result, term):
     found_it = False
     term = term.replace('"', "").strip()
     for item in data:
-        for association in item.get("assocs"):
-            if term in association.get("slim"):
-                found_it = True
+        if item.get("slim") == term:
+            found_it = True
+            break
     assert found_it
