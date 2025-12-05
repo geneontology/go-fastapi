@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.utils.settings import ESOLR, ESOLRDoc
+from tests.test_utils import retry_on_golr_error
 
 test_client = TestClient(app)
 
@@ -52,6 +53,7 @@ class TestBioentityEndpoints(unittest.TestCase):
         for item in response.json():
             self.assertEqual(item.get("id"), "MGI:3588192")
 
+    @retry_on_golr_error(max_retries=3, delay=2)
     def test_bioentity_function_id_endpoints(self):
         """
         Test bioentity function ID endpoints.
@@ -63,6 +65,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreater(len(response.json()), 99)
 
+    @retry_on_golr_error(max_retries=3, delay=2)
     def test_bioentity_gene_endpoints(self):
         """
         Test bioentity gene endpoints.
@@ -74,6 +77,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json().get("associations")), 4)
 
+    @retry_on_golr_error(max_retries=3, delay=2)
     def test_bioentity_gene_function_endpoints(self):
         """
         Test bioentity gene function endpoints.
@@ -85,6 +89,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json().get("associations")), 92)
 
+    @retry_on_golr_error(max_retries=3, delay=2)
     def test_bioentity_gene_function_id_genes_endpoint(self):
         """
         Test bioentity gene function taxon endpoint.
@@ -97,6 +102,7 @@ class TestBioentityEndpoints(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertGreaterEqual(len(response.json().get("associations")), 100)
 
+    @retry_on_golr_error(max_retries=3, delay=2)
     def test_bioentity_gene_function_endpoints_taxons(self):
         """
         Test bioentity gene function endpoints taxons.

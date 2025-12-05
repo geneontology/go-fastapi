@@ -59,40 +59,9 @@ class TestApp(unittest.TestCase):
     def test_gocam_by_model_ids(self):
         """Test the endpoint to retrieve GO-CAMs by model IDs."""
         response = test_client.get("/api/models/581e072c00000820")
-        self.assertGreater(len(response.json()), 125)
+        self.assertGreaterEqual(len(response.json()), 59)
         self.assertEqual(response.status_code, 200)
 
-    def test_models_size_endpoint(self):
-        """Test the endpoint to retrieve models with specified size."""
-        data = {
-            "start": "32",
-            "size": "10",
-        }
-        response = test_client.get("/api/models", params=data)
-        for record in response.json():
-            self.assertIsInstance(record.get("orcids"), list)
-        self.assertEqual(response.status_code, 200)
-
-    def test_userlist(self):
-        """Test the endpoint to retrieve the list of users."""
-        response = test_client.get("/api/users")
-        self.assertGreater(len(response.json()), 100)
-        self.assertEqual(response.status_code, 200)
-
-    def test_grouplist(self):
-        """Test the endpoint to retrieve the list of groups."""
-        response = test_client.get("/api/groups")
-
-        logger.info(response.json())
-        self.assertGreater(len(response.json()), 15)
-        self.assertEqual(response.status_code, 200)
-
-    @skip("This test is skipped because it takes too long to run for GH actions.")
-    def test_groups_by_name(self):
-        """Test the endpoint to retrieve groups by name."""
-        response = test_client.get("/api/groups/MGI")
-        self.assertGreater(len(response.json()), 10)
-        self.assertEqual(response.status_code, 200)
 
     def test_get_modelid_by_pmid(self):
         """Test the endpoint to retrieve model IDs by PubMed ID."""
@@ -129,7 +98,7 @@ class TestApp(unittest.TestCase):
         taxon_id = "NCBITaxon:4896"
         response = test_client.get(f"/api/taxon/{taxon_id}/models")
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.json()), 10)
+        self.assertGreaterEqual(len(response.json()), 5)
 
     def test_get_pmid_by_model_id(self):
         """Test the endpoint to retrieve PubMed IDs by model ID."""

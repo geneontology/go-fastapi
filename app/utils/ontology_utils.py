@@ -2,17 +2,13 @@
 
 import logging
 
-from linkml_runtime.utils.namespaces import Namespaces
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.implementations.sparql.sparql_query import SparqlQuery
-from oaklib.resource import OntologyResource
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc
 from ontobio.ontol_factory import OntologyFactory
 from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
-from app.utils.settings import get_golr_config, get_sparql_endpoint
+from app.utils.settings import get_golr_config
 
 cfg = get_golr_config()
 omap = {}
@@ -45,24 +41,30 @@ def batch_fetch_labels(ids):
 
 def goont_fetch_label(id):
     """
-    Fetch all rdfs:label assertions for a URI.
+    Fetch label for a given ID using GOLR.
 
-    :param id: The URI for which the label is to be fetched.
+    :param id: The ID for which the label is to be fetched.
     :type id: str
-    :return: List of labels for the given URI.
-    :rtype: list
+    :return: Label for the given ID.
+    :rtype: str
     """
-    ns = Namespaces()
-    ns.add_prefixmap("go")
-    iri = ns.uri_for(id)
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = SparqlQuery(select=["?label"], where=["<" + iri + "> rdfs:label ?label"])
-    bindings = si._sparql_query(query.query_str())
-    if not bindings:
-        return None
-    rows = [r["label"]["value"] for r in bindings]
-    return rows[0]
+    try:
+        fields = "annotation_class_label,bioentity_label"
+        doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+        if doc and doc.get("annotation_class_label"):
+            return doc.get("annotation_class_label")
+    except Exception as e:
+        logger.error(f"Failed to fetch label from ONTOLOGY for {id}: {e}")
+
+    try:
+        fields = "bioentity_label"
+        doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.BIOENTITY, id, fields)
+        if doc and doc.get("bioentity_label"):
+            return doc.get("bioentity_label")
+    except Exception as e:
+        logger.error(f"Failed to fetch label from BIOENTITY for {id}: {e}")
+
+    return None
 
 
 def get_ontology_subsets_by_id(id: str):

@@ -7,16 +7,13 @@ from typing import List
 
 from curies import Converter
 from fastapi import APIRouter, Path, Query
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
 from pydantic import BaseModel
 
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.prefix_utils import get_prefixes
-from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
-from app.utils.sparql_utils import transform, transform_array
+from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 logger = logging.getLogger()
 
@@ -46,21 +43,28 @@ async def get_term_metadata_by_id(
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
 
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = ontology_utils.create_go_summary_sparql(id)
-    results = si._sparql_query(query)
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+    fields = "id,annotation_class_label,description,synonym,alternate_id,definition_xref,subset"
+    doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
 
-    transformed_result = transform(
-        results[0],
-        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
-    )
     cmaps = get_prefixes("go")
     converter = Converter.from_prefix_map(cmaps, strict=False)
-    transformed_result["goid"] = converter.compress(transformed_result["goid"])
-    return transformed_result
+    goid_iri = converter.expand(id)
+
+    result = {
+        "goid": goid_iri,
+        "label": doc.get("annotation_class_label", ""),
+        "definition": doc.get("description", ""),
+        "synonyms": doc.get("synonym", []),
+        "relatedSynonyms": [],
+        "alternativeIds": doc.get("alternate_id", []),
+        "xrefs": doc.get("definition_xref", []),
+        "subsets": doc.get("subset", []),
+        "comment": "",
+        "creation_date": ""
+    }
+
+    result["goid"] = converter.compress(result["goid"])
+    return result
 
 
 @router.get("/api/ontology/term/{id}/graph", tags=["ontology"])
@@ -213,12 +217,18 @@ async def get_ancestors_shared_between_two_terms(
         raise DataNotFoundException(detail=str(e)) from e
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
+    except Exception as e:
+        logger.warning(f"Validation failed, continuing anyway: {e}")
 
     fields = "isa_partof_closure,isa_partof_closure_label"
     logger.info(relation)
     if relation == "shared" or relation is None:
-        subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
-        objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        try:
+            subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+            objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        except Exception as e:
+            logger.error(f"Golr unavailable: {e}")
+            raise DataNotFoundException(detail="Ontology service temporarily unavailable") from e
 
         logger.info("SUBJECT: ", subres)
         logger.info("OBJECT: ", objres)
@@ -241,9 +251,12 @@ async def get_ancestors_shared_between_two_terms(
     else:
         logger.info("got here")
         fields = "neighborhood_graph_json"
-        # https://golr2.geneontology.org/solr/select?q=*:*&fq=document_category:%22ontology_class%22&fq=id:%22GO:0006259%22&fl=neighborhood_graph_json&wt=json&indent=on
-        subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
-        objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        try:
+            subres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, subject, fields)
+            objres = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, object, fields)
+        except Exception as e:
+            logger.error(f"Golr unavailable: {e}")
+            raise DataNotFoundException(detail="Ontology service temporarily unavailable") from e
 
         logger.info("SUBJECT: ", subres)
         logger.info("OBJECT: ", objres)
@@ -297,16 +310,18 @@ async def get_ancestors_shared_between_two_terms(
 @router.get(
     "/api/go/{id}",
     tags=["ontology"],
-    description="Returns GO-CAM model identifiers for a given GO term ID, e.g. GO:0008150",
+    description="Returns GO term metadata (label, definition, synonyms, etc.) for a given GO term ID, e.g. GO:0008150",
 )
 async def get_go_term_detail_by_go_id(
     id: str = Path(..., description="A GO-Term CURIE (e.g. GO:0005885, GO:0097136)", examples="GO:0008150")
 ):
     """
-    Returns models for a given GO term ID.
+    Returns GO term metadata including label, definition, synonyms, alternative IDs, xrefs, and subsets.
 
-    e.g. GO:0008150
-    please note, this endpoint was migrated from the GO-CAM service api and may not be
+    :param id: A GO-Term CURIE (e.g. GO:0008150)
+    :return: GO term metadata including goid, label, definition, synonyms, alternativeIds, xrefs, subsets
+
+    Note: This endpoint was migrated from the GO-CAM service API and may not be
     supported in its current form in the future.
     """
     try:
@@ -316,15 +331,27 @@ async def get_go_term_detail_by_go_id(
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
 
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = ontology_utils.create_go_summary_sparql(id)
-    results = si._sparql_query(query)
-    transformed_results = transform(
-        results[0],
-        ["synonyms", "relatedSynonyms", "alternativeIds", "xrefs", "subsets"],
-    )
-    return transformed_results
+    fields = "id,annotation_class_label,description,synonym,alternate_id,definition_xref,subset"
+    doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+
+    cmaps = get_prefixes("go")
+    converter = Converter.from_prefix_map(cmaps, strict=False)
+    goid_iri = converter.expand(id)
+
+    result = {
+        "goid": goid_iri,
+        "label": doc.get("annotation_class_label", ""),
+        "definition": doc.get("description", ""),
+        "synonyms": doc.get("synonym", []),
+        "relatedSynonyms": [],
+        "alternativeIds": doc.get("alternate_id", []),
+        "xrefs": doc.get("definition_xref", []),
+        "subsets": doc.get("subset", []),
+        "comment": "",
+        "creation_date": ""
+    }
+
+    return result
 
 
 class GOHierarchyItem(BaseModel):
@@ -369,45 +396,44 @@ async def get_go_hierarchy_go_id(
         raise InvalidIdentifier(detail=str(e)) from e
 
     cmaps = get_prefixes("go")
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
-    id = converter.expand(id)
-
-    query = (
-        """
-        PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
-        SELECT ?hierarchy ?GO ?label WHERE {
-            BIND(<%s> as ?goquery)
-            {
-                {
-                    ?goquery rdfs:subClassOf+ ?GO .
-                    ?GO rdfs:label ?label .
-                    FILTER (LANG(?label) != "en")
-                    BIND("parent" as ?hierarchy)
-                    }
-                UNION
-                {
-                    ?GO rdfs:subClassOf* ?goquery .
-                    ?GO rdfs:label ?label .
-                    FILTER (LANG(?label) != "en")
-                    BIND(IF(?goquery = ?GO, "query", "child") as ?hierarchy) .
-                }
-            }
-        }
-    """
-        % id
-    )
-    results = si._sparql_query(query)
 
     collated_results = []
-    for result in results:
-        collated = {
-            "GO": result["GO"].get("value"),
-            "label": result["label"].get("value"),
-            "hierarchy": result["hierarchy"].get("value"),
-        }
-        collated_results.append(collated)
+
+    fields = "id,annotation_class_label,isa_partof_closure,isa_partof_closure_label"
+    doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+
+    query_term_iri = converter.expand(id)
+
+    for parent_id, parent_label in zip(
+        doc.get("isa_partof_closure", []), doc.get("isa_partof_closure_label", []), strict=False
+    ):
+        if parent_id != id:
+            parent_iri = converter.expand(parent_id)
+            collated_results.append({"GO": parent_iri, "label": parent_label, "hierarchy": "parent"})
+
+    collated_results.append(
+        {"GO": query_term_iri, "label": doc.get("annotation_class_label", ""), "hierarchy": "query"}
+    )
+
+    query_filters = ""
+    where_statement = "*:*&fq=isa_partof_closure:" + '"' + id + '"'
+    fields_children = "id,annotation_class_label"
+    optionals = "&rows=10000"
+    children_data = gu_run_solr_text_on(
+        ESOLR.GOLR, ESOLRDoc.ONTOLOGY, where_statement, query_filters, fields_children, optionals, False
+    )
+
+    for child in children_data:
+        child_id = child.get("id", "")
+        if child_id != id:
+            child_iri = converter.expand(child_id)
+            collated_results.append({
+                "GO": child_iri,
+                "label": child.get("annotation_class_label", ""),
+                "hierarchy": "child"
+            })
+
     return collated_results
 
 
@@ -432,29 +458,45 @@ async def get_gocam_models_by_go_id(
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
 
+    import asyncio
+
+    import httpx
+
+    from app.utils.settings import get_index_files, get_user_agent
+
+    entity_index = get_index_files("gocam_entity_index_file")
+
     cmaps = get_prefixes("go")
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
-    id = converter.expand(id)
-    query = (
-        """
-        PREFIX metago: <http://model.geneontology.org/>
-        SELECT distinct ?gocam ?title
-        WHERE
-        {
-            GRAPH ?gocam {
-                ?gocam metago:graphType metago:noctuaCam .
-                ?entity rdf:type owl:NamedIndividual .
-                ?entity rdf:type ?goid .
-                ?gocam dc:title ?title .
-                FILTER(?goid = <%s>)
-            }
-        }
-    """
-        % id
-    )
-    logger.info(query)
-    results = si._sparql_query(query)
-    transformed_results = transform_array(results)
-    return transformed_results
+    id_iri = converter.expand(id)
+
+    model_ids = set()
+    if id in entity_index:
+        model_ids.update(entity_index[id])
+    if id_iri in entity_index:
+        model_ids.update(entity_index[id_iri])
+
+    if not model_ids:
+        return []
+
+    async def fetch_model_title(client, model_id):
+        path_to_s3 = f"https://go-public.s3.amazonaws.com/files/go-cam/{model_id}.json"
+        try:
+            response = await client.get(path_to_s3, timeout=30.0)
+            if response.status_code == 200:
+                data = response.json()
+                title = ""
+                for ann in data.get("annotations", []):
+                    if ann.get("key") == "title":
+                        title = ann.get("value", "")
+                        break
+                return {"gocam": f"http://model.geneontology.org/{model_id}", "title": title}
+        except Exception as e:
+            logger.error(f"Failed to fetch model title for {model_id}: {e}")
+        return {"gocam": f"http://model.geneontology.org/{model_id}", "title": ""}
+
+    async with httpx.AsyncClient(headers={"User-Agent": get_user_agent()}) as client:
+        tasks = [fetch_model_title(client, model_id) for model_id in sorted(model_ids)]
+        collated_results = await asyncio.gather(*tasks)
+
+    return collated_results

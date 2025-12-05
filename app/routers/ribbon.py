@@ -4,14 +4,11 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Path, Query
-from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
-from oaklib.resource import OntologyResource
 
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.golr_utils import gu_run_solr_text_on
-from app.utils.settings import ESOLR, ESOLRDoc, get_sparql_endpoint, get_user_agent
-from app.utils.sparql_utils import transform_array
+from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
 
@@ -41,13 +38,19 @@ async def get_subsets_by_term(
     except ValueError as e:
         raise InvalidIdentifier(detail=str(e)) from e
 
-    ont_r = OntologyResource(url=get_sparql_endpoint())
-    si = SparqlImplementation(ont_r)
-    query = ontology_utils.get_go_subsets_sparql_query(id)
-    results = si._sparql_query(query)
-    results = transform_array(results, [])
-    if not results:
-        raise DataNotFoundException(detail=f"Item with ID {id} not found")
+    from app.utils.golr_utils import run_solr_on
+
+    fields = "subset"
+    doc = run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, id, fields)
+
+    subsets = doc.get("subset", [])
+    if not subsets:
+        return []
+
+    results = []
+    for subset in subsets:
+        results.append({"subset": subset, "label": ""})
+
     return results
 
 

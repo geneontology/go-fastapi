@@ -82,6 +82,32 @@ class TestApp(unittest.TestCase):
                 self.assertGreaterEqual(len(response.json()["ancestors"]), 6)
                 self.assertGreaterEqual(len(response.json()["descendents"]), 11)
 
+    def test_go_hierarchy(self):
+        """Test the endpoint to get the hierarchy (parents and children) of a GO term."""
+        test_id = "GO:0003677"
+        response = test_client.get(f"/api/go/{test_id}/hierarchy")
+        self.assertEqual(response.status_code, 200)
+        
+        data = response.json()
+        self.assertIsInstance(data, list)
+        self.assertGreater(len(data), 0)
+        
+        parents = [item for item in data if item["hierarchy"] == "parent"]
+        query_term = [item for item in data if item["hierarchy"] == "query"]
+        children = [item for item in data if item["hierarchy"] == "child"]
+        
+        self.assertEqual(len(query_term), 1)
+        self.assertEqual(query_term[0]["label"], "DNA binding")
+        
+        self.assertGreater(len(parents), 0)
+        self.assertGreater(len(children), 0)
+        
+        for item in data:
+            self.assertIn("GO", item)
+            self.assertIn("label", item)
+            self.assertIn("hierarchy", item)
+            self.assertIn(item["hierarchy"], ["parent", "query", "child"])
+
 
 if __name__ == "__main__":
     unittest.main()

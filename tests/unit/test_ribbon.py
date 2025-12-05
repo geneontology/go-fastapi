@@ -136,6 +136,7 @@ class TestOntologyAPI(unittest.TestCase):
         """Test WB ribbon annotations."""
         data = {"subset": "goslim_agr", "subject": ["WB:WBGene00000898"]}
         response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.json().get("subjects")) > 0)
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("label") == "daf-2")
@@ -144,7 +145,7 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 17)
             self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 62)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 10)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     def test_rgd_ribbon(self):
         """Test RGD annotations in the ribbon."""
