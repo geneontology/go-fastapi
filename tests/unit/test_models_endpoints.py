@@ -62,25 +62,6 @@ class TestApp(unittest.TestCase):
         self.assertGreaterEqual(len(response.json()), 59)
         self.assertEqual(response.status_code, 200)
 
-    @skip("Endpoint /api/models appears to be deprecated or not implemented")
-    def test_models_size_endpoint(self):
-        """Test the endpoint to retrieve models with specified size."""
-        data = {
-            "start": "32",
-            "size": "10",
-        }
-        response = test_client.get("/api/models", params=data)
-        for record in response.json():
-            self.assertIsInstance(record.get("orcids"), list)
-        self.assertEqual(response.status_code, 200)
-
-
-    @skip("Groups endpoint not available without SPARQL backend")
-    def test_groups_by_name(self):
-        """Test the endpoint to retrieve groups by name."""
-        response = test_client.get("/api/groups/MGI")
-        # Should return 404 since SPARQL backend is removed
-        self.assertEqual(response.status_code, 404)
 
     def test_get_modelid_by_pmid(self):
         """Test the endpoint to retrieve model IDs by PubMed ID."""
