@@ -6,28 +6,28 @@ ontologies:
     handle: go
     pre_load: false
 gocam_provided_by_index_file:
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/providedBy_index.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/providedBy_index.json"
     timeout: 30
 gocam_contributor_index_file:
     #url: "/tmp/test-output/contributor_index.json"
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/contributor_index.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/contributor_index.json"
     timeout: 30
 gocam_taxon_index_file:
     #url: "/tmp/test-output/taxon_index.json"
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/taxon_index.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/taxon_index.json"
     timeout: 30
 gocam_entity_index_file:
     #url: "/tmp/test-output/entity_index.json"
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/entity_index.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/entity_index.json"
     timeout: 30
 gocam_source_index_file:
     #url: "/tmp/test-output/source_index.json"
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/source_index.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/source_index.json"
     timeout: 30
 gocam_evidence_index_file:
     #url: "/tmp/test-output/evidence_index.json"
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/evidence_index.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/evidence_index.json"
     timeout: 30
 gocam_historical_index_file:
-    url: "https://go-data-product-live-go-cam.s3.us-east-1.amazonaws.com/product/json/provider-to-model.json"
+    url: "https://live-go-cam.geneontology.io/product/json/json-noctua-models/provider-to-model.json"
     timeout: 30
