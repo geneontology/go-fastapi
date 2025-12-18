@@ -184,8 +184,13 @@ def local_map2slim(subjects, slim_terms,
         fq = f'&fq=bioentity:"{subject_id}"'
 
         # Only request necessary fields for slimming
+        # Note: ontobio uses regulates_closure for acts_upstream_of_or_within, isa_partof_closure for involved_in
+        if relationship_type == "acts_upstream_of_or_within":
+            closure_field = "regulates_closure"
+        else:
+            closure_field = "isa_partof_closure"
         fields = ("id,bioentity,bioentity_label,annotation_class,annotation_class_label,"
-                  "regulates_closure,aspect,evidence_type,evidence_type_label,"
+                  f"{closure_field},aspect,evidence_type,evidence_type_label,"
                   "taxon,taxon_label,assigned_by,reference")
 
         # Apply evidence filters
@@ -233,14 +238,15 @@ def local_map2slim(subjects, slim_terms,
                     }
                 }
 
-            # Get the regulates_closure (object_closure)
-            regulates_closure = annot.get("regulates_closure", [])
-            if isinstance(regulates_closure, str):
-                regulates_closure = [regulates_closure]
+            # Get the closure field which contains all ancestor terms
+            # Use the same field we requested based on relationship type
+            closure = annot.get(closure_field, [])
+            if isinstance(closure, str):
+                closure = [closure]
 
             # Find which slim terms this annotation maps to
             for slim_term in slim_terms:
-                if slim_term in regulates_closure:
+                if slim_term in closure:
                     if slim_term not in slim_map:
                         slim_map[slim_term] = []
 

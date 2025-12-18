@@ -262,5 +262,66 @@ class TestOntologyAPI(unittest.TestCase):
                 )
                 self.assertTrue(has_annotations, f"{subject.get('id')} should have annotations")
 
+    def test_hgnc8729_ribbon_detailed(self):
+        """Test ribbon endpoint specifically for HGNC:8729 to verify it returns rows with data."""
+        data = {"subset": "goslim_agr", "subject": ["HGNC:8729"]}
+        response = test_client.get("/api/ontology/ribbon/", params=data)
+        self.assertEqual(response.status_code, 200)
+        
+        response_data = response.json()
+        self.assertIsInstance(response_data, dict)
+        self.assertIn("subjects", response_data)
+        self.assertIn("categories", response_data)
+        
+        # Check subjects
+        subjects = response_data.get("subjects", [])
+        self.assertEqual(len(subjects), 1, "Should have exactly one subject for HGNC:8729")
+        
+        subject = subjects[0]
+        self.assertEqual(subject.get("id"), "HGNC:8729")
+        
+        # Verify the subject has groups (these are the rows in the ribbon)
+        groups = subject.get("groups", {})
+        self.assertIsInstance(groups, dict)
+        self.assertGreater(len(groups), 0, "HGNC:8729 should have annotation groups")
+        
+        # Log the groups for debugging
+        logger.info(f"Groups for HGNC:8729: {list(groups.keys())}")
+        
+        # Check specific GO categories that should have annotations
+        # Check molecular function
+        if "GO:0003674" in groups:
+            mf_group = groups.get("GO:0003674", {})
+            self.assertIsInstance(mf_group, dict)
+            all_data = mf_group.get("ALL", {})
+            nb_annotations = all_data.get("nb_annotations", 0)
+            self.assertGreater(nb_annotations, 0, "Should have molecular function annotations")
+            logger.info(f"Molecular function annotations: {nb_annotations}")
+        
+        # Check biological process
+        if "GO:0008150" in groups:
+            bp_group = groups.get("GO:0008150", {})
+            self.assertIsInstance(bp_group, dict)
+            all_data = bp_group.get("ALL", {})
+            nb_annotations = all_data.get("nb_annotations", 0)
+            self.assertGreater(nb_annotations, 0, "Should have biological process annotations")
+            logger.info(f"Biological process annotations: {nb_annotations}")
+        
+        # Check that we have data for rendering ribbon rows
+        total_annotations = 0
+        slim_terms_with_data = []
+        for group_id, group_data in groups.items():
+            if isinstance(group_data, dict) and "ALL" in group_data:
+                nb = group_data["ALL"].get("nb_annotations", 0)
+                if nb > 0:
+                    total_annotations += nb
+                    slim_terms_with_data.append(group_id)
+        
+        self.assertGreater(total_annotations, 0, "HGNC:8729 should have total annotations")
+        self.assertGreater(len(slim_terms_with_data), 0, "HGNC:8729 should have slim terms with data")
+        
+        logger.info(f"Total annotations for HGNC:8729: {total_annotations}")
+        logger.info(f"Slim terms with data: {slim_terms_with_data}")
+
 if __name__ == "__main__":
     unittest.main()
