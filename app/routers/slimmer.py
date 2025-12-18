@@ -185,7 +185,10 @@ def local_map2slim(subjects, slim_terms,
 
         # Only request necessary fields for slimming
         # Note: ontobio uses regulates_closure for acts_upstream_of_or_within, isa_partof_closure for involved_in
-        closure_field = "regulates_closure" if relationship_type == "acts_upstream_of_or_within" else "isa_partof_closure"
+        if relationship_type == "acts_upstream_of_or_within":
+            closure_field = "regulates_closure"
+        else:
+            closure_field = "isa_partof_closure"
         fields = ("id,bioentity,bioentity_label,annotation_class,annotation_class_label,"
                   f"{closure_field},aspect,evidence_type,evidence_type_label,"
                   "taxon,taxon_label,assigned_by,reference")
