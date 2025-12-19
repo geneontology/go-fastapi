@@ -89,11 +89,14 @@ def gu_run_solr_text_on(
         + category.value
         + '"&fl='
         + fields
-        + "&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class,"
-        + "annotation_class_label_searchable,&hl.requireFieldMatch=true"
-        + "&wt=json&indent=on"
-        + optionals
     )
+
+    # Only add highlighting parameters if requested
+    if highlight:
+        query += ("&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class,"
+                  + "annotation_class_label_searchable,&hl.requireFieldMatch=true")
+
+    query += "&wt=json&indent=on" + optionals
     logger.info(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 

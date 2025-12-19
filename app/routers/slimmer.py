@@ -7,9 +7,9 @@ from typing import List
 from fastapi import APIRouter, Query
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.utils.golr_utils import gu_run_solr_text_on
+from app.utils.golr_wrappers import map2slim
 from app.utils.mygene_utils import gene_to_uniprot_from_mygene, uniprot_to_gene_from_mygene
-from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
+from app.utils.settings import ESOLR, get_user_agent
 
 INVOLVED_IN = "involved_in"
 ACTS_UPSTREAM_OF_OR_WITHIN = "acts_upstream_of_or_within"
@@ -100,12 +100,17 @@ async def slimmer_function(
     logger.info(f"Original subjects: {subject}")
     logger.info(f"Converted subjects for GOLr: {slimmer_subjects}")
 
-    # Use local implementation to avoid timeout issues
-    results = local_map2slim(
+    # Use ontobio map2slim with rate limiting and retry logic from golr_wrappers
+    results = map2slim(
         subjects=slimmer_subjects,
-        slim_terms=slim,
+        slim=slim,
+        object_category="function",
+        user_agent=USER_AGENT,
+        url=ESOLR.GOLR.value,
         relationship_type=relationship_type.value,
         exclude_automatic_assertions=exclude_automatic_assertions,
+        rows=rows,
+        start=start,
     )
 
     # Map subjects back to original IDs in results
@@ -151,135 +156,3 @@ async def slimmer_function(
     return results
 
 
-def local_map2slim(subjects, slim_terms,
-                   relationship_type="acts_upstream_of_or_within",
-                   exclude_automatic_assertions=False):
-    """
-    Local implementation of map2slim using gu_run_solr_text_on.
-
-    This avoids the timeout issues with the ontobio map2slim by:
-    1. Using gu_run_solr_text_on with 60-second timeout
-    2. Requesting only necessary fields
-    3. Processing the slimming logic locally
-    """
-    # Convert single slim term to list if needed
-    if isinstance(slim_terms, str):
-        slim_terms = [slim_terms]
-
-    # Clean up slim terms - handle comma-separated strings
-    cleaned_slim_terms = []
-    for term in slim_terms:
-        if ',' in term:
-            cleaned_slim_terms.extend([t.strip() for t in term.split(',')])
-        else:
-            cleaned_slim_terms.append(term.strip())
-    slim_terms = cleaned_slim_terms
-
-    results = []
-
-    for subject_id in subjects:
-        # Build the query
-        q = "*:*"
-        qf = ""
-        fq = f'&fq=bioentity:"{subject_id}"'
-
-        # Only request necessary fields for slimming
-        # Note: ontobio uses regulates_closure for acts_upstream_of_or_within, isa_partof_closure for involved_in
-        if relationship_type == "acts_upstream_of_or_within":
-            closure_field = "regulates_closure"
-        else:
-            closure_field = "isa_partof_closure"
-        fields = ("id,bioentity,bioentity_label,annotation_class,annotation_class_label,"
-                  f"{closure_field},aspect,evidence_type,evidence_type_label,"
-                  "taxon,taxon_label,assigned_by,reference")
-
-        # Apply evidence filters
-        if exclude_automatic_assertions:
-            fq += '&fq=!evidence_type:("IEA")'
-
-        # Apply relationship type filter if not default
-        if relationship_type == "involved_in":
-            # For involved_in, we only want direct annotations
-            fq += '&fq=qualifier:"involved_in"'
-        # For acts_upstream_of_or_within, we want all relationships
-
-        # Set rows to fetch all annotations for this subject
-        fq += "&rows=100000"
-
-        # Make the request with 60-second timeout
-        try:
-            logger.info(f"Querying GOLr for subject: {subject_id}")
-            logger.info(f"Query params - q: {q}, qf: {qf}, fq: {fq}")
-            # gu_run_solr_text_on expects enum objects, not strings
-            annotations = gu_run_solr_text_on(
-                ESOLR.GOLR,
-                ESOLRDoc.ANNOTATION,
-                q, qf, fields, fq,
-                highlight=False
-            )
-            logger.info(f"Found {len(annotations)} annotations for {subject_id}")
-        except Exception as e:
-            logger.error(f"Error fetching annotations for {subject_id}: {e}")
-            continue
-
-        # Process annotations into slim groups
-        slim_map = {}
-        subject_info = None
-
-        for annot in annotations:
-            # Get subject info from first annotation
-            if subject_info is None:
-                subject_info = {
-                    "id": annot.get("bioentity", ""),
-                    "label": annot.get("bioentity_label", ""),
-                    "taxon": {
-                        "id": annot.get("taxon", ""),
-                        "label": annot.get("taxon_label", "")
-                    }
-                }
-
-            # Get the closure field which contains all ancestor terms
-            # Use the same field we requested based on relationship type
-            closure = annot.get(closure_field, [])
-            if isinstance(closure, str):
-                closure = [closure]
-
-            # Find which slim terms this annotation maps to
-            for slim_term in slim_terms:
-                if slim_term in closure:
-                    if slim_term not in slim_map:
-                        slim_map[slim_term] = []
-
-                    # Create association object matching map2slim format
-                    assoc = {
-                        "id": annot.get("id", ""),
-                        "subject": subject_info,
-                        "object": {
-                            "id": annot.get("annotation_class", ""),
-                            "label": annot.get("annotation_class_label", "")
-                        },
-                        "relation": {
-                            "id": relationship_type,
-                            "label": relationship_type.replace("_", " ")
-                        },
-                        "evidence": [
-                            {
-                                "id": annot.get("evidence_type", ""),
-                                "label": annot.get("evidence_type_label", "")
-                            }
-                        ],
-                        "provided_by": [annot.get("assigned_by", "")] if annot.get("assigned_by") else [],
-                        "publications": [annot.get("reference", "")] if annot.get("reference") else []
-                    }
-                    slim_map[slim_term].append(assoc)
-
-        # Format results to match map2slim output
-        for slim_term, assocs in slim_map.items():
-            result = {
-                "subject": subject_id,
-                "slim": slim_term,
-                "assocs": assocs
-            }
-            results.append(result)
-
-    return results
