@@ -1,15 +1,14 @@
-"""Wrappers for external library functions that need rate limiting."""
+"""Wrappers for external library functions with retry logic."""
 
 from typing import Any, Dict, List, Optional
 
 from ontobio.golr.golr_associations import map2slim as _map2slim
 from ontobio.golr.golr_associations import search_associations as _search_associations
 
-from app.utils.rate_limiter import rate_limit_golr, retry_on_golr_error
+from app.utils.retry_utils import retry_on_golr_error
 
 
 @retry_on_golr_error(max_retries=3, delay=2)
-@rate_limit_golr
 def search_associations(
     subject_category: Optional[str] = None,
     object_category: Optional[str] = None,
@@ -30,9 +29,9 @@ def search_associations(
     **kwargs
 ) -> Dict[str, Any]:
     """
-    Rate-limited wrapper for ontobio's search_associations function.
+    Wrapper for ontobio's search_associations function.
 
-    This wrapper adds rate limiting to prevent hitting GOLr API limits.
+    This wrapper adds retry logic for handling transient errors.
     All parameters are passed through to the original function.
     """
     # Build kwargs dynamically to exclude None values
@@ -77,7 +76,6 @@ def search_associations(
 
 
 @retry_on_golr_error(max_retries=3, delay=2)
-@rate_limit_golr
 def map2slim(
     subjects: List[str],
     slim: List[str],
@@ -91,9 +89,9 @@ def map2slim(
     **kwargs
 ) -> List[Dict[str, Any]]:
     """
-    Rate-limited wrapper for ontobio's map2slim function.
+    Wrapper for ontobio's map2slim function.
 
-    This wrapper adds rate limiting to prevent hitting GOLr API limits.
+    This wrapper adds retry logic for handling transient errors.
     All parameters are passed through to the original function.
     """
     return _map2slim(

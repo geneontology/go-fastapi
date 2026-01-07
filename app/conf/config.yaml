@@ -8,3 +8,4 @@ ontologies:
 sparql_url:
   url: "https://rdf.geneontology.org/sparql"
   timeout: 60
+
