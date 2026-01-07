@@ -9,7 +9,6 @@ from fastapi.responses import JSONResponse
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.middleware.logging_middleware import LoggingMiddleware
-from app.middleware.pyinstrument_middleware import PyinstrumentMiddleware
 from app.routers import (
     bioentity,
     labeler,
@@ -48,8 +47,6 @@ app.include_router(labeler.router)
 app.include_router(search.router)
 app.include_router(users_and_groups.router)
 
-# Profiling (only in development - comment out in production)
-app.add_middleware(PyinstrumentMiddleware, profiler_output_dir=".", profile_all_requests=False)
 # Logging
 app.add_middleware(LoggingMiddleware)
 # CORS

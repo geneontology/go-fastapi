@@ -1,6 +1,7 @@
 """ontology utility functions."""
 
 import logging
+from functools import lru_cache
 
 from linkml_runtime.utils.namespaces import Namespaces
 from oaklib.implementations.sparql.sparql_implementation import SparqlImplementation
@@ -65,6 +66,7 @@ def goont_fetch_label(id):
     return rows[0]
 
 
+@lru_cache(maxsize=1024)
 def get_ontology_subsets_by_id(id: str):
     """
     Get ontology subsets based on the provided identifier.
