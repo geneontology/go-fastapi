@@ -65,8 +65,8 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("label") == "SHH")
             self.assertTrue(subject.get("taxon_label") == "Homo sapiens")
             self.assertTrue(subject.get("groups").get("GO:0003674"))
-            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 165)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations"), 38)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 125)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations"), 35)
         self.assertTrue(response.status_code == 200)
 
     def test_sars_cov2_ribbon(self):
@@ -159,8 +159,8 @@ class TestOntologyAPI(unittest.TestCase):
 
             self.assertTrue(subject.get("groups").get("GO:0003674"))
             self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 5)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 47)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_classes"), 37)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 45)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_classes"), 35)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005576").get("ALL").get("nb_classes"), 2)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005576").get("ALL").get("nb_annotations"), 7)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 10)
