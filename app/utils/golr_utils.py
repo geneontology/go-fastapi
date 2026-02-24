@@ -6,13 +6,12 @@ import requests
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.mygene_utils import gene_to_uniprot_from_mygene
-from app.utils.rate_limiter import rate_limit_golr, retry_on_golr_error
+from app.utils.retry_utils import retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
 
 
 # Respect the method name for run_sparql_on with enums
 @retry_on_golr_error(max_retries=3, delay=2)
-@rate_limit_golr
 def run_solr_on(solr_instance, category, id, fields):
     """Return the result of a Solr query."""
     query = (
@@ -57,7 +56,6 @@ def run_solr_on(solr_instance, category, id, fields):
 
 # (ESOLR.GOLR, ESOLRDoc.ANNOTATION, q, qf, fields, fq, False)
 @retry_on_golr_error(max_retries=3, delay=2)
-@rate_limit_golr
 def gu_run_solr_text_on(
     solr_instance, category: str, q: str, qf: str, fields: str, optionals: str, highlight: bool = False
 ):
@@ -89,11 +87,14 @@ def gu_run_solr_text_on(
         + category.value
         + '"&fl='
         + fields
-        + "&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class,"
-        + "annotation_class_label_searchable,&hl.requireFieldMatch=true"
-        + "&wt=json&indent=on"
-        + optionals
     )
+
+    # Only add highlighting parameters if requested
+    if highlight:
+        query += ("&hl=on&hl.snippets=1000&hl.fl=bioentity_name_searchable,bioentity_label_searchable,bioentity_class,"
+                  + "annotation_class_label_searchable,&hl.requireFieldMatch=true")
+
+    query += "&wt=json&indent=on" + optionals
     logger.info(query)
     timeout_seconds = 60  # Set the desired timeout value in seconds
 

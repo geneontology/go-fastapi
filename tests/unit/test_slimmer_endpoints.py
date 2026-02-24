@@ -197,6 +197,58 @@ class TestSlimmerEndpoint(unittest.TestCase):
                     self.assertEqual(item.get("slim"), slim_id)
                     self.assertIsInstance(item.get("assocs"), list)
 
+    def test_hgnc8729_specific_association_counts(self):
+        """Test that HGNC:8729 returns the expected number of associations for each slim term."""
+        test_cases = [
+            {
+                "name": "HGNC:8729 with GO:0003824 (molecular_function)",
+                "subject": ["HGNC:8729"],
+                "slim": ["GO:0003824"],
+                "expected_min_associations": 3
+            },
+            {
+                "name": "HGNC:8729 with GO:0008150 (biological_process)",
+                "subject": ["HGNC:8729"], 
+                "slim": ["GO:0008150"],
+                "expected_min_associations": 35
+            },
+            {
+                "name": "HGNC:8729 with GO:0005575 (cellular_component)",
+                "subject": ["HGNC:8729"],
+                "slim": ["GO:0005575"],
+                "expected_min_associations": 100  # We expect at least 100, actual was 101
+            }
+        ]
+        
+        endpoint = "/api/bioentityset/slimmer/function"
+        for test_case in test_cases:
+            with self.subTest(test_case["name"]):
+                data = {
+                    "subject": test_case["subject"],
+                    "slim": test_case["slim"]
+                }
+                response = test_client.get(endpoint, params=data)
+                self.assertEqual(response.status_code, 200, f"Should return 200 OK for {test_case['name']}")
+                
+                response_data = response.json()
+                self.assertIsInstance(response_data, list)
+                self.assertEqual(len(response_data), 1, f"Should return exactly one result for {test_case['name']}")
+                
+                result = response_data[0]
+                self.assertEqual(result.get("subject"), "HGNC:8729")
+                self.assertEqual(result.get("slim"), test_case["slim"][0])
+                
+                # Check association count meets minimum expected
+                associations = result.get("assocs", [])
+                self.assertGreaterEqual(
+                    len(associations), 
+                    test_case["expected_min_associations"],
+                    f"HGNC:8729 should have at least {test_case['expected_min_associations']} associations for {test_case['slim'][0]}"
+                )
+                
+                # Log the actual count for reference
+                logger.info(f"{test_case['name']}: {len(associations)} associations")
+
 
 if __name__ == "__main__":
     unittest.main()
