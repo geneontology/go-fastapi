@@ -7,15 +7,19 @@ correctly interact with the mygene.info API and return expected results.
 import pytest
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.utils.mygene_utils import gene_to_uniprot_from_mygene, uniprot_to_gene_from_mygene
+from app.utils.mygene_utils import (
+    gene_to_uniprot_from_alliance,
+    gene_to_uniprot_from_mygene,
+    uniprot_to_gene_from_mygene,
+)
 
 
 @pytest.mark.integration
 @pytest.mark.parametrize(
     "gene_id,expected_prefix,description",
     [
-        # HGNC:5 is TP53 (tumor protein p53) - well-known gene
-        ("HGNC:5", "UniProtKB:", "TP53 gene should return UniProt IDs"),
+        # HGNC:11998 is TP53 (tumor protein p53) - well-known gene
+        ("HGNC:11998", "UniProtKB:", "TP53 gene should return UniProt IDs"),
         ("HGNC:30692", "UniProtKB:", ""),
         ("HGNC:12139", "UniProtKB:", ""),
         # HGNC:1100 is BRCA1 - breast cancer gene
@@ -44,7 +48,7 @@ def test_gene_to_uniprot_from_mygene_with_valid_hgnc_ids(
         expected_prefix: The expected prefix in results
         description: Test case description
 
-    >>> result = gene_to_uniprot_from_mygene("HGNC:5")
+    >>> result = gene_to_uniprot_from_mygene("HGNC:11998")
     >>> assert isinstance(result, list)
     >>> assert len(result) > 0
     >>> assert all(id.startswith("UniProtKB:") for id in result)
@@ -67,13 +71,13 @@ def test_gene_to_uniprot_from_mygene_with_valid_hgnc_ids(
 def test_gene_to_uniprot_from_mygene_tp53_specific() -> None:
     """Test gene_to_uniprot_from_mygene returns known UniProt ID for TP53.
 
-    TP53 (HGNC:5) should map to UniProtKB:P04637 (Swiss-Prot entry).
+    TP53 (HGNC:11998) should map to UniProtKB:P04637 (Swiss-Prot entry).
     This test verifies the exact mapping for a well-known gene.
 
-    >>> result = gene_to_uniprot_from_mygene("HGNC:5")
+    >>> result = gene_to_uniprot_from_mygene("HGNC:11998")
     >>> assert "UniProtKB:P04637" in result
     """
-    result = gene_to_uniprot_from_mygene("HGNC:5")
+    result = gene_to_uniprot_from_mygene("HGNC:11998")
 
     # TP53's primary Swiss-Prot ID is P04637
     assert "UniProtKB:P04637" in result, (
@@ -124,11 +128,11 @@ def test_gene_to_uniprot_handles_swiss_prot_priority() -> None:
     The function should prioritize Swiss-Prot (reviewed) entries over TrEMBL
     (unreviewed) entries when both are available.
 
-    >>> result = gene_to_uniprot_from_mygene("HGNC:5")
+    >>> result = gene_to_uniprot_from_mygene("HGNC:11998")
     >>> # TP53 has Swiss-Prot entry, should be included
     >>> assert any("P04637" in id for id in result)
     """
-    result = gene_to_uniprot_from_mygene("HGNC:5")
+    result = gene_to_uniprot_from_mygene("HGNC:11998")
 
     # All results should be UniProtKB formatted
     assert all(id.startswith("UniProtKB:") for id in result), (
@@ -143,10 +147,10 @@ def test_gene_to_uniprot_with_multiple_uniprot_ids() -> None:
     Some genes may have multiple UniProt entries (isoforms, etc.).
     The function should return all of them.
 
-    >>> result = gene_to_uniprot_from_mygene("HGNC:5")
+    >>> result = gene_to_uniprot_from_mygene("HGNC:11998")
     >>> assert isinstance(result, list)
     """
-    result = gene_to_uniprot_from_mygene("HGNC:5")
+    result = gene_to_uniprot_from_mygene("HGNC:11998")
 
     # Should return a list even if single result
     assert isinstance(result, list), "Result should always be a list"
@@ -259,6 +263,39 @@ def test_uniprot_to_gene_with_invalid_id() -> None:
 
     assert "No HGNC IDs found" in str(exc_info.value.detail), (
         "Exception should indicate no HGNC IDs were found"
+    )
+
+
+@pytest.mark.integration
+def test_alliance_fallback_for_hgnc12139() -> None:
+    """Test that HGNC:12139 (TRAV39) resolves via Alliance API fallback.
+
+    HGNC:12139 has no uniprot.Swiss-Prot field in mygene.info due to an upstream
+    data gap. The Alliance of Genome Resources API provides the cross-reference
+    mapping and should be used as a fallback.
+    """
+    result = gene_to_uniprot_from_mygene("HGNC:12139")
+
+    assert result is not None, "Should return results via Alliance fallback"
+    assert isinstance(result, list), "Result should be a list"
+    assert len(result) > 0, "Should return at least one UniProt ID"
+    assert all(uid.startswith("UniProtKB:") for uid in result), (
+        f"All IDs should start with UniProtKB:, got {result}"
+    )
+
+
+@pytest.mark.integration
+def test_gene_to_uniprot_from_alliance_direct() -> None:
+    """Test gene_to_uniprot_from_alliance directly for HGNC:12139.
+
+    Validates the Alliance API helper function works independently.
+    """
+    result = gene_to_uniprot_from_alliance("HGNC:12139")
+
+    assert isinstance(result, list), "Result should be a list"
+    assert len(result) > 0, "Should return at least one UniProt ID"
+    assert all(uid.startswith("UniProtKB:") for uid in result), (
+        f"All IDs should start with UniProtKB:, got {result}"
     )
 
 
