@@ -12,7 +12,8 @@ logger = logging.getLogger()
 
 
 def gene_to_uniprot_from_alliance(gene_id: str) -> list[str]:
-    """Query the Alliance of Genome Resources API for UniProtKB cross-references.
+    """
+    Query the Alliance of Genome Resources API for UniProtKB cross-references.
 
     This serves as a fallback when mygene.info does not have UniProt mappings
     for a given gene (e.g., HGNC:12139 / TRAV39).
@@ -25,6 +26,7 @@ def gene_to_uniprot_from_alliance(gene_id: str) -> list[str]:
 
     Raises:
         DataNotFoundException: If no UniProtKB cross-references are found.
+
     """
     url = f"https://www.alliancegenome.org/api/gene/{quote(gene_id, safe='')}"
     response = requests.get(url, timeout=30)
