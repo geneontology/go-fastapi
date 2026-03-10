@@ -1,12 +1,50 @@
 """Utilities for MyGene.info interactions."""
 
 import logging
+from urllib.parse import quote
 
+import requests
 from biothings_client import get_client
 
 from app.exceptions.global_exceptions import DataNotFoundException
 
 logger = logging.getLogger()
+
+
+def gene_to_uniprot_from_alliance(gene_id: str) -> list[str]:
+    """
+    Query the Alliance of Genome Resources API for UniProtKB cross-references.
+
+    This serves as a fallback when mygene.info does not have UniProt mappings
+    for a given gene (e.g., HGNC:12139 / TRAV39).
+
+    Args:
+        gene_id: A gene identifier (e.g., "HGNC:12139").
+
+    Returns:
+        A list of UniProtKB IDs (e.g., ["UniProtKB:A0A5H1ZRN5"]).
+
+    Raises:
+        DataNotFoundException: If no UniProtKB cross-references are found.
+
+    """
+    url = f"https://www.alliancegenome.org/api/gene/{quote(gene_id, safe='')}"
+    response = requests.get(url, timeout=30)
+    response.raise_for_status()
+    data = response.json()
+
+    uniprot_ids = []
+    cross_refs = data.get("crossReferenceMap", {}).get("other", [])
+    for ref in cross_refs:
+        name = ref.get("name", "")
+        if name.startswith("UniProtKB:"):
+            uniprot_ids.append(name)
+
+    if not uniprot_ids:
+        raise DataNotFoundException(detail=f"No UniProtKB IDs found for {gene_id} via Alliance API")
+
+    logger.info("Alliance API fallback found UniProt IDs for %s: %s", gene_id, uniprot_ids)
+    return uniprot_ids
 
 
 def gene_to_uniprot_from_mygene(id: str):
@@ -42,6 +80,12 @@ def gene_to_uniprot_from_mygene(id: str):
                         uniprot_ids.append(x)
     except ConnectionError:
         logging.error("ConnectionError while querying MyGeneInfo with {}".format(id))
+    if not uniprot_ids and id.startswith("HGNC:"):
+        logger.info("No UniProt IDs from mygene.info for %s, trying Alliance API fallback", id)
+        try:
+            return gene_to_uniprot_from_alliance(id)
+        except (requests.HTTPError, DataNotFoundException):
+            logger.info("Alliance API fallback also failed for %s", id)
     if not uniprot_ids:
         raise DataNotFoundException(detail="No UniProtKB IDs found for {}".format(id))
     return uniprot_ids

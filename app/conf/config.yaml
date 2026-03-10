@@ -5,7 +5,26 @@ ontologies:
   - id: go
     handle: go
     pre_load: false
-sparql_url:
-  url: "https://rdf.geneontology.org/sparql"
-  timeout: 60
-
+gocam_provided_by_index_file:
+    url: "https://current.geneontology.org/go-cams/index-json/provided_by_index.json"
+    timeout: 30
+gocam_contributor_index_file:
+    #url: "/tmp/test-output/contributor_index.json"
+    url: "https://current.geneontology.org/go-cams/index-json/contributor_index.json"
+    timeout: 30
+gocam_taxon_index_file:
+    #url: "/tmp/test-output/taxon_index.json"
+    url: "https://current.geneontology.org/go-cams/index-json/taxon_index.json"
+    timeout: 30
+gocam_entity_index_file:
+    #url: "/tmp/test-output/entity_index.json"
+    url: "https://current.geneontology.org/go-cams/index-json/entity_index.json"
+    timeout: 30
+gocam_source_index_file:
+    #url: "/tmp/test-output/source_index.json"
+    url: "https://current.geneontology.org/go-cams/index-json/source_index.json"
+    timeout: 30
+gocam_evidence_index_file:
+    #url: "/tmp/test-output/evidence_index.json"
+    url: "https://current.geneontology.org/go-cams/index-json/evidence_index.json"
+    timeout: 30

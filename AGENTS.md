@@ -4,7 +4,7 @@ FastAPI endpoint for GO services
 
 ## Repo management
 
-This repo uses `python` for managing dependencies. Never use commands like `pip` to add or manage dependencies.
+This repo uses `poetry` for managing dependencies. Never use commands like `pip` to add or manage dependencies.
 
 Layout:
 
@@ -12,8 +12,7 @@ Layout:
 
 Best practice:
 
-* Use doctests liberally - these serve as both explanatory examples for humans and as unit tests
-* For longer examples, write pytest tests
+* write pytest tests
 * always write pytest functional style rather than unittest OO style
 * use modern pytest idioms, including `@pytest.mark.parametrize` to test for combinations of inputs
 * NEVER write mock tests unless requested. I need to rely on tests to know if something breaks
