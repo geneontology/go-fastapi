@@ -4,14 +4,16 @@ ssh_keys:
 
 instance:
     tags:
-       Name: REPLACE_ME  # This will be the tag used in AWS 
+       # AWS instance name tag; use pattern go-api-production-YYYY-MM-DD
+       Name: REPLACE_ME_INSTANCE_NAME
     instance_type: t2.large
-    use_elastic_ip: True 
+    use_elastic_ip: True
 
-    # Set the fqdn if you want the record to be created  and make sure you have the right zone id. (See AWS console)
-    # The created record will be of type A and will be populated with the public ip address of the aws instance
-    dns_record_name: "REPLACE_ME"
-    dns_zone_id: "REPLACE_ME" # see documentation for the zone id
+    # Set the FQDN for a type A DNS record mapped to the instance's public IP.
+    # Use pattern go-api-production-YYYY-MM-DD.geneontology.org
+    dns_record_name: "REPLACE_ME_DNS_RECORD"
+    # For geneontology.org use Z04640331A23NHVPCC784
+    dns_zone_id: "REPLACE_ME_DNS_ZONE_ID"
 
     disk_size: 200
     open_ports:
