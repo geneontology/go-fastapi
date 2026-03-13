@@ -128,14 +128,6 @@ See https://github.com/geneontology/go-fastapi/blob/main/provision/production/PR
 
 ### API sources
 1) Golr: "https://golr.geneontology.org/solr/"
-2) GO RDF endpoint: "https://rdf.geneontology.org/sparql"
-3) precomputed JSON files for GO-CAM models: "https://go-public.s3.amazonaws.com/files/go-cam/[model_id].json"
+2) Precomputed GO-CAM index files: "https://current.geneontology.org/go-cams/index-json/"
 
-All three sources are regenerated via the GO Pipeline and will return stable results for a given release.
-The Pipeline goes through a complex process of generating the JSON files from the GO-CAM models, including spinning
-up a local RDF endpoint (from the regenerating blazegraph journal), and a copy of the api-gorest-2021 codebase.  It
-then calls several endpoints from the api-gorest-2021 codebase that return JSON files that it then stores in the
-S3 bucket.  The Pipeline then spins down the local RDF endpoint and api-gorest-2021 codebase.  The api-gorest-2021 
-codebase is effectively obsolete (replaced by api-gorest-2023 and eventually by this API - the endpoints in 
-api-gorest-2021 and api-gorest-2023 are all replaced by endpoints recreated in this codebase, but as of 10/19/2023, the
-pipeline still depends on api-gorest-2021 to generate the JSON files for the GO-CAM models).  
+Both sources are regenerated via the GO Pipeline and will return stable results for a given release.  
