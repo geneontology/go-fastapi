@@ -56,10 +56,25 @@ Key points:
 - [devops-apache-proxy](https://github.com/geneontology/devops-apache-proxy) — Apache reverse proxy Docker image (consumed at deploy time).
 - [devops-deployment-scripts](https://github.com/geneontology/devops-deployment-scripts) — Builds the `geneontology/go-devops-base` Docker image used as the devops environment.
 
+## Build and test
+
+Local development uses Poetry:
+```
+poetry install
+```
+
+Run tests via Make:
+- `make test` — runs unit tests, integration tests, lint, and spell check
+- `make unit-tests` — `poetry run pytest -v tests/unit/*.py`
+- `make integration-tests` — `poetry run pytest tests/integration/step_defs/*.py`
+- `make lint` — `poetry run tox -e lint-fix`
+
+CI builds and pushes a Docker image to DockerHub on version tags via `.github/workflows/docker-build.yaml`.
+
 ## Important conventions
 
 - The default instance user is `ubuntu`.
-- Docker container name for devops work: `go-api-dev`.
+- Docker container name for devops work: `go-fastapi`.
 - Credentials and SSH keys go in `/tmp/` inside the devops container (see README.setup.md).
 - Never commit credentials, SSH keys, or `backend.tf` files (covered by `.gitignore`).
 - **When generating deployment commands, always read the actual sample files** (e.g. `production/backend.tf.sample`, `production/config-instance.yaml.sample`, `production/config-stack.yaml.sample`) to determine exact placeholder names and file structure. Do not rely on documentation alone — the docs may use different placeholder names than the files. The sample files are the source of truth.
