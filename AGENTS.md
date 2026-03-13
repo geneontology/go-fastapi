@@ -37,6 +37,19 @@ This repo uses `poetry` for managing dependencies. Never use commands like `pip`
 * Declarative principles are favored
 * Always use type hints, always document methods and classes
 
+## Releasing
+
+A GitHub release is required before deploying new code to production. The release tag triggers CI to build and push a Docker image to DockerHub.
+
+1. Decide on the new version number following semver (e.g. `v0.4.0`). The previous release is shown at https://github.com/geneontology/go-fastapi/releases.
+2. Create the release from `main`:
+   ```
+   gh release create vX.Y.Z --target main --generate-notes --repo geneontology/go-fastapi
+   ```
+3. This triggers `.github/workflows/docker-build.yaml`, which builds and pushes `geneontology/go-fastapi:X.Y.Z` to DockerHub.
+4. Verify the image is available: `docker pull geneontology/go-fastapi:X.Y.Z`
+5. Use `X.Y.Z` as the `fastapi_tag` (note: no leading "v") when deploying.
+
 ## Deployment
 
 Canonical deployment documentation lives at:
