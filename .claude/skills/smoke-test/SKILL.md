@@ -1,6 +1,8 @@
 ---
+name: smoke-test
 description: Smoke test a deployed go-fastapi instance
 argument-hint: [instance-url]
+disable-model-invocation: true
 ---
 
 # Smoke test a deployed go-fastapi instance

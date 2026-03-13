@@ -1,6 +1,8 @@
 ---
+name: deploy-commands
 description: Generate deployment commands for a production go-fastapi instance
 argument-hint: [version] [date]
+disable-model-invocation: true
 ---
 
 # Generate go-fastapi deployment commands
