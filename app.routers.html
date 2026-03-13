@@ -403,9 +403,16 @@ supported in its current form in the future.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.ontology.get_go_term_detail_by_go_id">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.ontology.</span></span><span class="sig-name descname"><span class="pre">get_go_term_detail_by_go_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Path(PydanticUndefined)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.routers.ontology.get_go_term_detail_by_go_id" title="Permalink to this definition"></a></dt>
-<dd><p>Returns models for a given GO term ID.</p>
-<p>e.g. <a class="reference external" href="GO:0008150">GO:0008150</a>
-please note, this endpoint was migrated from the GO-CAM service api and may not be
+<dd><p>Returns GO term metadata including label, definition, synonyms, alternative IDs, xrefs, and subsets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> – A GO-Term CURIE (e.g. <a class="reference external" href="GO:0008150">GO:0008150</a>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GO term metadata including goid, label, definition, synonyms, alternativeIds, xrefs, subsets</p>
+</dd>
+</dl>
+<p>Note: This endpoint was migrated from the GO-CAM service API and may not be
 supported in its current form in the future.</p>
 </dd></dl>
 
