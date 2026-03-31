@@ -166,7 +166,11 @@ def get_bioentity_isoforms(entity_id: str) -> list[str]:
     timeout_seconds = 60
     response = requests.get(query, timeout=timeout_seconds)
     response.raise_for_status()
-    data = response.json()
+    try:
+        data = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        logger.error(f"Failed to parse JSON response from GOLr: {e}")
+        raise ValueError(f"Invalid JSON response from GOLr server: {e}") from e
     # Facet field response is alternating [value, count, value, count, ...]
     facet_list = (
         data.get("facet_counts", {})
