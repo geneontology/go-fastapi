@@ -136,6 +136,46 @@ def gu_run_solr_text_on(
         raise
 
 
+@retry_on_golr_error(max_retries=3, delay=2)
+def get_bioentity_isoforms(entity_id: str) -> list[str]:
+    """
+    Query GOlr annotations to retrieve all isoform IDs associated with a canonical bioentity.
+
+    The bioentity document type in GOlr does not carry isoform information.
+    However, annotation documents have a `bioentity_isoform` field that records
+    the specific isoform used in each annotation. A facet query on this field
+    (with rows=0) efficiently returns the distinct isoform IDs without
+    transferring full annotation documents.
+
+    This is needed because GO-CAM models may reference isoform-specific IDs
+    (e.g. UniProtKB:P08887-2) rather than the canonical ID (UniProtKB:P08887).
+    See: https://github.com/geneontology/go-fastapi/issues/135
+
+    :param entity_id: A canonical bioentity CURIE (e.g. "UniProtKB:P08887")
+    :return: List of isoform CURIEs (may include the canonical ID itself)
+    """
+    query = (
+        ESOLR.GOLR.value
+        + 'select?q=*:*&fq=document_category:"'
+        + ESOLRDoc.ANNOTATION.value
+        + '"&fq=bioentity:"'
+        + entity_id
+        + '"&rows=0&facet=true&facet.field=bioentity_isoform&facet.mincount=1&wt=json'
+    )
+
+    timeout_seconds = 60
+    response = requests.get(query, timeout=timeout_seconds)
+    response.raise_for_status()
+    data = response.json()
+    # Facet field response is alternating [value, count, value, count, ...]
+    facet_list = (
+        data.get("facet_counts", {})
+        .get("facet_fields", {})
+        .get("bioentity_isoform", [])
+    )
+    return [facet_list[i] for i in range(0, len(facet_list), 2) if facet_list[i]]
+
+
 def is_valid_bioentity(entity_id) -> bool:
     """
     Check if the provided identifier is valid by querying the AmiGO Solr (GOLR) instance.

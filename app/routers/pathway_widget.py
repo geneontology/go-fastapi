@@ -7,7 +7,7 @@ from fastapi import APIRouter, Path, Query
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.routers.models import get_model_details_by_model_id_json
-from app.utils.golr_utils import is_valid_bioentity
+from app.utils.golr_utils import get_bioentity_isoforms, is_valid_bioentity
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_user_agent
 
@@ -55,6 +55,21 @@ async def get_gocams_by_geneproduct_id(
         model_ids.update(entity_index[id])
     if id_iri in entity_index:
         model_ids.update(entity_index[id_iri])
+
+    # GO-CAM models may reference isoform-specific IDs (e.g. UniProtKB:P08887-2)
+    # rather than the canonical ID. Query GOlr for all isoforms of this bioentity
+    # and look each up in the entity index, so we return models for all isoforms.
+    # See: https://github.com/geneontology/go-fastapi/issues/135
+    try:
+        isoforms = get_bioentity_isoforms(id)
+    except Exception:
+        isoforms = []
+    for isoform in isoforms:
+        if isoform in entity_index:
+            model_ids.update(entity_index[isoform])
+        iso_iri = converter.expand(isoform)
+        if iso_iri in entity_index:
+            model_ids.update(entity_index[iso_iri])
 
     if not model_ids:
         # Only validate with Golr if not found in index
