@@ -8,7 +8,7 @@ from oaklib.implementations.sparql.sparql_implementation import SparqlImplementa
 from oaklib.resource import OntologyResource
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
-from app.utils.golr_utils import is_valid_bioentity
+from app.utils.golr_utils import get_bioentity_isoforms, is_valid_bioentity
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_sparql_endpoint, get_user_agent
 from app.utils.sparql_utils import transform_array
@@ -55,8 +55,32 @@ async def get_gocams_by_geneproduct_id(
     ont_r = OntologyResource(url=get_sparql_endpoint())
     si = SparqlImplementation(ont_r)
     converter = Converter.from_prefix_map(cmaps, strict=False)
-    id = converter.expand(id)
-    logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id)
+
+    # GO-CAM models may reference isoform-specific IDs (e.g. UniProtKB:P08887-2)
+    # rather than the canonical ID. Query GOlr for all isoforms so the SPARQL
+    # query matches models annotated with any isoform of this gene product.
+    # See: https://github.com/geneontology/go-fastapi/issues/135
+    id_iri = converter.expand(id)
+    logger.info("reformatted curie into IRI using identifiers.org from api/gp/%s/models endpoint", id_iri)
+
+    try:
+        isoforms = get_bioentity_isoforms(id)
+    except Exception:
+        isoforms = []
+    # Build the set of all IRIs to query: canonical + any isoforms from GOlr
+    all_iris = {id_iri}
+    for isoform in isoforms:
+        iso_iri = converter.expand(isoform)
+        if iso_iri:
+            all_iris.add(iso_iri)
+
+    # Build SPARQL FILTER clause for all IRIs
+    if len(all_iris) == 1:
+        filter_clause = "FILTER(?identifier = <%s>)" % id_iri
+    else:
+        iri_list = ", ".join("<%s>" % iri for iri in sorted(all_iris))
+        filter_clause = "FILTER(?identifier IN (%s))" % iri_list
+
     query = (
         """
             PREFIX metago: <http://model.geneontology.org/>
@@ -73,15 +97,24 @@ async def get_gocams_by_geneproduct_id(
                 ?s enabled_by: ?gpnode .
                 ?gpnode rdf:type ?identifier .
                 ?gocam dc:title ?title .
-                FILTER(?identifier = <%s>) .
+                %s .
               }
 
             }
             ORDER BY ?gocam
 
         """
-        % id
+        % filter_clause
     )
+    # Build VALUES clause for the causal query — matches gene product by any isoform IRI.
+    # VALUES is used here instead of FILTER IN because the gene variable is referenced
+    # throughout the query for inequality checks and pattern matching.
+    if len(all_iris) == 1:
+        values_clause = "VALUES ?gene_type { <%s> }" % id_iri
+    else:
+        iri_list = " ".join("<%s>" % iri for iri in sorted(all_iris))
+        values_clause = "VALUES ?gene_type { %s }" % iri_list
+
     if causalmf == 2:
         query = (
             """
@@ -116,10 +149,11 @@ async def get_gocams_by_geneproduct_id(
         PREFIX hint: <http://www.bigdata.com/queryHints#>
         SELECT DISTINCT ?gocam ?title
         WHERE {
+          %s
           {
             GRAPH ?gocam  {
-              # Inject gene product ID here
-              ?gene rdf:type <%s> .
+              # Match gene product by any isoform IRI
+              ?gene rdf:type ?gene_type .
             }
             FILTER EXISTS {
               ?gocam metago:graphType metago:noctuaCam .
@@ -173,7 +207,7 @@ async def get_gocams_by_geneproduct_id(
           UNION
           {
             GRAPH ?gocam {
-               ?gene rdf:type <%s> .
+               ?gene rdf:type ?gene_type .
             }
             FILTER EXISTS {
               ?gocam metago:graphType metago:noctuaCam .
@@ -196,7 +230,7 @@ async def get_gocams_by_geneproduct_id(
         }
         ORDER BY ?gocam
     """
-            %(id, id)
+            % values_clause
         )
     results = si._sparql_query(query)
     return transform_array(results)
