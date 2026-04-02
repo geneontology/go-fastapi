@@ -160,7 +160,7 @@ def get_bioentity_isoforms(entity_id: str) -> list[str]:
         + ESOLRDoc.ANNOTATION.value
         + '"&fq=bioentity:"'
         + entity_id
-        + '"&rows=0&facet=true&facet.field=bioentity_isoform&facet.mincount=1&wt=json'
+        + '"&rows=0&facet=true&facet.field=bioentity_isoform&facet.mincount=1&facet.limit=-1&wt=json'
     )
 
     timeout_seconds = 60
