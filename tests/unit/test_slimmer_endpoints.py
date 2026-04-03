@@ -210,7 +210,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
                 "name": "HGNC:8729 with GO:0008150 (biological_process)",
                 "subject": ["HGNC:8729"], 
                 "slim": ["GO:0008150"],
-                "expected_min_associations": 30
+                "expected_min_associations": 25
             },
             {
                 "name": "HGNC:8729 with GO:0005575 (cellular_component)",

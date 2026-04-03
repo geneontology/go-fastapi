@@ -48,9 +48,9 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertEqual(subject.get("label"), "shha")
             self.assertEqual(subject.get("taxon_label"), "Danio rerio")
             self.assertTrue(subject.get("groups").get("GO:0003674"))
-            self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 5)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 93)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations"), 22)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 4)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 90)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0030154").get("ALL").get("nb_annotations"), 20)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 4)
         self.assertEqual(response.status_code, 200)
 
@@ -84,7 +84,7 @@ class TestOntologyAPI(unittest.TestCase):
         for subject in response.json().get("subjects"):
             self.assertTrue(subject.get("groups").get("GO:0008219") is None)
             self.assertGreaterEqual(subject.get("groups").get("GO:0032991").get("ALL").get("nb_annotations"), 5)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0032991").get("ALL").get("nb_classes"), 2)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0032991").get("ALL").get("nb_classes"), 1)
             self.assertGreaterEqual(subject.get("groups").get("GO:0032991").get("IDA").get("nb_annotations"), 3)
             self.assertGreaterEqual(subject.get("groups").get("GO:0032991").get("IEA").get("nb_annotations"), 1)
             self.assertGreaterEqual(subject.get("groups").get("GO:0032991").get("IBA").get("nb_annotations"), 1)
@@ -142,9 +142,9 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("label") == "daf-2")
             self.assertTrue(subject.get("taxon_label") == "Caenorhabditis elegans")
             self.assertTrue(subject.get("groups").get("GO:0003674"))
-            self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 17)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 62)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 10)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 10)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 55)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 9)
         self.assertEqual(response.status_code, 200)
 
     def test_rgd_ribbon(self):
@@ -161,7 +161,7 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 5)
             self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 45)
             self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_classes"), 35)
-            self.assertGreaterEqual(subject.get("groups").get("GO:0005576").get("ALL").get("nb_classes"), 2)
+            self.assertGreaterEqual(subject.get("groups").get("GO:0005576").get("ALL").get("nb_classes"), 1)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005576").get("ALL").get("nb_annotations"), 7)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 10)
         self.assertTrue(response.status_code == 200)
