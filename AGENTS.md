@@ -75,6 +75,8 @@ Key points:
 - **Branch-aware provisioning**: The `provision/` directory (templates, vars, sample configs) may differ between branches. When deploying code from a release branch (e.g. `release/v0.3.9`), checkout that branch's `provision/` directory in the devops container — otherwise you may get templates missing required variables (e.g. `sparql_url` was present in v0.3.9 templates but removed on main).
 - Docker image versioning: the `fastapi_tag` in config-stack.yaml matches the GitHub release version without the leading "v" (e.g. release `v0.2.0` → tag `0.2.0`). See releases at https://github.com/geneontology/go-fastapi/releases.
 - Config sample files in `provision/production/` use unique `REPLACE_ME_*` placeholders (e.g. `REPLACE_ME_INSTANCE_NAME`, `REPLACE_ME_DNS_RECORD`, `REPLACE_ME_SSL_CERTS_LOCATION`). Each placeholder is self-documenting. Always scan for remaining placeholders before deploying: `grep -rn 'REPLACE_ME_' config-stack.yaml config-instance.yaml aws/backend.tf`
+- **Hot backup policy**: Always maintain at least two running instances — the current production instance and the previous production instance as a hot backup. When tearing down old instances, never remove the most recent backup.
+- **Identifying the production instance**: `api.geneontology.org` is fronted by Cloudflare, so its origin IP cannot be resolved via DNS. To determine which instance Cloudflare is pointing to, ask the user to check the Cloudflare dashboard. There is currently no version endpoint in the API to programmatically identify which build is running (see #155).
 
 ## Related repositories
 
