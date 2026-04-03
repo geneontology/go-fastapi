@@ -42,13 +42,26 @@ This repo uses `poetry` for managing dependencies. Never use commands like `pip`
 A GitHub release is required before deploying new code to production. The release tag triggers CI to build and push a Docker image to DockerHub.
 
 1. Decide on the new version number following semver (e.g. `v0.4.0`). The previous release is shown at https://github.com/geneontology/go-fastapi/releases.
-2. Create the release from `main`:
+2. Create the release, specifying the correct `--target` branch:
    ```
+   # From main:
    gh release create vX.Y.Z --target main --generate-notes --repo geneontology/go-fastapi
+   # From a release/backport branch:
+   gh release create vX.Y.Z-a --target release/vX.Y.Z --generate-notes --repo geneontology/go-fastapi
    ```
+   **IMPORTANT**: The `--target` flag controls which commit is tagged. Always verify it points to the correct branch — especially for backports. Using `--target main` for a backport release will tag the wrong code.
 3. This triggers `.github/workflows/docker-build.yaml`, which builds and pushes `geneontology/go-fastapi:X.Y.Z` to DockerHub.
 4. Verify the image is available: `docker pull geneontology/go-fastapi:X.Y.Z`
 5. Use `X.Y.Z` as the `fastapi_tag` (note: no leading "v") when deploying.
+
+### Version tag constraints
+
+The Docker CI workflow uses `docker/metadata-action` with `type=semver` patterns. Tags **must be valid semver**:
+- 3-component tags work: `v0.4.0` → image tag `0.4.0`
+- Pre-release tags work: `v0.3.9-a` → image tag `0.3.9-a`
+- 4-component tags do NOT work: `v0.3.9.1` → metadata action produces no tags, build fails silently with "tag is needed when pushing to registry"
+
+For backport/patch releases, use the semver pre-release format: `vX.Y.Z-a`, `vX.Y.Z-b`, etc.
 
 ## Deployment
 
@@ -59,6 +72,7 @@ Key points:
 - `go-deploy` is the high-level deployment tool for day-to-day operations. Use it for provisioning, deploying stacks, inspecting state, and destroying instances.
 - Raw `terraform` commands are for lower-level debugging only.
 - Workspace naming convention: `go-api-production-YYYY-MM-DD`.
+- **Branch-aware provisioning**: The `provision/` directory (templates, vars, sample configs) may differ between branches. When deploying code from a release branch (e.g. `release/v0.3.9`), checkout that branch's `provision/` directory in the devops container — otherwise you may get templates missing required variables (e.g. `sparql_url` was present in v0.3.9 templates but removed on main).
 - Docker image versioning: the `fastapi_tag` in config-stack.yaml matches the GitHub release version without the leading "v" (e.g. release `v0.2.0` → tag `0.2.0`). See releases at https://github.com/geneontology/go-fastapi/releases.
 - Config sample files in `provision/production/` use unique `REPLACE_ME_*` placeholders (e.g. `REPLACE_ME_INSTANCE_NAME`, `REPLACE_ME_DNS_RECORD`, `REPLACE_ME_SSL_CERTS_LOCATION`). Each placeholder is self-documenting. Always scan for remaining placeholders before deploying: `grep -rn 'REPLACE_ME_' config-stack.yaml config-instance.yaml aws/backend.tf`
 
