@@ -38,6 +38,7 @@ def gene_to_uniprot_from_alliance(gene_id: str) -> list[str]:
         segments like TRAV39 / HGNC:12139) the UniProtKB ref was moved out of the
         general cross-reference list into ``gcrpCrossReference`` by
         alliance-genome/agr_curation#2713 (2026-05-05), so both must be read.
+
     """
     url = f"https://www.alliancegenome.org/api/gene/{quote(gene_id, safe='')}"
     response = requests.get(url, timeout=30)
