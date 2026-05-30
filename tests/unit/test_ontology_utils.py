@@ -219,9 +219,22 @@ class TestOntologyUtils(unittest.TestCase):
         """Test getting subsets of an ontology by ID."""
         ribbon_categories = ou.get_ontology_subsets_by_id("goslim_agr")
         self.assertEqual(len(ribbon_categories), 3)
+        # Every aspect category must resolve to its root GO term. Regression guard
+        # for #165: a root-term relabel in GOlr (e.g. GO:0003674) must not drop the
+        # category's annotation_class, which previously KeyError'd / 500'd the ribbon.
+        resolved = {c.get("annotation_class") for c in ribbon_categories}
+        self.assertEqual(resolved, {"GO:0003674", "GO:0008150", "GO:0005575"})
         for ribbon_category in ribbon_categories:
+            self.assertIsNotNone(ribbon_category.get("annotation_class"))
             if ribbon_category.get("annotation_class") == "GO:0003674":
                 self.assertEqual(len(ribbon_category.get("terms")), 16)
+
+    def test_get_ontology_subsets_by_id_generic(self):
+        """Non-AGR slims also resolve every aspect root by ID (no label round-trip)."""
+        categories = ou.get_ontology_subsets_by_id("goslim_generic")
+        self.assertGreater(len(categories), 0)
+        for category in categories:
+            self.assertIsNotNone(category.get("annotation_class"))
 
     def test_correct_goid(self):
         """Test correcting a GO ID."""

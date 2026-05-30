@@ -109,7 +109,9 @@ async def get_ribbon_results(
 
     # Step 1: create the categories
     categories = ontology_utils.get_ontology_subsets_by_id(subset)
-    # in categories
+    # Drop any aspect we couldn't resolve to a root term (no annotation_class) so
+    # a single ontology label drift can't 500 the whole ribbon. See #165.
+    categories = [category for category in categories if category.get("annotation_class")]
     for category in categories:
         category["groups"] = category["terms"]
         del category["terms"]
