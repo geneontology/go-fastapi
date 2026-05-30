@@ -1,7 +1,7 @@
 # Devops centralization handoff notes (go-fastapi API)
 
 **Purpose.** Preserve the lessons, procedures, and decisions from the May 2026
-non-Blazegraph (`v0.4.0`) API rollout, so the planned centralization of devops
+non-Blazegraph (`v0.4.0`/`v0.4.1`) API rollout, so the planned centralization of devops
 into the [`geneontology/operations`](https://github.com/geneontology/operations)
 repo can pick them up. This is intended to be read (and ported) during that move.
 
@@ -29,6 +29,16 @@ endpoints are now served by **GOlr** plus **six static GO-CAM index JSON files**
   makes the isoform fix (#135) work: isoform IDs like `UniProtKB:P08887-2` appear as
   keys, so `/api/gp/{id}/models` resolves them via the GOlr isoform facet then an
   index lookup.
+- **GOlr-backed subset/ribbon resolution must key on stable GO IDs, not labels.**
+  `/api/ontology/ribbon/` and `/api/ontology/subset/{id}` group slim terms by
+  aspect and resolve each aspect's root term. Matching the root by
+  `annotation_class_label` is fragile: GOlr relabelled the molecular_function root
+  `GO:0003674` ("molecular_function" → "gene product or complex activity"), the
+  lookup returned nothing, and an unguarded `KeyError` 500'd the ribbon for every
+  `goslim_agr` call. Fixed in `v0.4.1` by resolving roots from a fixed
+  `source → GO-ID` map (`ASPECT_ROOTS` in `app/utils/ontology_utils.py`). The
+  break was a **GOlr data condition** — identical on `v0.3.x` and `v0.4.0`, so an
+  API rollback did **not** mitigate it; see §6 (#165).
 
 ## 2. Generating the six index files for *this* version of the API
 
@@ -104,7 +114,13 @@ Lessons learned this cycle:
 - **No version endpoint (#155):** identify the running build via SSH
   `docker inspect fastapi --format '{{.Config.Image}}'`, or fingerprint over HTTP via
   the OpenAPI path-set (`/openapi.json`: 0.4.0 = 32 paths, drops `/api/groups` &
-  `/api/models`; 0.3.9 = 38).
+  `/api/models`; 0.3.9 = 38). (`v0.4.1` is logic-only — same path-set as `v0.4.0`.)
+- **Running the test suite locally:** the committed `.venv` targets Python 3.10 and
+  poetry is broken on the 3.12 host. Build a fresh env with
+  `uv venv --python 3.11 && uv pip install -e . && uv pip install httpx` — the
+  dev-group `httpx` that starlette's `TestClient` needs is **not** pulled by `-e .`.
+  Tests hit **live** GOlr + mygene, so the 3 mygene/Alliance `HGNC:12139` failures
+  (#159) are expected drift, not regressions; everything else should pass.
 
 ## 5. The cutover (`api.geneontology.org`)
 
@@ -116,10 +132,11 @@ edge entries age out; cache-busted/uncached requests hit the new origin immediat
 Keep the previous instance running as a hot backup until the cache has aged out and
 you're confident (rollback = repoint Cloudflare back).
 
-## 6. `v0.4.0` rollout record (May 2026)
+## 6. `v0.4.0`–`v0.4.1` rollout record (May 2026)
 
 Goal: remove Blazegraph and confirm the isoform fix (#135) holds. Both met on `0.4.0`
-(deployed to workspace `go-api-production-2026-05-29`, cut over 2026-05-30).
+(deployed to workspace `go-api-production-2026-05-29`, cut over 2026-05-30). `v0.4.1`
+is a same-day **ribbon hotfix** (#165) on top of `v0.4.0` — see §1.
 
 | Issue/PR | What |
 |---|---|
@@ -128,10 +145,13 @@ Goal: remove Blazegraph and confirm the isoform fix (#135) holds. Both met on `0
 | #135 / #150 / #151 | Isoform fix (`/gp/{id}/models` over all isoforms); #150 on main, #151 backport (`v0.3.9-a`) |
 | #157 / #158 | Deploy template missing index-file keys → fixed |
 | #160 / #161 | Index files were re-fetched per request → in-process caching |
-| #159 | Live-data QC test drift (GOlr `annotation_class`, mygene/Alliance HGNC:12139) — pre-existing |
+| #159 | Live-data QC test drift (GOlr `annotation_class`, mygene/Alliance HGNC:12139). The ribbon/subset portion was cleared by #167; the 3 mygene `HGNC:12139` cases remain (external data) |
 | #162 | GO hierarchy `rows=10000` cap (truncates large terms; latency-vs-completeness — confirm intent) |
 | #163 | `/api/users/{orcid}/gp` shape change (object→list) + untested |
+| #165 / #167 | Ribbon `500` on `goslim_agr`: GOlr relabelled the MF root `GO:0003674`, breaking the `annotation_class_label` self-join → `KeyError`. Fixed by resolving aspect roots by GO ID (`ASPECT_ROOTS`) + guards |
+| #166 | Bot-thought follow-up: drop the now-redundant GOlr round-trip kept only for the per-category `description` |
 | release `v0.4.0` | First non-Blazegraph production build |
+| release `v0.4.1` | Ribbon hotfix (#165) on top of `v0.4.0` |
 
 ## 7. Open follow-ups (NOT blockers for the Blazegraph/isoform goal)
 
@@ -139,6 +159,9 @@ Goal: remove Blazegraph and confirm the isoform fix (#135) holds. Both met on `0
 - **#162** — confirm intent of the hierarchy `rows` cap with @sierra-moxon; if a bug,
   `rows=-1` + a large-term regression test.
 - **#163** — decide the `/api/users/{orcid}/gp` contract (list shape, `/gp` naming) + add tests.
+- **#166** — optional ribbon cleanup: drop the second GOlr query in
+  `get_ontology_subsets_by_id` entirely (the `ASPECT_ROOTS` map alone resolves the
+  roots) if no client needs the per-category `description` on `/api/ontology/subset/{id}`.
 - **Index-file automation** — `pipeline-from-goa` (gocam-py → skyhook) is intended to
   replace the manual §2 generation; once live and pushing to S3, the manual step retires.
 
