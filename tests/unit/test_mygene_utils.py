@@ -299,6 +299,74 @@ def test_gene_to_uniprot_from_alliance_direct() -> None:
     )
 
 
+def test_alliance_parses_gcrp_only_gene_summary_shape(monkeypatch) -> None:
+    """Lock AGR's gene_summary shape where UniProtKB is in gcrpCrossReference.
+
+    Regression guard for #159: AGR restructured /api/gene/{id} with no public API
+    versioning or deprecation notice (alliance-genome/agr_curation#2713,
+    2026-05-05), moving the GCRP UniProtKB ref out of the general cross-reference
+    list into the dedicated gcrpCrossReference field -- the TR/IG-variable case
+    (TRAV39 / HGNC:12139). Mocked so live data drift can't silently break it again.
+    """
+
+    class _Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "category": "gene_summary",
+                "searchable": False,
+                "gene": {
+                    "crossReferences": [{"referencedCurie": "ENSEMBL:ENSG00000211818"}],
+                    "gcrpCrossReference": {"referencedCurie": "UniProtKB:A0A0B4J263"},
+                },
+            }
+
+    monkeypatch.setattr("app.utils.mygene_utils.requests.get", lambda *a, **k: _Resp())
+
+    assert gene_to_uniprot_from_alliance("HGNC:12139") == ["UniProtKB:A0A0B4J263"]
+
+
+def test_alliance_parses_uniprot_in_cross_references(monkeypatch) -> None:
+    """Lock the other gene_summary branch: UniProtKB in gene.crossReferences[]."""
+
+    class _Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "category": "gene_summary",
+                "gene": {
+                    "crossReferences": [
+                        {"referencedCurie": "UniProtKB:P04637"},
+                        {"referencedCurie": "ENSEMBL:ENSG00000141510"},
+                    ]
+                },
+            }
+
+    monkeypatch.setattr("app.utils.mygene_utils.requests.get", lambda *a, **k: _Resp())
+
+    assert gene_to_uniprot_from_alliance("HGNC:11998") == ["UniProtKB:P04637"]
+
+
+def test_alliance_no_uniprot_raises(monkeypatch) -> None:
+    """No UniProtKB anywhere in the gene_summary -> DataNotFoundException."""
+
+    class _Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"category": "gene_summary", "gene": {"crossReferences": []}}
+
+    monkeypatch.setattr("app.utils.mygene_utils.requests.get", lambda *a, **k: _Resp())
+
+    with pytest.raises(DataNotFoundException):
+        gene_to_uniprot_from_alliance("HGNC:99999999")
+
+
 @pytest.mark.integration
 def test_round_trip_gene_to_uniprot_to_gene() -> None:
     """Test round-trip conversion: HGNC -> UniProt -> HGNC.

@@ -22,23 +22,37 @@ def gene_to_uniprot_from_alliance(gene_id: str) -> list[str]:
         gene_id: A gene identifier (e.g., "HGNC:12139").
 
     Returns:
-        A list of UniProtKB IDs (e.g., ["UniProtKB:A0A5H1ZRN5"]).
+        A list of UniProtKB IDs (e.g., ["UniProtKB:A0A0B4J263"]).
 
     Raises:
         DataNotFoundException: If no UniProtKB cross-references are found.
+
+    Note:
+        AGR restructured this endpoint with no public API versioning or
+        deprecation notice (no ``/api/swagger.json``), which silently broke this
+        lookup. The response is now a ``gene_summary`` document
+        (``{category, searchable, gene}``); UniProtKB cross-references live under
+        ``gene.crossReferences[].referencedCurie`` and the GCRP reference under
+        ``gene.gcrpCrossReference`` -- not the former top-level
+        ``crossReferenceMap.other[].name``. For GCRP-only genes (TR/IG variable
+        segments like TRAV39 / HGNC:12139) the UniProtKB ref was moved out of the
+        general cross-reference list into ``gcrpCrossReference`` by
+        alliance-genome/agr_curation#2713 (2026-05-05), so both must be read.
 
     """
     url = f"https://www.alliancegenome.org/api/gene/{quote(gene_id, safe='')}"
     response = requests.get(url, timeout=30)
     response.raise_for_status()
-    data = response.json()
+    gene = response.json().get("gene", {}) or {}
 
     uniprot_ids = []
-    cross_refs = data.get("crossReferenceMap", {}).get("other", [])
-    for ref in cross_refs:
-        name = ref.get("name", "")
-        if name.startswith("UniProtKB:"):
-            uniprot_ids.append(name)
+    for ref in gene.get("crossReferences", []) or []:
+        curie = ref.get("referencedCurie", "")
+        if curie.startswith("UniProtKB:"):
+            uniprot_ids.append(curie)
+    gcrp_curie = (gene.get("gcrpCrossReference") or {}).get("referencedCurie", "")
+    if gcrp_curie.startswith("UniProtKB:") and gcrp_curie not in uniprot_ids:
+        uniprot_ids.append(gcrp_curie)
 
     if not uniprot_ids:
         raise DataNotFoundException(detail=f"No UniProtKB IDs found for {gene_id} via Alliance API")
