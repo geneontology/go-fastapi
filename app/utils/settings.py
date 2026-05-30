@@ -14,6 +14,7 @@ CONFIG = path.join(path.dirname(path.abspath(__file__)), "../conf/config.yaml")
 golr_config = None
 route_mapping = None
 index_file_overrides = {}
+index_file_cache: dict = {}
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
@@ -30,54 +31,35 @@ def set_index_file_override(file_key: str, file_path: str):
 
 
 def clear_index_file_overrides():
-    """Clear all index file overrides."""
+    """Clear all index file overrides and any cached index file contents."""
     global index_file_overrides
     index_file_overrides = {}
+    index_file_cache.clear()
 
 
-def get_index_files(file_key: str = None) -> dict:
+def _load_index_file(file_key: str, config: dict) -> dict:
     """
-    Retrieve JSON index file(s) from either a URL or local path.
+    Load a single index file's parsed JSON content, caching it after first load.
 
-    Automatically detects whether the configured path is a URL (http/https) or local file path.
-    For URLs, download the file using the configured timeout.
-    For local paths, read the file directly from disk.
+    A test override (see :func:`set_index_file_override`) always takes precedence and
+    is intentionally never cached, so tests can swap fixture files freely. Otherwise
+    the file is fetched once -- from its configured URL (http/https) or a local path --
+    and the parsed content is held in :data:`index_file_cache` for the lifetime of the
+    process. A given index file is therefore downloaded and parsed at most once;
+    restart the service to pick up regenerated index files.
 
-    :param file_key: The configuration key (e.g., 'gocam_contributor_index_file').
-                     If None, retrieve all index files matching '*_index_file' pattern.
-    :return: If file_key is provided, returns the parsed JSON content.
-             If file_key is None, returns a dict mapping config keys to their JSON content.
+    :param file_key: The configuration key (e.g., 'gocam_entity_index_file').
+    :param config: The parsed config.yaml mapping.
+    :return: The parsed JSON content of the index file.
+    :raises ValueError: If file_key is absent from both overrides and config.
     """
-    global index_file_overrides
-
-    with open(CONFIG, "r") as f:
-        config = yaml.safe_load(f)
-
-    if file_key is None:
-        index_files = {k: v for k, v in config.items() if k.endswith("_index_file")}
-        result = {}
-        for key, file_config in index_files.items():
-            if key in index_file_overrides:
-                with open(index_file_overrides[key], "r") as f:
-                    result[key] = json.load(f)
-                continue
-
-            file_url = file_config["url"]
-            timeout = file_config.get("timeout", 30)
-
-            parsed = urlparse(file_url)
-            if parsed.scheme in ("http", "https"):
-                response = requests.get(file_url, timeout=timeout)
-                response.raise_for_status()
-                result[key] = response.json()
-            else:
-                with open(file_url, "r") as f:
-                    result[key] = json.load(f)
-        return result
-
+    # Test overrides always win and are intentionally not cached.
     if file_key in index_file_overrides:
         with open(index_file_overrides[file_key], "r") as f:
             return json.load(f)
+
+    if file_key in index_file_cache:
+        return index_file_cache[file_key]
 
     if file_key not in config:
         raise ValueError(f"Configuration key '{file_key}' not found in config.yaml")
@@ -90,10 +72,37 @@ def get_index_files(file_key: str = None) -> dict:
     if parsed.scheme in ("http", "https"):
         response = requests.get(file_url, timeout=timeout)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
     else:
         with open(file_url, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+
+    index_file_cache[file_key] = data
+    return data
+
+
+def get_index_files(file_key: str = None) -> dict:
+    """
+    Retrieve JSON index file(s) from either a URL or local path.
+
+    Automatically detects whether the configured path is a URL (http/https) or local
+    file path. For URLs, download the file using the configured timeout; for local
+    paths, read it from disk. Each index file is loaded at most once per process and
+    then served from an in-memory cache, so restart the service to pick up regenerated
+    index files (see :func:`_load_index_file`).
+
+    :param file_key: The configuration key (e.g., 'gocam_contributor_index_file').
+                     If None, retrieve all index files matching '*_index_file' pattern.
+    :return: If file_key is provided, returns the parsed JSON content.
+             If file_key is None, returns a dict mapping config keys to their JSON content.
+    """
+    with open(CONFIG, "r") as f:
+        config = yaml.safe_load(f)
+
+    if file_key is None:
+        return {k: _load_index_file(k, config) for k in config if k.endswith("_index_file")}
+
+    return _load_index_file(file_key, config)
 
 def get_user_agent():
     """Returns the user agent string."""
