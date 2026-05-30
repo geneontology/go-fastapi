@@ -98,5 +98,8 @@ max-complexity = 10
 
 [tool.codespell]
 skip = ["*.po","*.ts",".git","pyproject.toml","assert*"]
+# "crossReferences" is a literal AGR API JSON field name, not a typo of
+# "cross-references" (see app/utils/mygene_utils.py).
+ignore-words-list = "crossreferences"
 count = ""
 quiet-level = 3
