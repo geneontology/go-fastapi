@@ -15,6 +15,7 @@ This repo uses `poetry` for managing dependencies. Never use commands like `pip`
 - `app/` — Application code (routers, utils, config).
 - `tests/` — Pytest test suite.
 - `provision/` — All deployment infrastructure:
+  - **`CENTRALIZATION_NOTES.md`** — devops handoff for the planned move into `geneontology/operations`: index-file generation, deploy gotchas, CDN/cutover, and the `v0.4.0` rollout record. **Start here when porting or doing API devops.**
   - `aws/main.tf` — Terraform config, uses module from `geneontology/devops-aws-go-instance` (ref V3.1).
   - `stage.yaml`, `start_services.yaml` — Ansible playbooks.
   - `vars.yaml`, `ssl-vars.yaml`, `qos-vars.yaml`, `s3-vars.yaml`, `docker-vars.yaml` — Ansible variables.
