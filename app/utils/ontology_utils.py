@@ -67,6 +67,18 @@ def goont_fetch_label(id):
     return None
 
 
+# The three GO aspect roots, keyed by the GOlr ``source`` value their terms
+# carry. Resolved by stable GO ID rather than by ``annotation_class_label`` so a
+# label change on a root term (e.g. GO:0003674 "molecular_function" ->
+# "gene product or complex activity") cannot drop a category's annotation_class
+# and 500 the ribbon. See geneontology/go-fastapi#165.
+ASPECT_ROOTS = {
+    "molecular_function": "GO:0003674",
+    "biological_process": "GO:0008150",
+    "cellular_component": "GO:0005575",
+}
+
+
 def get_ontology_subsets_by_id(id: str):
     """
     Get ontology subsets based on the provided identifier.
@@ -104,18 +116,24 @@ def get_ontology_subsets_by_id(id: str):
         del ready_term["source"]
         tr[source]["terms"].append(ready_term)
 
-    cats = []
-    for category in tr:
-        cats.append(category)
+    # Resolve each aspect category to its root term by stable GO ID. The second
+    # GOlr query is keyed on annotation_class (the fixed root IDs), not on
+    # annotation_class_label, which drifts when a root term is relabelled.
+    root_ids = [ASPECT_ROOTS[c] for c in tr if c in ASPECT_ROOTS]
+    data = []
+    if root_ids:
+        root_fq = '&fq=annotation_class:("' + '" "'.join(root_ids) + '")&rows=1000'
+        data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, root_fq, False)
 
-    fq = "&fq=annotation_class_label:(" + " or ".join(cats) + ")&rows=1000"
-    data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, q, qf, fields, fq, False)
-
     for category in tr:
+        root_id = ASPECT_ROOTS.get(category)
+        if root_id is None:
+            # Unknown aspect source: leave annotation_class unset; callers skip it.
+            continue
+        tr[category]["annotation_class"] = root_id
         for temp in data:
-            if temp["annotation_class_label"] == category:
-                tr[category]["annotation_class"] = temp["annotation_class"]
-                tr[category]["description"] = temp["description"]
+            if temp.get("annotation_class") == root_id:
+                tr[category]["description"] = temp.get("description", "")
                 break
 
     result = []
@@ -129,11 +147,11 @@ def get_ontology_subsets_by_id(id: str):
         for agr_category in agr_slim_order:
             cat = agr_category["category"]
             for category in result:
-                if category["annotation_class"] == cat:
+                if category.get("annotation_class") == cat:
                     ordered_terms = []
                     for ordered_term in agr_category["terms"]:
                         for unordered_term in category["terms"]:
-                            if unordered_term["annotation_class"] == ordered_term:
+                            if unordered_term.get("annotation_class") == ordered_term:
                                 ordered_terms.append(unordered_term)
                                 break
                     category["terms"] = ordered_terms
