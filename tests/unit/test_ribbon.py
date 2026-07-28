@@ -8,8 +8,8 @@ import logging
 
 test_client = TestClient(app)
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72", 
-             "HGNC:8725", "HGNC:8729"]
+gene_ids = ["ZFIN:ZDB-GENE-990415-8", "ZFIN:ZDB-GENE-990415-72",
+            "HGNC:8725", "HGNC:8729"]
 ortho_gene_ids = ["WB:WBGene00002147", "HGNC:3449", "HGNC:16942", "HGNC:8725", "HGNC:8729",
                   "MGI:1930134", "MGI:1349436", "RGD:1559716",
                   "RGD:1308743", "Xenbase:XB-GENE-4594134", "ZFIN:ZDB-GENE-050522-431",
@@ -110,7 +110,12 @@ class TestOntologyAPI(unittest.TestCase):
             self.assertTrue(subject.get("label") == "Polr2G")
             self.assertTrue(subject.get("taxon_label") == "Drosophila melanogaster")
             self.assertTrue(subject.get("groups").get("GO:0003674"))
-            self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 4)
+            # Re-baselined 4 -> 2 after the GO pipeline file migration
+            # (go-technical-announcements#20, see #170): the new MOD-centric
+            # DROME-mod.gaf carries 2 molecular-function annotations for
+            # FBgn0051155 where the legacy fb.gaf carried 5. GOlr matches the new
+            # file exactly, so 2 is current upstream truth, not a relaxed bound.
+            self.assertGreaterEqual(subject.get("groups").get("GO:0003674").get("ALL").get("nb_annotations"), 2)
             self.assertGreaterEqual(subject.get("groups").get("GO:0008150").get("ALL").get("nb_annotations"), 5)
             self.assertGreaterEqual(subject.get("groups").get("GO:0005575").get("ALL").get("nb_annotations"), 5)
         self.assertTrue(response.status_code == 200)
