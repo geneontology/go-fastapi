@@ -28,16 +28,25 @@ def gene_to_uniprot_from_alliance(gene_id: str) -> list[str]:
         DataNotFoundException: If no UniProtKB cross-references are found.
 
     Note:
-        AGR restructured this endpoint with no public API versioning or
-        deprecation notice (no ``/api/swagger.json``), which silently broke this
-        lookup. The response is now a ``gene_summary`` document
-        (``{category, searchable, gene}``); UniProtKB cross-references live under
+        The response is a ``gene_summary`` document (``{category, searchable,
+        gene}``); UniProtKB cross-references live under
         ``gene.crossReferences[].referencedCurie`` and the GCRP reference under
         ``gene.gcrpCrossReference`` -- not the former top-level
         ``crossReferenceMap.other[].name``. For GCRP-only genes (TR/IG variable
         segments like TRAV39 / HGNC:12139) the UniProtKB ref was moved out of the
         general cross-reference list into ``gcrpCrossReference`` by
         alliance-genome/agr_curation#2713 (2026-05-05), so both must be read.
+
+        That restructuring shipped with no warning and silently broke this lookup
+        (#159). Following GO feedback, AGR now pre-announces API changes on the
+        ``alliance-api-changes@lists.stanford.edu`` list (public archives at
+        https://mailman.stanford.edu/pipermail/alliance-api-changes/) and on
+        https://www.alliancegenome.org/release-notes, and stages the next release
+        at ``stage.alliancegenome.org`` while ``www`` still serves the current one,
+        so response shapes can be diffed before they land. An OpenAPI spec is at
+        ``https://www.alliancegenome.org/openapi?format=json`` -- paths only, no
+        response schemas, and note ``/api/swagger.json`` 404s. See the
+        ``upstream-api-check`` skill for the procedure.
 
     """
     url = f"https://www.alliancegenome.org/api/gene/{quote(gene_id, safe='')}"
