@@ -86,6 +86,45 @@ Key points:
 - [devops-apache-proxy](https://github.com/geneontology/devops-apache-proxy) — Apache reverse proxy Docker image (consumed at deploy time).
 - [devops-deployment-scripts](https://github.com/geneontology/devops-deployment-scripts) — Builds the `geneontology/go-devops-base` Docker image used as the devops environment.
 
+## Upstream API dependencies
+
+The service depends on external APIs that change without our involvement. Drift has
+repeatedly surfaced as CI failures rather than as advance warning (#152, #153, #159, #167).
+
+- **Alliance of Genome Resources (AGR)** — one call, `GET /api/gene/{id}`, used by
+  `gene_to_uniprot_from_alliance` in `app/utils/mygene_utils.py` as a fallback when
+  mygene.info has no UniProt mapping for an HGNC gene. AGR restructured this response
+  with no warning in May 2026 (#159, fixed by #168).
+- **GOlr** (`golr.geneontology.org`) and **mygene.info** — data drift shows up in the
+  live QC tests; neither publishes advance notices or offers a staging environment.
+
+**When an upstream announces a change** — typically an AGR release-notes email — run
+the `upstream-api-check` skill in this repo. It walks the verification: compare `www`
+against the staged next release at `stage.alliancegenome.org`, diff the live response
+key paths, and run our real parser against the staged release. Do not conclude from
+the release notes alone; the #159 reshape was never mentioned in them.
+
+Following GO feedback, AGR now publishes **advance** release notes and stages the next
+release publicly, so this class of change is catchable before it reaches production.
+Where the announcements live:
+
+- **`alliance-api-changes@lists.stanford.edu`** — AGR's announcement list for upcoming
+  public API changes; this is what triggers the check.
+  [List info / subscribe](https://mailman.stanford.edu/mailman/listinfo/alliance-api-changes).
+  The [archives](https://mailman.stanford.edu/pipermail/alliance-api-changes/) are
+  publicly readable as one plain-text file per month, which is the easiest source to
+  read — e.g. the 9.1.0 advance notes are in `2026-July.txt`.
+- **[Release notes page](https://www.alliancegenome.org/release-notes)** — same content,
+  kept current. Note it is a client-rendered SPA: fetching the URL returns an empty
+  shell, and the text has to come from the WordPress API behind it (the skill has the
+  command).
+- **OpenAPI spec** — `https://www.alliancegenome.org/openapi?format=json`. Paths only,
+  no response schemas, so it catches endpoint removals but not field reshapes. Note
+  `/api/swagger.json` 404s.
+
+Other GO repos consume AGR **download files**, which are on a separate change track:
+see geneontology/gopreprocess#78.
+
 ## Build and test
 
 Local development uses Poetry:
