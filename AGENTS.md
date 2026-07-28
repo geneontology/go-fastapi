@@ -30,7 +30,7 @@ This repo uses `poetry` for managing dependencies. Never use commands like `pip`
 * use modern pytest idioms, including `@pytest.mark.parametrize` to test for combinations of inputs
 * NEVER write mock tests unless requested. I need to rely on tests to know if something breaks
 * For tests that have external dependencies, you can do `@pytest.mark.integration`
-* Do not "fix" issues by changing or weakening test conditions. Try harder, or ask questions if a test fails.
+* Do not "fix" issues by changing or weakening test conditions. Try harder, or ask questions if a test fails. Re-baselining a fixture against a *verified* upstream data change is the one exception — prefer repointing the fixture over relaxing an assertion, and comment the reason inline ([`tests/README.md`](tests/README.md))
 * Avoid try/except blocks, these can mask bugs
 * Fail fast is a good principle
 * Follow the DRY principle
@@ -95,8 +95,16 @@ repeatedly surfaced as CI failures rather than as advance warning (#152, #153, #
   `gene_to_uniprot_from_alliance` in `app/utils/mygene_utils.py` as a fallback when
   mygene.info has no UniProt mapping for an HGNC gene. AGR restructured this response
   with no warning in May 2026 (#159, fixed by #168).
-- **GOlr** (`golr.geneontology.org`) and **mygene.info** — data drift shows up in the
-  live QC tests; neither publishes advance notices or offers a staging environment.
+- **GOlr** (`golr.geneontology.org`) — indexes the published GO annotation files, so its
+  content moves with each GO release. Coverage changed materially at the pipeline file
+  migration ([go-technical-announcements#20](https://github.com/geneontology/go-technical-announcements/issues/20)):
+  GOlr is a faithful load of the new `annotations/gaf/<MNEMONIC>-{mod,uniprot}.gaf.gz`
+  files, so compare against those, never the legacy `annotations/<db>.gaf.gz` paths that
+  are still served through the transition. Changes are announced in
+  `geneontology/go-technical-announcements`. Triage for the fixture failures this causes
+  is in [`tests/README.md`](tests/README.md).
+- **mygene.info** — data drift shows up in the live QC tests; no advance notice, no
+  staging environment.
 
 **When an upstream announces a change** — typically an AGR release-notes email — run
 the `upstream-api-check` skill in this repo. It walks the verification: compare `www`
