@@ -14,7 +14,7 @@ logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, fo
 logger = logging.getLogger()
 
 test_client = TestClient(app)
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
+gene_ids = ["ZFIN:ZDB-GENE-990415-72", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
 go_cam_ids = ["gomodel:66187e4700001573", "66187e4700001573", "59a6110e00000067", "SYNGO_369",
               "581e072c00000820", "gomodel:59a6110e00000067", "gomodel:SYNGO_369"]
 go_cam_not_found_ids = ["NGO_369", "581e072c000008", "gomodel:59a6110e000000",]

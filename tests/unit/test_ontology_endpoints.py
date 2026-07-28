@@ -12,7 +12,7 @@ logger = logging.getLogger()
 test_client = TestClient(app)
 
 # Test data
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
+gene_ids = ["ZFIN:ZDB-GENE-990415-72", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
 ontology_ids = ["GO:0008150", "NCBITaxon:1"]
 go_ids = ["GO:0008150", "GO:0046330"]
 subsets = ["goslim_agr"]

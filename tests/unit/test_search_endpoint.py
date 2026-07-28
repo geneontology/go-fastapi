@@ -11,7 +11,7 @@ test_client = TestClient(app)
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
 
-gene_ids = ["ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
+gene_ids = ["ZFIN:ZDB-GENE-990415-72", "ZFIN:ZDB-GENE-990415-8", "MGI:3588192"]
 go_ids = ["GO:0008150"]
 subsets = ["goslim_agr"]
 shared_ancestors = [("GO:0006259", "GO:0046483")]

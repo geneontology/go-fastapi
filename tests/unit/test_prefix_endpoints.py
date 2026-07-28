@@ -11,7 +11,7 @@ logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, fo
 logger = logging.getLogger()
 
 gene_ids = [
-    "ZFIN:ZDB-GENE-980526-388",
+    "ZFIN:ZDB-GENE-990415-72",
     "ZFIN:ZDB-GENE-990415-8",
     "MGI:3588192",
     "MGI:MGI:3588192",

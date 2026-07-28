@@ -11,7 +11,7 @@ logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, fo
 logger = logging.getLogger()
 
 gene_ids = [
-    "ZFIN:ZDB-GENE-980526-388", "ZFIN:ZDB-GENE-990415-8",
+    "ZFIN:ZDB-GENE-990415-72", "ZFIN:ZDB-GENE-990415-8",
     "MGI:3588192", "MGI:MGI:3588192", "HGNC:8725", "HGNC:8729"
 ]
 go_ids = ["GO:0008150"]
@@ -32,7 +32,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
         """
         endpoint = "/api/bioentityset/slimmer/function"
         data = {
-            "subject": "ZFIN:ZDB-GENE-980526-388",
+            "subject": "ZFIN:ZDB-GENE-990415-72",
             "slim": ["GO:0003674", "GO:0008150", "GO:0005575"],
         }
         response = test_client.get(endpoint, params=data)
@@ -41,7 +41,7 @@ class TestSlimmerEndpoint(unittest.TestCase):
         logger.info(response.json())
         for item in response.json():
             self.assertIn(item.get("slim"), ["GO:0003674", "GO:0008150", "GO:0005575"])
-            self.assertEqual(item.get("subject"), "ZFIN:ZDB-GENE-980526-388")
+            self.assertEqual(item.get("subject"), "ZFIN:ZDB-GENE-990415-72")
             self.assertTrue(item.get("assocs"))
             for assoc in item.get("assocs"):
                 self.assertTrue(assoc.get("evidence"))
