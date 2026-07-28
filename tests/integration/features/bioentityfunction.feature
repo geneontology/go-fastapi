@@ -1,7 +1,7 @@
 Feature: bioentity function (GO) routes work as expected
 
   Scenario: test function endpoint
-    Given the "bioentity/gene/id/function endpoint" is queried with "ZFIN:ZDB-GENE-050417-357"
+    Given the "bioentity/gene/id/function endpoint" is queried with "ZFIN:ZDB-GENE-010302-1"
     Then the response status code is "200"
     And the response contains an association with object.id of "GO:0030500"
     And the response should have an association with object.label of "regulation of bone mineralization"
