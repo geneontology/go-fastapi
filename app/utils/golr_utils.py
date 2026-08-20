@@ -1,5 +1,6 @@
 """golr utils."""
 
+from urllib.parse import quote
 from zipfile import error
 
 import requests
@@ -8,6 +9,21 @@ from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.mygene_utils import gene_to_uniprot_from_mygene
 from app.utils.retry_utils import retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
+
+
+def solr_encode_query_value(user_text: str) -> str:
+    """
+    Percent-encode caller text for concatenation into a GOlr query string.
+
+    Without this an unencoded "&" starts a new Solr parameter rather than
+    being searched for. "+" is left raw deliberately: it decodes to a space
+    downstream, and encoding it would change what multi-word terms match.
+    Expects raw input -- applying it twice escapes the first pass's percents.
+
+    :param user_text: caller-supplied text
+    :return: percent-encoded text safe to concatenate into a query string
+    """
+    return quote(user_text, safe="+")
 
 
 # Respect the method name for run_sparql_on with enums
