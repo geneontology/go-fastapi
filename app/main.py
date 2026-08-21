@@ -53,7 +53,9 @@ app.add_middleware(LoggingMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    # With "*" origins, true would grant every origin a credentialed read.
+    # Enumerate origins first if this ever needs to change.
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
