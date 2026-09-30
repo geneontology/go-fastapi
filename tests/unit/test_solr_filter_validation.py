@@ -12,7 +12,7 @@ rather than trusting a list to contain it.
 """
 
 import time
-from urllib.parse import unquote_plus
+from urllib.parse import quote, unquote_plus
 
 import pytest
 from fastapi.testclient import TestClient
@@ -24,6 +24,7 @@ from app.utils.golr_utils import (
     solr_encode_query_value,
     solr_escape_query_syntax,
     solr_phrase_filter,
+    solr_prefix_query,
     validate_solr_filter_values,
 )
 from app.utils.settings import ESOLR, ESOLRDoc
@@ -48,6 +49,7 @@ STORED_ID_SHAPES = [
     "UniProtKB:P08887-2",
     "UniProtKB:P08887-PRO_0000012345",
     "RNAcentral:URS00000B2A2E_9606",
+    "RNAcentral:URS00000B2A2E/9606",
     "PomBase:SPAC1002.19",
     "dictyBase:DDB_G0267178",
     "TAIR:locus:2032970",
@@ -80,7 +82,7 @@ ID_PROBES = [
 # the rest are refused because no identifier contains them.
 PHRASE_ENDING_CHARACTERS = ['"', "\\"]
 QUERY_STRING_CHARACTERS = ["&", "#", "?", "%", "+", " "]
-OTHER_DISALLOWED_CHARACTERS = ["(", ")", "*", "=", "{", "}", "/", ",", "|", "\r", "\n", "\x00", "é"]
+OTHER_DISALLOWED_CHARACTERS = ["(", ")", "*", "=", "{", "}", ",", "|", "\r", "\n", "\x00", "é"]
 DISALLOWED_CHARACTERS = PHRASE_ENDING_CHARACTERS + QUERY_STRING_CHARACTERS + OTHER_DISALLOWED_CHARACTERS
 
 
@@ -173,8 +175,8 @@ def test_id_lookup_refuses_probes_before_any_query(value):
     started = time.monotonic()
     with pytest.raises(InvalidIdentifier):
         run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, value, "id")
-    # The retry wrapper sleeps 2 s per attempt on anything whose text contains "400";
-    # validation must sit outside it.
+    # The retry wrapper makes three attempts with two 2 s sleeps on anything whose
+    # text contains "400"; validation must sit outside it.
     assert time.monotonic() - started < 1.0
 
 
@@ -189,17 +191,21 @@ def test_id_lookup_refuses_probes_before_any_query(value):
         ("/api/bioentity/function/{probe}", None),
         ("/api/bioentity/function/{probe}/genes", None),
         ("/api/bioentity/function/{probe}/taxons", None),
+        ("/api/association/between/{probe}/GO:0016070", None),
+        ("/api/taxon/{probe}/models", None),
+        ("/api/gp/{probe}/models", None),
+        ("/api/ontology/ribbon", {"subject": "{probe}"}),
     ],
 )
 @pytest.mark.parametrize("probe", ID_PROBES)
 def test_id_routes_refuse_probes_with_400(path, params, probe):
-    """Every route that looks a caller-supplied id up by fq=id:"…" refuses a quoted breakout."""
+    """Every route that puts a caller-supplied id into a quoted fq refuses a quoted breakout."""
     if params is not None:
         params = {k: v.format(probe=probe) for k, v in params.items()}
     response = test_client.get(path.format(probe=probe), params=params)
 
     assert response.status_code == 400
-    assert "id" in response.json()["detail"]
+    assert "Invalid" in response.json()["detail"]
 
 
 # --- free text (autocomplete) -----------------------------------------------
@@ -215,6 +221,8 @@ CURATOR_TERMS = [
 AUTOCOMPLETE_PROBES = [
     "zzzznotexist12345 OR *:*",
     "*:*",
+    "?",
+    "zzzznotexist12345 OR ?",
     "bioentity_label_searchable:*",
     "DNA AND taxon:NCBITaxon\\:7955",
     "{!dismax qf=bioentity_name_searchable}test",
@@ -229,7 +237,7 @@ def test_real_search_terms_are_not_escaped(term):
     assert solr_escape_query_syntax(term) == term
 
 
-@pytest.mark.parametrize("char", ["*", "{", "}", "\\"])
+@pytest.mark.parametrize("char", ["*", "?", "{", "}", "\\"])
 def test_each_query_syntax_character_is_escaped(char):
     """Plant the character; it must come out backslash-escaped and nothing else may change."""
     assert solr_escape_query_syntax("shh" + char + "x") == "shh\\" + char + "x"
@@ -245,8 +253,38 @@ def test_probes_carry_no_unescaped_syntax_after_escaping(probe):
     """Every "*", "{" or "}" in a probe is preceded by a backslash once escaped."""
     escaped = solr_escape_query_syntax(probe)
     for index, char in enumerate(escaped):
-        if char in "*{}":
+        if char in "*?{}":
             assert escaped[index - 1] == "\\"
+
+
+@pytest.mark.parametrize(
+    "term, expected",
+    [
+        ("shh", "shh*"),
+        ("protein+kinase", "protein+kinase*"),  # "+" decodes to a space downstream; verified live to match
+        ("zzzz OR ", "zzzz%20OR*"),  # trailing space would leave "*" as its own clause
+        ("zzzz+OR+", "zzzz+OR*"),  # trailing "+" is a trailing space once decoded
+        ("shh\\", "shh%5C%5C*"),
+    ],
+)
+def test_prefix_query_keeps_the_wildcard_attached(term, expected):
+    """The router's "*" must always extend the caller's last token, never stand alone."""
+    assert solr_prefix_query(term) == expected
+
+
+@pytest.mark.parametrize("term", ["", "+", " ", "++ ", "\t"])
+def test_prefix_query_refuses_terms_with_nothing_to_search(term):
+    """Alone, these would leave q equal to "*"."""
+    with pytest.raises(InvalidIdentifier):
+        solr_prefix_query(term)
+
+
+@pytest.mark.parametrize("term", ["+", " ", "++"])
+def test_autocomplete_route_refuses_empty_terms_with_400(term):
+    """No network: the refusal happens before the query is built."""
+    response = test_client.get("/api/search/entity/autocomplete/" + quote(term, safe=""))
+
+    assert response.status_code == 400
 
 
 def test_escaping_then_encoding_round_trips():
@@ -259,7 +297,7 @@ def test_escaping_then_encoding_round_trips():
 @pytest.mark.parametrize("probe", AUTOCOMPLETE_PROBES)
 def test_live_autocomplete_probes_match_nothing(probe):
     """Against GOlr: each probe, which returned records in production, now matches no document."""
-    response = test_client.get(f"/api/search/entity/autocomplete/{probe}", params={"rows": 3})
+    response = test_client.get("/api/search/entity/autocomplete/" + quote(probe, safe=""), params={"rows": 3})
 
     assert response.status_code == 200
     assert response.json()["docs"] == []

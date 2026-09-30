@@ -28,10 +28,10 @@ def solr_encode_query_value(user_text: str) -> str:
     return quote(user_text, safe="+")
 
 
-# Query syntax a free-text search term must not carry: wildcards (*:* alone
-# matches the whole index), local-parameter braces (a parser switch), and the
-# backslash (which could escape the wildcard the router appends).
-QUERY_SYNTAX_CHARACTERS = frozenset("\\*{}")
+# Query syntax a free-text search term must not carry: the two wildcards (a
+# bare "*" or "?" matches the whole index), local-parameter braces (a parser
+# switch), and the backslash (which could escape the wildcard the router appends).
+QUERY_SYNTAX_CHARACTERS = frozenset("\\*?{}")
 
 
 def solr_escape_query_syntax(user_text: str) -> str:
@@ -48,10 +48,29 @@ def solr_escape_query_syntax(user_text: str) -> str:
     return "".join("\\" + char if char in QUERY_SYNTAX_CHARACTERS else char for char in user_text)
 
 
-# Identifier characters: enough for every CURIE GOlr stores (ECO:0000314,
-# NCBITaxon:9606, ZFIN:ZDB-PUB-060503-2), none with meaning inside a quoted
-# Solr phrase or a URL query string.
-SOLR_FILTER_VALUE = re.compile(r"[A-Za-z0-9_.:-]+")
+def solr_prefix_query(user_text: str) -> str:
+    """
+    Turn caller-supplied search text into the q value of a prefix (autocomplete) query.
+
+    Escapes query syntax, percent-encodes, and appends the wildcard. Trailing
+    spaces and "+" (which the backend decodes to a space) are removed first:
+    otherwise the appended "*" stands alone as its own clause and matches every
+    document.
+
+    :param user_text: caller-supplied search text
+    :return: the encoded q value, ending in the router's wildcard
+    :raises InvalidIdentifier: if nothing is left to search for
+    """
+    stripped = user_text.rstrip(" \t\r\n+")
+    if not stripped:
+        raise InvalidIdentifier(detail="Empty search term")
+    return solr_encode_query_value(solr_escape_query_syntax(stripped)) + "*"
+
+
+# Identifier characters: enough for every id shape in the GO db-xref registry
+# (ECO:0000314, NCBITaxon:9606, ZFIN:ZDB-PUB-060503-2, RNAcentral:URS…/9606),
+# none with meaning inside a quoted Solr phrase or a URL query string.
+SOLR_FILTER_VALUE = re.compile(r"[A-Za-z0-9_.:/-]+")
 
 
 def validate_solr_filter_values(values: Optional[List[str]], param_name: str) -> Optional[List[str]]:
@@ -75,7 +94,7 @@ def validate_solr_filter_values(values: Optional[List[str]], param_name: str) ->
         if not SOLR_FILTER_VALUE.fullmatch(value):
             raise InvalidIdentifier(
                 detail=f"Invalid {param_name} value {value!r}: expected an identifier "
-                "(letters, digits, ':', '_', '.', '-')"
+                "(letters, digits, ':', '_', '.', '-', '/')"
             )
     return values
 
@@ -120,8 +139,8 @@ def run_solr_on(solr_instance, category, id, fields):
 
 
 @retry_on_golr_error(max_retries=3, delay=2)
-def _fetch_solr_document_by_id(solr_instance, category, id, fields):
-    """Return the result of a Solr query."""
+def _fetch_solr_document_by_id(solr_instance: ESOLR, category: ESOLRDoc, id: str, fields: str) -> dict:
+    """Return the first GOlr document whose id matches; raise DataNotFoundException if none does."""
     query = (
         solr_instance.value
         + 'select?q=*:*&fq=document_category:"'
@@ -244,8 +263,23 @@ def gu_run_solr_text_on(
         raise
 
 
-@retry_on_golr_error(max_retries=3, delay=2)
 def get_bioentity_isoforms(entity_id: str) -> list[str]:
+    """
+    Return all isoform ids GOlr annotations carry for a canonical bioentity.
+
+    The id lands inside fq=bioentity:"…", so it is validated first, outside the
+    retrying fetch (see run_solr_on).
+
+    :param entity_id: A canonical bioentity CURIE (e.g. "UniProtKB:P08887")
+    :return: List of isoform CURIEs (may include the canonical ID itself)
+    :raises InvalidIdentifier: if the id carries characters outside the identifier set
+    """
+    validate_solr_filter_values([entity_id], "id")
+    return _fetch_bioentity_isoforms(entity_id)
+
+
+@retry_on_golr_error(max_retries=3, delay=2)
+def _fetch_bioentity_isoforms(entity_id: str) -> list[str]:
     """
     Query GOlr annotations to retrieve all isoform IDs associated with a canonical bioentity.
 

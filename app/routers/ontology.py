@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
-from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
+from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on, validate_solr_filter_values
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
@@ -210,6 +210,7 @@ async def get_ancestors_shared_between_two_terms(
     :param object: 'CURIE identifier of a GO term, e.g. GO:0016070'
     :param relation: 'relation between two terms' can only be one of two values: shared or closest
     """
+    validate_solr_filter_values([subject, object], "id")
     try:
         ontology_utils.is_valid_goid(subject)
         ontology_utils.is_valid_goid(object)

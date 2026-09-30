@@ -7,7 +7,7 @@ from fastapi import APIRouter, Path, Query
 
 import app.utils.ontology_utils as ontology_utils
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
-from app.utils.golr_utils import gu_run_solr_text_on
+from app.utils.golr_utils import gu_run_solr_text_on, validate_solr_filter_values
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 from .slimmer import gene_to_uniprot_from_mygene
@@ -96,6 +96,9 @@ async def get_ribbon_results(
     ),
 ):
     """Fetch the summary of annotations for a given gene or set of genes."""
+    validate_solr_filter_values(subject, "subject")
+    validate_solr_filter_values(ecodes, "ecodes")
+    validate_solr_filter_values(None if subset is None else [subset], "subset")
     mgied_subjects = []
 
     for sub in subject:

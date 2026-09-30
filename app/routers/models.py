@@ -10,6 +10,7 @@ from gocam.translation.minerva_wrapper import MinervaWrapper
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils import ontology_utils
+from app.utils.golr_utils import validate_solr_filter_values
 from app.utils.settings import get_user_agent
 
 USER_AGENT = get_user_agent()
@@ -398,6 +399,7 @@ async def get_term_details_by_taxon_id(
     """Returns model details based on a NCBI Taxon ID."""
     from app.utils.settings import get_index_files
 
+    validate_solr_filter_values([taxon], "taxon")
     taxon_index = get_index_files("gocam_taxon_index_file")
 
     if taxon not in taxon_index:
