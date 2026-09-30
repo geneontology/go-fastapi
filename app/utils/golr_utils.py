@@ -28,6 +28,26 @@ def solr_encode_query_value(user_text: str) -> str:
     return quote(user_text, safe="+")
 
 
+# Query syntax a free-text search term must not carry: wildcards (*:* alone
+# matches the whole index), local-parameter braces (a parser switch), and the
+# backslash (which could escape the wildcard the router appends).
+QUERY_SYNTAX_CHARACTERS = frozenset("\\*{}")
+
+
+def solr_escape_query_syntax(user_text: str) -> str:
+    """
+    Backslash-escape the characters that let a search term act as query syntax.
+
+    Field names, boolean operators and phrases are left alone: uf=-* on the
+    query keeps field names inert, and the rest only combines the caller's own
+    words. Apply before solr_encode_query_value, on raw text.
+
+    :param user_text: caller-supplied search text
+    :return: the text with wildcard, brace and backslash characters escaped
+    """
+    return "".join("\\" + char if char in QUERY_SYNTAX_CHARACTERS else char for char in user_text)
+
+
 # Identifier characters: enough for every CURIE GOlr stores (ECO:0000314,
 # NCBITaxon:9606, ZFIN:ZDB-PUB-060503-2), none with meaning inside a quoted
 # Solr phrase or a URL query string.
@@ -36,12 +56,13 @@ SOLR_FILTER_VALUE = re.compile(r"[A-Za-z0-9_.:-]+")
 
 def validate_solr_filter_values(values: Optional[List[str]], param_name: str) -> Optional[List[str]]:
     """
-    Reject filter values that could carry Solr or query-string syntax.
+    Reject filter values outside the identifier grammar.
 
     Filter values are identifiers that end up inside a quoted phrase of an fq
-    clause. A quote, backslash, space, parenthesis, ampersand or wildcard in one
-    lets a caller close the phrase and write the rest of the query. Legitimate
-    values never contain those characters, so this costs nothing.
+    clause, in a query string that is concatenated rather than encoded. Only a
+    quote or backslash can end the phrase; only "&", "#", "?", "%", "+" and a
+    space can alter the query string. Everything else outside the class is
+    refused because no identifier contains it, not because it is dangerous.
 
     :param values: caller-supplied values, or None when the filter is absent
     :param param_name: the query parameter's name, for the error message
@@ -64,7 +85,9 @@ def solr_phrase_filter(field: str, values: Optional[List[str]]) -> str:
     Build an fq clause matching any of the values as exact phrases, or "" when there are none.
 
     Produces the shape the routers have always sent: &fq=<field>:("a","b").
-    Caller-supplied values must have passed validate_solr_filter_values first.
+    No escaping happens here: caller-supplied values must have passed
+    validate_solr_filter_values, and configuration values are trusted as
+    written (a quote in one would change the query, not fail it).
 
     :param field: the Solr field to filter on
     :param values: identifiers to match, or None
