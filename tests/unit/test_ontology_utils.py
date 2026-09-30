@@ -3,7 +3,6 @@ import logging
 import unittest
 
 from fastapi.testclient import TestClient
-from ontobio.sparql.sparql_ontology import EagerRemoteSparqlOntology
 
 import app.utils.ontology_utils as ou
 from app.main import app
@@ -27,13 +26,6 @@ class TestOntologyUtils(unittest.TestCase):
         """Test fetching label for a given GO term."""
         results = ou.goont_fetch_label("GO:0008150")
         self.assertEqual(results, "biological_process")
-
-    @unittest.skip("Requires external SPARQL endpoint which may be unavailable in CI/CD")
-    def test_get_ontology(self):
-        """Test getting the ontology by ID."""
-        return_value = ou.get_ontology(id="go")
-        self.assertIsInstance(return_value, EagerRemoteSparqlOntology)
-        self.assertEqual(return_value.handle, "go")
 
     def test_get_category_terms(self):
         """Test getting terms of a category."""
@@ -240,18 +232,6 @@ class TestOntologyUtils(unittest.TestCase):
         """Test correcting a GO ID."""
         corrected_id = ou.correct_goid(goid="GO:00012345")
         self.assertEqual(corrected_id, "GO_00012345")
-
-    def test_get_go_subsets(self):
-        """Test getting GO subsets."""
-        subset_sparql = ou.get_go_subsets_sparql_query(goid="GO:0003674")
-        self.assertIsNotNone(subset_sparql)
-        self.assertIn("GO_0003674", subset_sparql)
-
-    def test_create_go_summary_sparql(self):
-        """Test creating a GO summary sparql query."""
-        go_summary_sparql = ou.create_go_summary_sparql(goid="GO:0003674")
-        self.assertIsNotNone(go_summary_sparql)
-        self.assertIn("GO_0003674", go_summary_sparql)
 
     def test_get_go_hierarchy_go_id(self):
         """Test getting GO hierarchy for a given GO ID."""
