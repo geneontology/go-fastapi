@@ -1,11 +1,13 @@
 """golr utils."""
 
+import re
+from typing import List, Optional
 from urllib.parse import quote
 from zipfile import error
 
 import requests
 
-from app.exceptions.global_exceptions import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.mygene_utils import gene_to_uniprot_from_mygene
 from app.utils.retry_utils import retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
@@ -24,6 +26,53 @@ def solr_encode_query_value(user_text: str) -> str:
     :return: percent-encoded text safe to concatenate into a query string
     """
     return quote(user_text, safe="+")
+
+
+# Identifier characters: enough for every CURIE GOlr stores (ECO:0000314,
+# NCBITaxon:9606, ZFIN:ZDB-PUB-060503-2), none with meaning inside a quoted
+# Solr phrase or a URL query string.
+SOLR_FILTER_VALUE = re.compile(r"[A-Za-z0-9_.:-]+")
+
+
+def validate_solr_filter_values(values: Optional[List[str]], param_name: str) -> Optional[List[str]]:
+    """
+    Reject filter values that could carry Solr or query-string syntax.
+
+    Filter values are identifiers that end up inside a quoted phrase of an fq
+    clause. A quote, backslash, space, parenthesis, ampersand or wildcard in one
+    lets a caller close the phrase and write the rest of the query. Legitimate
+    values never contain those characters, so this costs nothing.
+
+    :param values: caller-supplied values, or None when the filter is absent
+    :param param_name: the query parameter's name, for the error message
+    :return: the values, unchanged
+    :raises InvalidIdentifier: on the first value outside the identifier character set
+    """
+    if values is None:
+        return None
+    for value in values:
+        if not SOLR_FILTER_VALUE.fullmatch(value):
+            raise InvalidIdentifier(
+                detail=f"Invalid {param_name} value {value!r}: expected an identifier "
+                "(letters, digits, ':', '_', '.', '-')"
+            )
+    return values
+
+
+def solr_phrase_filter(field: str, values: Optional[List[str]]) -> str:
+    """
+    Build an fq clause matching any of the values as exact phrases, or "" when there are none.
+
+    Produces the shape the routers have always sent: &fq=<field>:("a","b").
+    Caller-supplied values must have passed validate_solr_filter_values first.
+
+    :param field: the Solr field to filter on
+    :param values: identifiers to match, or None
+    :return: the clause to append to the query string
+    """
+    if not values:
+        return ""
+    return "&fq=" + field + ":(" + ",".join('"' + value + '"' for value in values) + ")"
 
 
 # Respect the method name for run_sparql_on with enums
