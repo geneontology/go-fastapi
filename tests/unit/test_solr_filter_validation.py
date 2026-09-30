@@ -7,12 +7,15 @@ that can close a quoted phrase or start another query-string parameter; each tes
 plants the character rather than trusting a list to contain it.
 """
 
+import time
+
 import pytest
 from fastapi.testclient import TestClient
 
 from app.exceptions.global_exceptions import InvalidIdentifier
 from app.main import app
-from app.utils.golr_utils import solr_phrase_filter, validate_solr_filter_values
+from app.utils.golr_utils import run_solr_on, solr_phrase_filter, validate_solr_filter_values
+from app.utils.settings import ESOLR, ESOLRDoc
 
 test_client = TestClient(app)
 
@@ -34,6 +37,14 @@ SCANNER_PROBES = [
     'NONEXISTENT_CODE" OR *:* OR "',
     'NONEXISTENT_CODE" OR evidence_type:"IDA',
     'NCBITaxon:9606" OR taxon:"NCBITaxon:10090',
+]
+
+# Probes against id lookups (fq=id:"…"), verbatim from the same scan.
+ID_PROBES = [
+    'GO:9999999" OR annotation_class:"GO:0008150',
+    'GO:9999999" OR annotation_class_label:binding OR annotation_class:"GO:9999998',
+    'GO:9999999" OR _val_:"sum(1,1)',
+    'GO:0003677" OR annotation_class_label:"biological_process',
 ]
 
 # One character each that has meaning inside a quoted Solr phrase or a URL query string.
@@ -140,3 +151,35 @@ def test_live_taxon_filter_still_constrains_results():
 
     assert response.status_code == 200
     assert {assoc["subject"]["taxon"]["id"] for assoc in response.json()["associations"]} == {"NCBITaxon:9606"}
+
+
+@pytest.mark.parametrize("value", ID_PROBES)
+def test_id_lookup_refuses_probes_before_any_query(value):
+    """run_solr_on validates before fetching, so no network and no retry delay."""
+    started = time.monotonic()
+    with pytest.raises(InvalidIdentifier):
+        run_solr_on(ESOLR.GOLR, ESOLRDoc.ONTOLOGY, value, "id")
+    # The retry wrapper sleeps 2 s per attempt on anything whose text contains "400";
+    # validation must sit outside it.
+    assert time.monotonic() - started < 1.0
+
+
+@pytest.mark.parametrize(
+    "path, params",
+    [
+        ("/api/ontology/term/{probe}", None),
+        ("/api/ontology/term/{probe}/graph", None),
+        ("/api/ontol/labeler", {"id": "{probe}"}),
+        ("/api/bioentity/{probe}", None),
+        ("/api/bioentity/gene/{probe}/function", None),
+    ],
+)
+@pytest.mark.parametrize("probe", ID_PROBES)
+def test_id_routes_refuse_probes_with_400(path, params, probe):
+    """Every route that looks a caller-supplied id up by fq=id:"…" refuses a quoted breakout."""
+    if params is not None:
+        params = {k: v.format(probe=probe) for k, v in params.items()}
+    response = test_client.get(path.format(probe=probe), params=params)
+
+    assert response.status_code == 400
+    assert "id" in response.json()["detail"]

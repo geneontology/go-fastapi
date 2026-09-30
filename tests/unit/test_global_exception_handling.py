@@ -14,11 +14,13 @@ test_client = TestClient(app)
 
 
 def test_value_error_handler():
-    # Simulate an endpoint that raises a ValueError (e.g., by sending an invalid CURIE)
-    response = test_client.get("/api/ontol/labeler?id=@base:invalid")
-
-    # Verify that invalid IDs return 404 when not found
+    # A well-formed CURIE that nothing in GOlr carries is not found: 404.
+    # (Was "@base:invalid"; ids are now validated before lookup, so a
+    # malformed one is refused with 400, checked next.)
+    response = test_client.get("/api/ontol/labeler?id=base:invalid")
     assert response.status_code == 404
+    response = test_client.get("/api/ontol/labeler?id=@base:invalid")
+    assert response.status_code == 400
     response = test_client.get(f"/api/gp/P05067/models")
     assert response.status_code == 400
 

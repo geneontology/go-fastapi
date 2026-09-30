@@ -76,8 +76,28 @@ def solr_phrase_filter(field: str, values: Optional[List[str]]) -> str:
 
 
 # Respect the method name for run_sparql_on with enums
-@retry_on_golr_error(max_retries=3, delay=2)
 def run_solr_on(solr_instance, category, id, fields):
+    """
+    Return the GOlr document with the given id.
+
+    The id lands inside fq=id:"…", so it is validated first. That happens out
+    here rather than in the retrying fetch: the retry wrapper matches "400" in
+    an exception's text, and InvalidIdentifier's text starts with it.
+
+    :param solr_instance: The solr instance to query
+    :param category: The document category to query
+    :param id: The document id (a CURIE)
+    :param fields: The fields to return
+    :return: The matching document
+    :raises InvalidIdentifier: if the id carries characters outside the identifier set
+    :raises DataNotFoundException: if no document has that id
+    """
+    validate_solr_filter_values([id], "id")
+    return _fetch_solr_document_by_id(solr_instance, category, id, fields)
+
+
+@retry_on_golr_error(max_retries=3, delay=2)
+def _fetch_solr_document_by_id(solr_instance, category, id, fields):
     """Return the result of a Solr query."""
     query = (
         solr_instance.value
@@ -254,6 +274,9 @@ def is_valid_bioentity(entity_id) -> bool:
     :return: True if the entity identifier is valid, False otherwise.
     :rtype: bool
     """
+    # Validated here as well as in run_solr_on: the lookup below swallows every
+    # exception into False, and a refused id has to reach the caller as a 400.
+    validate_solr_filter_values([entity_id], "id")
     # Ensure the GO ID starts with the proper prefix
     if ":" not in entity_id:
         raise ValueError("Invalid CURIE format")
