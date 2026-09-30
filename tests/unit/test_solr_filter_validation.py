@@ -1,5 +1,8 @@
 """
-Caller-supplied identifiers before they reach a quoted fq phrase in a GOlr query.
+Caller-supplied values before they reach a GOlr query.
+
+Identifiers (evidence, taxon, id) land inside a quoted fq phrase; free text
+(autocomplete) lands in q.
 
 Legitimate identifiers are values seen in production responses or the GO
 db-xref registry; legitimate search terms are real ones from the production
@@ -9,6 +12,7 @@ rather than trusting a list to contain it.
 """
 
 import time
+from urllib.parse import unquote_plus
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,6 +21,8 @@ from app.exceptions.global_exceptions import InvalidIdentifier
 from app.main import app
 from app.utils.golr_utils import (
     run_solr_on,
+    solr_encode_query_value,
+    solr_escape_query_syntax,
     solr_phrase_filter,
     validate_solr_filter_values,
 )
@@ -194,6 +200,79 @@ def test_id_routes_refuse_probes_with_400(path, params, probe):
 
     assert response.status_code == 400
     assert "id" in response.json()["detail"]
+
+
+# --- free text (autocomplete) -----------------------------------------------
+
+# Real terms observed in the production access logs (see test_solr_encoding.py).
+CURATOR_TERMS = [
+    "KRAS", "Ppargc1a", "GO:0045087", "WB:WBGene00003622", "UniProtKB:P14713", "ceh-20",
+    "asparagine--tRNA", "hydroxyacyl-CoA dehydratase", "cellular import/export",
+    "mitochondrial biogenesis", "3-hydroxyacyl-CoA dehydrogenase (NAD+)", "protein+kinase", "shh",
+]
+
+# Probes the Red Agent used against the autocomplete route, verbatim.
+AUTOCOMPLETE_PROBES = [
+    "zzzznotexist12345 OR *:*",
+    "*:*",
+    "bioentity_label_searchable:*",
+    "DNA AND taxon:NCBITaxon\\:7955",
+    "{!dismax qf=bioentity_name_searchable}test",
+    "{!lucene df=bioentity_label}BRCA1",
+    '{!edismax qf=bioentity_label_searchable uf=*}test _query_:"{!lucene}*:*"',
+]
+
+
+@pytest.mark.parametrize("term", CURATOR_TERMS)
+def test_real_search_terms_are_not_escaped(term):
+    """No real term carries query syntax, so none may change."""
+    assert solr_escape_query_syntax(term) == term
+
+
+@pytest.mark.parametrize("char", ["*", "{", "}", "\\"])
+def test_each_query_syntax_character_is_escaped(char):
+    """Plant the character; it must come out backslash-escaped and nothing else may change."""
+    assert solr_escape_query_syntax("shh" + char + "x") == "shh\\" + char + "x"
+
+
+def test_trailing_backslash_cannot_escape_the_appended_wildcard():
+    """A term ending in a backslash must not swallow the "*" the router appends."""
+    assert (solr_escape_query_syntax("shh\\") + "*").endswith("\\\\*")
+
+
+@pytest.mark.parametrize("probe", AUTOCOMPLETE_PROBES)
+def test_probes_carry_no_unescaped_syntax_after_escaping(probe):
+    """Every "*", "{" or "}" in a probe is preceded by a backslash once escaped."""
+    escaped = solr_escape_query_syntax(probe)
+    for index, char in enumerate(escaped):
+        if char in "*{}":
+            assert escaped[index - 1] == "\\"
+
+
+def test_escaping_then_encoding_round_trips():
+    """The encoder must carry the escapes through unchanged."""
+    escaped = solr_escape_query_syntax("zzz OR *:*")
+    assert unquote_plus(solr_encode_query_value(escaped)) == escaped
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("probe", AUTOCOMPLETE_PROBES)
+def test_live_autocomplete_probes_match_nothing(probe):
+    """Against GOlr: each probe, which returned records in production, now matches no document."""
+    response = test_client.get(f"/api/search/entity/autocomplete/{probe}", params={"rows": 3})
+
+    assert response.status_code == 200
+    assert response.json()["docs"] == []
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("term", ["shh", "WB:WBGene00003622", "KRAS", "actin"])
+def test_live_autocomplete_real_terms_still_match(term):
+    """Against GOlr: real terms keep returning documents."""
+    response = test_client.get(f"/api/search/entity/autocomplete/{term}", params={"rows": 3})
+
+    assert response.status_code == 200
+    assert response.json()["docs"]
 
 
 @pytest.mark.integration
