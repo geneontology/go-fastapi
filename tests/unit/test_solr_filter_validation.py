@@ -1,14 +1,10 @@
 """
 Caller-supplied values before they reach a GOlr query.
 
-Identifiers (evidence, taxon, id) land inside a quoted fq phrase; free text
-(autocomplete) lands in q.
-
-Legitimate identifiers are values seen in production responses or the GO
-db-xref registry; legitimate search terms are real ones from the production
-access logs. Hostile inputs are the scanner's own probes plus one planted
-example per disallowed character, so that each test exercises the character
-rather than trusting a list to contain it.
+Identifiers (evidence, taxon, id) land in a quoted fq phrase; free text
+(autocomplete) lands in q. Hostile inputs are the scanner's own probes plus one planted example per
+disallowed character, so each test exercises the character rather than
+trusting a list to contain it.
 """
 
 import time

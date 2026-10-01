@@ -28,9 +28,8 @@ def solr_encode_query_value(user_text: str) -> str:
     return quote(user_text, safe="+")
 
 
-# Query syntax a free-text search term must not carry: the two wildcards (a
-# bare "*" or "?" matches the whole index), local-parameter braces (a parser
-# switch), and the backslash (which could escape the wildcard the router appends).
+# Wildcards, local-parameter braces, and the backslash (which could escape the
+# wildcard the autocomplete router appends).
 QUERY_SYNTAX_CHARACTERS = frozenset("\\*?{}")
 
 
@@ -38,9 +37,7 @@ def solr_escape_query_syntax(user_text: str) -> str:
     """
     Backslash-escape the characters that let a search term act as query syntax.
 
-    Field names, boolean operators and phrases are left alone: uf=-* on the
-    query keeps field names inert, and the rest only combines the caller's own
-    words. Apply before solr_encode_query_value, on raw text.
+    Apply to raw text, before solr_encode_query_value.
 
     :param user_text: caller-supplied search text
     :return: the text with wildcard, brace and backslash characters escaped
@@ -52,36 +49,26 @@ def solr_prefix_query(user_text: str) -> str:
     """
     Turn caller-supplied search text into the q value of a prefix (autocomplete) query.
 
-    Escapes query syntax, percent-encodes, and appends the wildcard. Trailing
-    spaces and "+" (which the backend decodes to a space) are removed first:
-    otherwise the appended "*" stands alone as its own clause and matches every
-    document.
-
     :param user_text: caller-supplied search text
-    :return: the encoded q value, ending in the router's wildcard
+    :return: the escaped, encoded text with the wildcard appended
     :raises InvalidIdentifier: if nothing is left to search for
     """
+    # A trailing space, or a "+" (a space once decoded), would leave the appended
+    # "*" as a clause of its own, which matches every document.
     stripped = user_text.rstrip(" \t\r\n+")
     if not stripped:
         raise InvalidIdentifier(detail="Empty search term")
     return solr_encode_query_value(solr_escape_query_syntax(stripped)) + "*"
 
 
-# Identifier characters: enough for every id shape in the GO db-xref registry
-# (ECO:0000314, NCBITaxon:9606, ZFIN:ZDB-PUB-060503-2, RNAcentral:URS…/9606),
-# none with meaning inside a quoted Solr phrase or a URL query string.
+# Covers every id shape in the GO db-xref registry; none of these characters has
+# meaning inside a quoted Solr phrase or a URL query string.
 SOLR_FILTER_VALUE = re.compile(r"[A-Za-z0-9_.:/-]+")
 
 
 def validate_solr_filter_values(values: Optional[List[str]], param_name: str) -> Optional[List[str]]:
     """
-    Reject filter values outside the identifier grammar.
-
-    Filter values are identifiers that end up inside a quoted phrase of an fq
-    clause, in a query string that is concatenated rather than encoded. Only a
-    quote or backslash can end the phrase; only "&", "#", "?", "%", "+" and a
-    space can alter the query string. Everything else outside the class is
-    refused because no identifier contains it, not because it is dangerous.
+    Reject filter values outside the identifier grammar before they reach a quoted fq phrase.
 
     :param values: caller-supplied values, or None when the filter is absent
     :param param_name: the query parameter's name, for the error message
@@ -101,12 +88,10 @@ def validate_solr_filter_values(values: Optional[List[str]], param_name: str) ->
 
 def solr_phrase_filter(field: str, values: Optional[List[str]]) -> str:
     """
-    Build an fq clause matching any of the values as exact phrases, or "" when there are none.
+    Build &fq=<field>:("a","b") for the values, or "" when there are none.
 
-    Produces the shape the routers have always sent: &fq=<field>:("a","b").
-    No escaping happens here: caller-supplied values must have passed
-    validate_solr_filter_values, and configuration values are trusted as
-    written (a quote in one would change the query, not fail it).
+    Nothing is escaped: caller-supplied values must have passed
+    validate_solr_filter_values; configuration values are trusted as written.
 
     :param field: the Solr field to filter on
     :param values: identifiers to match, or None
@@ -120,17 +105,11 @@ def solr_phrase_filter(field: str, values: Optional[List[str]]) -> str:
 # Respect the method name for run_sparql_on with enums
 def run_solr_on(solr_instance, category, id, fields):
     """
-    Return the GOlr document with the given id.
+    Return the GOlr document with the given id, after validating the id.
 
-    The id lands inside fq=id:"…", so it is validated first. That happens out
-    here rather than in the retrying fetch: the retry wrapper matches "400" in
-    an exception's text, and InvalidIdentifier's text starts with it.
+    Validation stays outside the retrying fetch: the retry wrapper treats any
+    exception whose text contains "400" as retryable, and InvalidIdentifier's does.
 
-    :param solr_instance: The solr instance to query
-    :param category: The document category to query
-    :param id: The document id (a CURIE)
-    :param fields: The fields to return
-    :return: The matching document
     :raises InvalidIdentifier: if the id carries characters outside the identifier set
     :raises DataNotFoundException: if no document has that id
     """
@@ -267,8 +246,7 @@ def get_bioentity_isoforms(entity_id: str) -> list[str]:
     """
     Return all isoform ids GOlr annotations carry for a canonical bioentity.
 
-    The id lands inside fq=bioentity:"…", so it is validated first, outside the
-    retrying fetch (see run_solr_on).
+    Validation stays outside the retrying fetch, as in run_solr_on.
 
     :param entity_id: A canonical bioentity CURIE (e.g. "UniProtKB:P08887")
     :return: List of isoform CURIEs (may include the canonical ID itself)
@@ -331,8 +309,7 @@ def is_valid_bioentity(entity_id) -> bool:
     :return: True if the entity identifier is valid, False otherwise.
     :rtype: bool
     """
-    # Validated here as well as in run_solr_on: the lookup below swallows every
-    # exception into False, and a refused id has to reach the caller as a 400.
+    # Validated again here: the lookup below swallows every exception into False.
     validate_solr_filter_values([entity_id], "id")
     # Ensure the GO ID starts with the proper prefix
     if ":" not in entity_id:
