@@ -1,11 +1,13 @@
 """golr utils."""
 
+import re
+from typing import List, Optional
 from urllib.parse import quote
 from zipfile import error
 
 import requests
 
-from app.exceptions.global_exceptions import DataNotFoundException
+from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.utils.mygene_utils import gene_to_uniprot_from_mygene
 from app.utils.retry_utils import retry_on_golr_error
 from app.utils.settings import ESOLR, ESOLRDoc, logger
@@ -26,10 +28,98 @@ def solr_encode_query_value(user_text: str) -> str:
     return quote(user_text, safe="+")
 
 
+# Wildcards, local-parameter braces, and the backslash (which could escape the
+# wildcard the autocomplete router appends).
+QUERY_SYNTAX_CHARACTERS = frozenset("\\*?{}")
+
+
+def solr_escape_query_syntax(user_text: str) -> str:
+    """
+    Backslash-escape the characters that let a search term act as query syntax.
+
+    Apply to raw text, before solr_encode_query_value.
+
+    :param user_text: caller-supplied search text
+    :return: the text with wildcard, brace and backslash characters escaped
+    """
+    return "".join("\\" + char if char in QUERY_SYNTAX_CHARACTERS else char for char in user_text)
+
+
+def solr_prefix_query(user_text: str) -> str:
+    """
+    Turn caller-supplied search text into the q value of a prefix (autocomplete) query.
+
+    :param user_text: caller-supplied search text
+    :return: the escaped, encoded text with the wildcard appended
+    :raises InvalidIdentifier: if nothing is left to search for
+    """
+    # A trailing space, or a "+" (a space once decoded), would leave the appended
+    # "*" as a clause of its own, which matches every document.
+    stripped = user_text.rstrip(" \t\r\n+")
+    if not stripped:
+        raise InvalidIdentifier(detail="Empty search term")
+    return solr_encode_query_value(solr_escape_query_syntax(stripped)) + "*"
+
+
+# Covers every id shape in the GO db-xref registry; none of these characters has
+# meaning inside a quoted Solr phrase or a URL query string.
+SOLR_FILTER_VALUE = re.compile(r"[A-Za-z0-9_.:/-]+")
+
+
+def validate_solr_filter_values(values: Optional[List[str]], param_name: str) -> Optional[List[str]]:
+    """
+    Reject filter values outside the identifier grammar before they reach a quoted fq phrase.
+
+    :param values: caller-supplied values, or None when the filter is absent
+    :param param_name: the query parameter's name, for the error message
+    :return: the values, unchanged
+    :raises InvalidIdentifier: on the first value outside the identifier character set
+    """
+    if values is None:
+        return None
+    for value in values:
+        if not SOLR_FILTER_VALUE.fullmatch(value):
+            raise InvalidIdentifier(
+                detail=f"Invalid {param_name} value {value!r}: expected an identifier "
+                "(letters, digits, ':', '_', '.', '-', '/')"
+            )
+    return values
+
+
+def solr_phrase_filter(field: str, values: Optional[List[str]]) -> str:
+    """
+    Build &fq=<field>:("a","b") for the values, or "" when there are none.
+
+    Nothing is escaped: caller-supplied values must have passed
+    validate_solr_filter_values; configuration values are trusted as written.
+
+    :param field: the Solr field to filter on
+    :param values: identifiers to match, or None
+    :return: the clause to append to the query string
+    """
+    if not values:
+        return ""
+    return "&fq=" + field + ":(" + ",".join('"' + value + '"' for value in values) + ")"
+
+
 # Respect the method name for run_sparql_on with enums
-@retry_on_golr_error(max_retries=3, delay=2)
 def run_solr_on(solr_instance, category, id, fields):
-    """Return the result of a Solr query."""
+    """
+    Return the GOlr document with the given id, after validating the id.
+
+    Validation stays outside the retrying fetch: the retry wrapper treats any
+    exception whose text contains "400" as retryable, and InvalidIdentifier's does.
+
+    :raises InvalidIdentifier: if the id carries characters outside the identifier set
+    :raises DataNotFoundException: if no document has that id
+    """
+    validate_solr_filter_values([id], "id")
+    return _fetch_solr_document_by_id(solr_instance, category, id, fields)
+
+
+@retry_on_golr_error(max_retries=3, delay=2)
+def _fetch_solr_document_by_id(solr_instance: ESOLR, category: ESOLRDoc, id: str, fields: str) -> dict:
+    """Return the first GOlr document whose id matches; raise DataNotFoundException if none does."""
     query = (
         solr_instance.value
         + 'select?q=*:*&fq=document_category:"'
@@ -152,8 +242,22 @@ def gu_run_solr_text_on(
         raise
 
 
-@retry_on_golr_error(max_retries=3, delay=2)
 def get_bioentity_isoforms(entity_id: str) -> list[str]:
+    """
+    Return all isoform ids GOlr annotations carry for a canonical bioentity.
+
+    Validation stays outside the retrying fetch, as in run_solr_on.
+
+    :param entity_id: A canonical bioentity CURIE (e.g. "UniProtKB:P08887")
+    :return: List of isoform CURIEs (may include the canonical ID itself)
+    :raises InvalidIdentifier: if the id carries characters outside the identifier set
+    """
+    validate_solr_filter_values([entity_id], "id")
+    return _fetch_bioentity_isoforms(entity_id)
+
+
+@retry_on_golr_error(max_retries=3, delay=2)
+def _fetch_bioentity_isoforms(entity_id: str) -> list[str]:
     """
     Query GOlr annotations to retrieve all isoform IDs associated with a canonical bioentity.
 
@@ -205,6 +309,8 @@ def is_valid_bioentity(entity_id) -> bool:
     :return: True if the entity identifier is valid, False otherwise.
     :rtype: bool
     """
+    # Validated again here: the lookup below swallows every exception into False.
+    validate_solr_filter_values([entity_id], "id")
     # Ensure the GO ID starts with the proper prefix
     if ":" not in entity_id:
         raise ValueError("Invalid CURIE format")

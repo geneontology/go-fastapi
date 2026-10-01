@@ -8,7 +8,12 @@ from fastapi import APIRouter, Path, Query
 from ontobio.config import get_config
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
-from app.utils.golr_utils import gu_run_solr_text_on, is_valid_bioentity
+from app.utils.golr_utils import (
+    gu_run_solr_text_on,
+    is_valid_bioentity,
+    solr_phrase_filter,
+    validate_solr_filter_values,
+)
 from app.utils.golr_wrappers import search_associations
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
@@ -152,6 +157,7 @@ async def get_annotations_by_goterm_id(
           'start' determines the starting index for fetching results, and 'rows' specifies
           the number of results to be retrieved per page.
     """
+    evidence_clause = solr_phrase_filter("evidence_closure", validate_solr_filter_values(evidence, "evidence"))
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:
@@ -177,16 +183,7 @@ async def get_annotations_by_goterm_id(
         "panther_family_label_searchable%5E1&qf=bioentity_isoform%5E1"
     )
 
-    evidences = evidence
-    evidence = ""
-    if evidences is not None:
-        evidence = "&fq=evidence_closure:("
-        for ev in evidences:
-            evidence += '"' + ev + '",'
-        evidence = evidence[:-1]
-        evidence += ")"
-
-    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence_clause
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
     if not data:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")
@@ -243,6 +240,7 @@ async def get_genes_by_goterm_id(
              and 'annotation_extension_class_label' associated with the provided GO term.
 
     """
+    validate_solr_filter_values(taxon, "taxon")
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:
@@ -340,6 +338,7 @@ async def get_taxon_by_goterm_id(
     :return: A dictionary containing the taxon information for genes annotated to the provided GO term.
              The dictionary will contain fields such as 'taxon' and 'taxon_label' associated with the genes.
     """
+    evidence_clause = solr_phrase_filter("evidence_closure", validate_solr_filter_values(evidence, "evidence"))
     try:
         is_valid_goid(id)
     except DataNotFoundException as e:
@@ -359,25 +358,9 @@ async def get_taxon_by_goterm_id(
         "bioentity_isoform%5E1"
     )
 
-    evidences = evidence
-    evidence = ""
-    if evidences is not None:
-        evidence = "&fq=evidence_closure:("
-        for ev in evidences:
-            evidence += '"' + ev + '",'
-        evidence = evidence[:-1]
-        evidence += ")"
+    taxon_restrictions = solr_phrase_filter("taxon_subset_closure", get_config().taxon_restriction)
 
-    taxon_restrictions = ""
-    cfg = get_config()
-    if cfg.taxon_restriction is not None:
-        taxon_restrictions = "&fq=taxon_subset_closure:("
-        for c in cfg.taxon_restriction:
-            taxon_restrictions += '"' + c + '",'
-        taxon_restrictions = taxon_restrictions[:-1]
-        taxon_restrictions += ")"
-
-    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence + taxon_restrictions
+    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows) + evidence_clause + taxon_restrictions
     data = gu_run_solr_text_on(ESOLR.GOLR, ESOLRDoc.ANNOTATION, id, query_filters, fields, optionals, False)
     if not data:
         raise DataNotFoundException(detail=f"Item with ID {id} not found")

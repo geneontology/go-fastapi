@@ -7,7 +7,7 @@ from fastapi import APIRouter, Path, Query
 
 from app.exceptions.global_exceptions import DataNotFoundException, InvalidIdentifier
 from app.routers.models import get_model_details_by_model_id_json
-from app.utils.golr_utils import get_bioentity_isoforms, is_valid_bioentity
+from app.utils.golr_utils import get_bioentity_isoforms, is_valid_bioentity, validate_solr_filter_values
 from app.utils.prefix_utils import get_prefixes
 from app.utils.settings import get_user_agent
 
@@ -38,6 +38,7 @@ async def get_gocams_by_geneproduct_id(
 
     (e.g. MGI:3588192, ZFIN:ZDB-GENE-000403-1).
     """
+    validate_solr_filter_values([id], "id")
     if id.startswith("MGI:MGI:"):
         id = id.replace("MGI:MGI:", "MGI:")
 

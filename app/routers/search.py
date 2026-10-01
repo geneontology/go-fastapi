@@ -6,7 +6,7 @@ from enum import Enum
 from fastapi import APIRouter, Path, Query
 
 from app.exceptions.global_exceptions import DataNotFoundException
-from app.utils.golr_utils import gu_run_solr_text_on, solr_encode_query_value
+from app.utils.golr_utils import gu_run_solr_text_on, solr_prefix_query
 from app.utils.settings import ESOLR, ESOLRDoc, get_user_agent
 
 logger = logging.getLogger()
@@ -73,11 +73,10 @@ async def autocomplete_term(
     else:
         category = ESOLRDoc.ANNOTATION
 
-    optionals = "&defType=edismax&start=" + str(start) + "&rows=" + str(rows)
+    # uf=-*: the caller's text may not name fields (taxon:…, _query_:…).
+    optionals = "&defType=edismax&uf=-*&start=" + str(start) + "&rows=" + str(rows)
 
-    # Encode before concatenating; the trailing "*" is appended after because
-    # that wildcard is ours, not the caller's.
-    encoded_term = solr_encode_query_value(term) + "*"
+    encoded_term = solr_prefix_query(term)
     data = gu_run_solr_text_on(ESOLR.GOLR, category, encoded_term, query_fields, fields, optionals, True)
     docs = []
 
