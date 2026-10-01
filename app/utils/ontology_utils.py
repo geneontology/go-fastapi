@@ -3,16 +3,12 @@
 import logging
 
 from ontobio.golr.golr_query import ESOLR, ESOLRDoc
-from ontobio.ontol_factory import OntologyFactory
-from ontobio.sparql.sparql_ontol_utils import SEPARATOR
 
 from app.exceptions.global_exceptions import DataNotFoundException
 from app.utils.golr_utils import gu_run_solr_text_on, run_solr_on
 from app.utils.settings import get_golr_config
 
 cfg = get_golr_config()
-omap = {}
-
 aspect_map = {"P": "GO:0008150", "F": "GO:0003674", "C": "GO:0005575"}
 logging.basicConfig(filename="combined_access_error.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger()
@@ -177,32 +173,6 @@ def get_category_terms(category):
     return terms
 
 
-def get_ontology(id):
-    """
-    Get ontology based on the provided identifier.
-
-    :param id: The identifier for the ontology.
-    :type id: str
-    :return: Ontology object.
-    :rtype: Ontology
-    """
-    handle = id
-    for c in cfg["ontologies"]:
-        if c["id"] == id:
-            logger.info("getting handle for id: {} from cfg".format(id))
-            handle = c["handle"]
-
-    if handle not in omap:
-        logging.info("Creating a new ontology object for {}".format(handle))
-        ofa = OntologyFactory()
-        omap[handle] = ofa.create(handle)
-    else:
-        logging.info("Using cached for {}".format(handle))
-
-    logger.info("handle: " + handle)
-    return omap[handle]
-
-
 # this is a temporary json object, while waiting the
 # ontology gets an annotation field to specify the order of a term in a slim
 agr_slim_order = [
@@ -277,56 +247,6 @@ agr_slim_order = [
 ]
 
 
-def create_go_summary_sparql(goid):
-    """
-    Create SPARQL query for fetching GO summary.
-
-    :param goid: The GO identifier for which the summary is to be fetched.
-    :type goid: str
-    :return: SPARQL query string.
-    :rtype: str
-    """
-    goid = correct_goid(goid)
-    return (
-        """
-    PREFIX definition: <http://purl.obolibrary.org/obo/IAO_0000115>
-    PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-
-    SELECT ?goid ?label ?definition ?comment ?creation_date		(GROUP_CONCAT(distinct ?synonym;separator='"""
-        + SEPARATOR
-        + """') as ?synonyms)
-                                                                (GROUP_CONCAT(distinct ?relatedSynonym;separator='"""
-        + SEPARATOR
-        + """') as ?relatedSynonyms)
-                                                                (GROUP_CONCAT(distinct ?alternativeId;separator='"""
-        + SEPARATOR
-        + """') as ?alternativeIds)
-                                                                (GROUP_CONCAT(distinct ?xref;separator='"""
-        + SEPARATOR
-        + """') as ?xrefs)
-                                                                (GROUP_CONCAT(distinct ?subset;separator='"""
-        + SEPARATOR
-        + """') as ?subsets)
-
-    WHERE {
-        BIND(<http://purl.obolibrary.org/obo/"""
-        + goid
-        + """> as ?goid) .
-        optional { ?goid rdfs:label ?label } .
-        optional { ?goid definition: ?definition } .
-        optional { ?goid rdfs:comment ?comment } .
-        optional { ?goid obo:creation_date ?creation_date } .
-        optional { ?goid obo:hasAlternativeId ?alternativeId } .
-        optional { ?goid obo:hasRelatedSynonym ?relatedSynonym } .
-        optional { ?goid obo:hasExactSynonym ?synonym } .
-        optional { ?goid obo:hasDbXref ?xref } .
-        optional { ?goid obo:inSubset ?subset } .
-    }
-    GROUP BY ?goid ?label ?definition ?comment ?creation_date
-    """
-    )
-
-
 def correct_goid(goid):
     """
     Correct the format of the GO identifier.
@@ -350,33 +270,6 @@ def get_purl(goid):
     """
     goid = correct_goid(goid)
     return "http://purl.obolibrary.org/obo/" + goid
-
-
-def get_go_subsets_sparql_query(goid):
-    """
-    Create SPARQL query for fetching GO subsets.
-
-    :param goid: The GO identifier for which the subsets are to be fetched.
-    :type goid: str
-    :return: SPARQL query string.
-    :rtype: str
-    """
-    goid = correct_goid(goid)
-    return (
-        """
-    PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
-
-    SELECT ?label ?subset
-
-    WHERE {
-        BIND(<http://purl.obolibrary.org/obo/"""
-        + goid
-        + """> as ?goid) .
-        optional { ?goid obo:inSubset ?subset .
-                   ?subset rdfs:comment ?label } .
-    }
-    """
-    )
 
 
 def is_valid_goid(goid) -> bool:
